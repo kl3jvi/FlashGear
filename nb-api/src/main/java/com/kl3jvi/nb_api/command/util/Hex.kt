@@ -24,16 +24,16 @@ fun bytesToHex(bytes: ByteArray): String {
  * @param hexRepresentation The hexadecimal string to be converted to bytes.
  * @return A byte array
  */
-fun hexToBytes(hexRepresentation: String): ByteArray {
-    require(hexRepresentation.length % 2 != 1) { "hexToBytes requires an even-length String parameter" }
-    val len = hexRepresentation.length
+fun String.hexToBytes(): ByteArray {
+    require(this.length % 2 != 1) { "hexToBytes requires an even-length String parameter" }
+    val len = this.length
     val data = ByteArray(len / 2)
     var i = 0
     while (i < len) {
         data[i / 2] = (
-            (hexRepresentation[i].digitToIntOrNull(16) ?: (-1 shl 4)) +
-                hexRepresentation[i + 1].digitToIntOrNull(16)!!
-            ).toByte()
+                (this[i].digitToIntOrNull(16) ?: (-1 shl 4)) +
+                        this[i + 1].digitToIntOrNull(16)!!
+                ).toByte()
         i += 2
     }
     return data

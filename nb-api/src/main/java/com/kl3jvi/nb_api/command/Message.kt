@@ -51,6 +51,11 @@ class Message {
             }
         }
 
+        /**
+         * `setPayload` takes a list of integers and adds them to the payload of the packet
+         *
+         * @param bytesToSend The payload to be sent.
+         */
         fun setPayload(bytesToSend: List<Int>) = apply {
             payload = bytesToSend
             checksum += payload.size + 2

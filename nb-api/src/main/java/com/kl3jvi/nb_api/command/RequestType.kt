@@ -1,6 +1,8 @@
 package com.kl3jvi.nb_api.command
 
-/* It's an enum class that contains all the possible request types that can be sent to the scooter */
+/**
+ *  Contains all the possible request types that can be sent to the scooter.
+ */
 enum class RequestType {
     VOLTAGE,
     AMEPERE,
