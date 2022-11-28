@@ -33,5 +33,7 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+//        startForegroundService(Intent(this, GattService::class.java))
     }
 }
