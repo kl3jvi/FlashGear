@@ -1,42 +1,48 @@
 package com.kl3jvi.yonda.ui.home
 
 import android.os.Bundle
-import android.view.LayoutInflater
+import android.util.Log
 import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.kl3jvi.yonda.MainActivity
+import com.kl3jvi.yonda.R
 import com.kl3jvi.yonda.databinding.FragmentHomeBinding
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private var _binding: FragmentHomeBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
+    private val homeViewModel: HomeViewModel by viewModel()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        val homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)
+    private lateinit var resultsAdapter: ScanResultsAdapter
 
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        _binding = FragmentHomeBinding.bind(view)
+        resultsAdapter = ScanResultsAdapter()
+        binding.rv.adapter = resultsAdapter
+        binding.rv.layoutManager = LinearLayoutManager(requireContext())
+    }
 
-        val textView: TextView = binding.textHome
-        homeViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+    override fun onResume() {
+        super.onResume()
+        setupScanButton()
+    }
+
+    private fun setupScanButton() {
+        (activity as? MainActivity)?.scanBle {
+            homeViewModel.scan()
+                .subscribe({ resultsAdapter.submitList(mutableListOf(it)) }, {
+                    Log.e("Error", "happened", it)
+                })
         }
-        return root
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        homeViewModel.scan()
         _binding = null
     }
 }
