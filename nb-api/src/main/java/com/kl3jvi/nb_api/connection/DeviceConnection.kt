@@ -22,7 +22,7 @@ class DeviceConnection(
         command: ScooterCommand,
         useCache: Boolean = false,
         delayTime: Long = 0
-    ):ScooterResponse = runBlocking {
+    ): ScooterResponse = runBlocking {
         val deviceRawResponse =
             if (useCache && rawResponseCache[command] != null) {
                 rawResponseCache.getValue(command)
@@ -79,11 +79,10 @@ class DeviceConnection(
     }
 }
 
-
-//class ObdDeviceConnection(
+// class ObdDeviceConnection(
 //    private val inputStream: InputStream,
 //    private val outputStream: OutputStream
-//) {
+// ) {
 //    private val responseCache = mutableMapOf<ObdCommand, ObdRawResponse>()
 //
 //    suspend fun run(
@@ -151,4 +150,4 @@ class DeviceConnection(
 //            removeAll(SEARCHING_PATTERN, res.toString()).trim()
 //        }
 //    }
-//}
+// }

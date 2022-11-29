@@ -23,11 +23,4 @@ class CruiseOff : ScooterCommand() {
         .setPayload(0x0000)
         .build()
 
-    override fun handleResponse(deviceRawRawResponse: RawResponse): ScooterResponse {
-        TODO("Not yet implemented")
-    }
-
-    fun handleResponse(request: List<String>): String {
-        return request.toString()
-    }
 }

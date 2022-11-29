@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "com.kl3jvi.yonda"
-        minSdk 24
+        minSdk 26
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -39,7 +39,7 @@ dependencies {
 
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation "com.polidea.rxandroidble3:rxandroidble:1.17.2"
+    implementation "com.github.weliem:blessed-android-coroutines:0.3.2"
     implementation "io.insert-koin:koin-android:3.3.0"
     implementation 'com.google.android.material:material:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'

@@ -1,7 +1,6 @@
 package com.kl3jvi.yonda.ui.home
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,13 +15,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private val binding get() = _binding!!
     private val homeViewModel: HomeViewModel by viewModel()
 
-    private lateinit var resultsAdapter: ScanResultsAdapter
+//    private lateinit var resultsAdapter: ScanResultsAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentHomeBinding.bind(view)
-        resultsAdapter = ScanResultsAdapter()
-        binding.rv.adapter = resultsAdapter
+//        resultsAdapter = ScanResultsAdapter()
+//        binding.rv.adapter = resultsAdapter
         binding.rv.layoutManager = LinearLayoutManager(requireContext())
     }
 
@@ -34,15 +33,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun setupScanButton() {
         (activity as? MainActivity)?.scanBle {
             homeViewModel.scan()
-                .subscribe({ resultsAdapter.submitList(mutableListOf(it)) }, {
-                    Log.e("Error", "happened", it)
-                })
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        homeViewModel.scan()
         _binding = null
     }
 }

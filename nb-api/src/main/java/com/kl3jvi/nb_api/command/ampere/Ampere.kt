@@ -32,7 +32,6 @@ class Ampere : ScooterCommand() {
         )
     }
 
-
     /**
      * It converts the hexadecimal value of the current to a decimal value.
      *
@@ -46,5 +45,4 @@ class Ampere : ScooterCommand() {
         c /= 100
         return c
     }
-
 }

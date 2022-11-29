@@ -19,10 +19,7 @@ fun bytesToHex(bytes: ByteArray): String {
 }
 
 /**
- * It converts a hexadecimal string to a byte array.
- *
- * @param hexRepresentation The hexadecimal string to be converted to bytes.
- * @return A byte array
+ *  It converts a hexadecimal string to a byte array.
  */
 fun String.hexToBytes(): ByteArray {
     require(this.length % 2 != 1) { "hexToBytes requires an even-length String parameter" }

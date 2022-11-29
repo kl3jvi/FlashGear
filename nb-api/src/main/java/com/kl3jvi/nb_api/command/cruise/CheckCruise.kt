@@ -28,5 +28,5 @@ class CheckCruise : ScooterCommand() {
      *
      * @param request The request string from the client.
      */
-    private fun cruiseState(request: String): String = if (request == ("01")) "ON" else "Off"
+    private fun cruiseState(request: String): String = if (request == ("01")) "ON" else "OFF"
 }
