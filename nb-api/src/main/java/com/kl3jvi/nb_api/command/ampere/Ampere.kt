@@ -5,7 +5,6 @@ import com.kl3jvi.nb_api.command.Message
 import com.kl3jvi.nb_api.command.RawResponse
 import com.kl3jvi.nb_api.command.RequestType
 import com.kl3jvi.nb_api.command.ScooterCommand
-import com.kl3jvi.nb_api.command.ScooterResponse
 
 class Ampere : ScooterCommand() {
     override val tag: String = "Ampere"
@@ -23,14 +22,6 @@ class Ampere : ScooterCommand() {
         .setPayload(0x02)
         .build()
 
-    override fun handleResponse(deviceRawRawResponse: RawResponse): ScooterResponse {
-        return ScooterResponse(
-            command = this,
-            rawResponse = deviceRawRawResponse,
-            value = handler(deviceRawRawResponse),
-            unit = defaultUnit
-        )
-    }
 
     /**
      * It converts the hexadecimal value of the current to a decimal value.
