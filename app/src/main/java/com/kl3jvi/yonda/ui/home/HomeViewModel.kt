@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.stateIn
 class HomeViewModel(
     private val connectionService: ConnectionService,
 
-) : ViewModel() {
+    ) : ViewModel() {
     val connectedDevices = callbackFlow {
         trySend(BluetoothState.Idle)
         connectionService.scanBleDevices(
@@ -32,7 +32,7 @@ class HomeViewModel(
         BluetoothState.Idle
     )
 
-    fun stopScanPressed() =connectionService.stopScanning()
+    fun stopScanPressed() = connectionService.stopScanning()
 
 
 }
