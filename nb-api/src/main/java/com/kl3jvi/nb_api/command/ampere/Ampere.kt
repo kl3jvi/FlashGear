@@ -22,7 +22,6 @@ class Ampere : ScooterCommand() {
         .setPayload(0x02)
         .build()
 
-
     /**
      * It converts the hexadecimal value of the current to a decimal value.
      *

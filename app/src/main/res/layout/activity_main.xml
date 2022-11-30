@@ -47,7 +47,7 @@
             android:id="@+id/fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_search"
+            android:src="@drawable/ic_search_state"
             app:layout_anchor="@id/bottomAppBar"
             app:tint="@android:color/white" />
 

@@ -1,5 +1,8 @@
 package com.kl3jvi.yonda
 
+import android.Manifest.permission.BLUETOOTH_ADMIN
+import android.Manifest.permission.BLUETOOTH_CONNECT
+import android.Manifest.permission.BLUETOOTH_SCAN
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -8,6 +11,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.kl3jvi.yonda.databinding.ActivityMainBinding
+import com.kl3jvi.yonda.ext.checkSelfPermissions
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,6 +20,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        checkSelfPermissions(
+            BLUETOOTH_CONNECT,
+            BLUETOOTH_SCAN,
+            BLUETOOTH_ADMIN
+        )
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -34,9 +43,10 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
-    fun scanBle(block: () -> Unit) {
+    fun scanBle(block: (Boolean) -> Unit) {
         binding.fab.setOnClickListener {
-            block()
+            binding.fab.isActivated = !binding.fab.isActivated
+            block(binding.fab.isActivated)
         }
     }
 }

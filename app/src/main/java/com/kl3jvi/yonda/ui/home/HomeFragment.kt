@@ -26,7 +26,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 //        resultsAdapter = ScanResultsAdapter()
 //        binding.rv.adapter = resultsAdapter
 //        binding.rv.layoutManager = LinearLayoutManager(requireContext())
-        binding.stop.setOnClickListener { homeViewModel.stopScanPressed() }
+        binding.stop.setOnClickListener {
+            homeViewModel.stopScanPressed()
+        }
     }
 
     override fun onResume() {
@@ -35,26 +37,30 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun setupScanButton() {
-        (activity as? MainActivity)?.scanBle {
-            launchAndRepeatWithViewLifecycle {
-                homeViewModel.connectedDevices.collect { bluetoothState ->
-                    when (bluetoothState) {
-                        is BluetoothState.Error -> Toast.makeText(
-                            requireContext(),
-                            "${bluetoothState.exception}",
-                            Toast.LENGTH_SHORT
-                        ).show()
+        (activity as? MainActivity)?.scanBle { isScanning ->
+            if (!isScanning) {
+                homeViewModel.stopScanPressed()
+            } else {
+                launchAndRepeatWithViewLifecycle {
+                    homeViewModel.connectedDevices.collect { bluetoothState ->
+                        when (bluetoothState) {
+                            is BluetoothState.Error -> Toast.makeText(
+                                requireContext(),
+                                bluetoothState.exception?.localizedMessage,
+                                Toast.LENGTH_SHORT
+                            ).show()
 
-                        BluetoothState.Idle -> {
-                            binding.progress.isVisible = true
+                            BluetoothState.Idle -> {
+                                binding.progress.isVisible = true
 //                            binding.rv.isVisible = false
-                        }
+                            }
 
-                        is BluetoothState.Success -> {
-                            binding.progress.isVisible = false
+                            is BluetoothState.Success -> {
+                                binding.progress.isVisible = false
 //                            binding.rv.isVisible = true
-                            binding.text.append(bluetoothState.data.first.address + "   ")
-                            Log.e("State", bluetoothState.data.toString())
+                                binding.text.append(bluetoothState.data.first.address + "   ")
+                                Log.e("State", bluetoothState.data.toString())
+                            }
                         }
                     }
                 }
