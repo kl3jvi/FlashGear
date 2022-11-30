@@ -32,7 +32,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         checkSelfPermissions(
             BLUETOOTH_CONNECT,
             BLUETOOTH_SCAN,
-            BLUETOOTH_ADMIN
+            BLUETOOTH_ADMIN,
+            BLUETOOTH_CONNECT
         )
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -51,8 +52,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-
-        binding.fab.isEnabled = connectionService.isBluetoothEnabled()
 
     }
 

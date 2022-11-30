@@ -26,8 +26,7 @@ class ConnectionService(
      */
     fun scanBleDevices(
         onSuccess: (Pair<BluetoothPeripheral, ScanResult>) -> Unit,
-        onLibraryError: (ScanFailure) -> Unit,
-        onError: (Throwable) -> Unit
+        onError: (ScanFailure?, Throwable?) -> Unit,
     ) {
         runCatching {
             central.scanForPeripherals(
@@ -36,12 +35,12 @@ class ConnectionService(
                 },
                 scanError = {
                     Log.e("Error", "happened ${it.name}")
-                    onLibraryError(it)
+                    onError(it, null)
                 }
             )
         }.onFailure {
             Log.e("Error", "happened", it)
-            onError(it)
+            onError(null, it)
         }
     }
 

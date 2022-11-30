@@ -14,14 +14,11 @@ class HomeViewModel(
         trySend(BluetoothState.Idle)
         connectionService.scanBleDevices(
             onSuccess = {
-                bluetoothDevices += BleDevice(it.first.name, it.first.address)
+                bluetoothDevices += BleDevice(it.first.name.orEmpty(), it.first.address.orEmpty())
                 trySend(BluetoothState.Success(bluetoothDevices.toList()))
             },
-            onLibraryError = {
-                trySend(BluetoothState.Error(scanFailure = it))
-            },
-            onError = {
-                trySend(BluetoothState.Error(exception = it))
+            onError = { scanFailure, throwable ->
+                trySend(BluetoothState.Error(scanFailure = scanFailure, exception = throwable))
             }
         )
         awaitClose(::stopScanPressed)
@@ -39,8 +36,3 @@ sealed interface BluetoothState {
 
     object Idle : BluetoothState
 }
-
-data class BleDevice(
-    val name: String,
-    val macAddress: String
-)

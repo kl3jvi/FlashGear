@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.kl3jvi.yonda.MainActivity
 import com.kl3jvi.yonda.R
 import com.kl3jvi.yonda.databinding.FragmentHomeBinding
@@ -37,7 +38,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         (activity as? MainActivity)?.scanBle { isScanning ->
             if (!isScanning) {
                 homeViewModel.stopScanPressed()
+                Snackbar.make(binding.root, "Stopped Scanning", Snackbar.LENGTH_SHORT).show()
             } else {
+                Snackbar.make(
+                    binding.root, "Started scanning for peripherals",
+                    Snackbar.LENGTH_SHORT
+                ).show()
                 launchAndRepeatWithViewLifecycle {
                     homeViewModel.connectedDevices.collect { bluetoothState ->
                         when (bluetoothState) {
