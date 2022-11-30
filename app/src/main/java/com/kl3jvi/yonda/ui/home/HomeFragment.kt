@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.kl3jvi.yonda.MainActivity
 import com.kl3jvi.yonda.R
 import com.kl3jvi.yonda.databinding.FragmentHomeBinding
@@ -18,17 +19,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private val binding get() = _binding!!
     private val homeViewModel: HomeViewModel by viewModel()
 
-//    private lateinit var resultsAdapter: ScanResultsAdapter
+    private val resultsAdapter: ScanResultsAdapter = ScanResultsAdapter()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentHomeBinding.bind(view)
-//        resultsAdapter = ScanResultsAdapter()
-//        binding.rv.adapter = resultsAdapter
-//        binding.rv.layoutManager = LinearLayoutManager(requireContext())
-        binding.stop.setOnClickListener {
-            homeViewModel.stopScanPressed()
-        }
+        binding.rv.layoutManager = LinearLayoutManager(requireContext())
+        binding.rv.adapter = resultsAdapter
     }
 
     override fun onResume() {
@@ -58,8 +55,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                             is BluetoothState.Success -> {
                                 binding.progress.isVisible = false
 //                            binding.rv.isVisible = true
-                                binding.text.append(bluetoothState.data.first.address + "   ")
                                 Log.e("State", bluetoothState.data.toString())
+                                resultsAdapter.submitList(bluetoothState.data)
                             }
                         }
                     }

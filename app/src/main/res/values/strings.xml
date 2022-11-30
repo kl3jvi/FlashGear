@@ -3,7 +3,8 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
-    <string name="dialog_title">No Permissions</string>
-    <string name="usage_message">The app can\'t run if it\'s not granted Bluetooth permission.</string>
-    <string name="yes">Grant</string>
+    <string name="dialog_title">Bluetooth is turned off</string>
+    <string name="usage_message">Turn on bluetooth to scan for devices.</string>
+    <string name="yes">OK</string>
+    <string name="title_scan">Scan</string>
 </resources>

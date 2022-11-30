@@ -45,6 +45,8 @@ class ConnectionService(
         }
     }
 
+    fun isBluetoothEnabled() = central.isBluetoothEnabled
+
     /**
      * Stop scanning for peripherals
      */
