@@ -1,6 +1,5 @@
 package com.kl3jvi.yonda.models
 
-data class BleDevice(
-    val name: String,
-    val macAddress: String
-)
+import com.welie.blessed.BluetoothPeripheral
+
+data class BleDevice(val peripheral: BluetoothPeripheral)

@@ -19,7 +19,6 @@ import com.kl3jvi.yonda.ext.checkSelfPermissions
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-
 class MainActivity : AppCompatActivity(), KoinComponent {
 
     private val connectionService: ConnectionService by inject()
@@ -52,13 +51,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-
     }
 
     fun scanBle(block: (Boolean) -> Unit) {
         binding.fab.setOnClickListener {
             if (!connectionService.isBluetoothEnabled()) {
-                askToTurnOnBlueTooth()
+                askToTurnOnBluetooth()
                 return@setOnClickListener
             }
             binding.fab.isActivated = !binding.fab.isActivated
@@ -66,7 +64,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
     }
 
-    private fun askToTurnOnBlueTooth() {
+    private fun askToTurnOnBluetooth() {
         MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.dialog_title))
             .setMessage(getString(R.string.usage_message))

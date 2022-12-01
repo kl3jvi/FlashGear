@@ -20,11 +20,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private val binding get() = _binding!!
     private val homeViewModel: HomeViewModel by viewModel()
 
-    private val resultsAdapter: ScanResultsAdapter = ScanResultsAdapter()
+    private lateinit var resultsAdapter: ScanResultsAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentHomeBinding.bind(view)
+        resultsAdapter = ScanResultsAdapter(homeViewModel)
         binding.rv.layoutManager = LinearLayoutManager(requireContext())
         binding.rv.adapter = resultsAdapter
     }
@@ -41,7 +42,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 Snackbar.make(binding.root, "Stopped Scanning", Snackbar.LENGTH_SHORT).show()
             } else {
                 Snackbar.make(
-                    binding.root, "Started scanning for peripherals",
+                    binding.root,
+                    "Started scanning for peripherals",
                     Snackbar.LENGTH_SHORT
                 ).show()
                 launchAndRepeatWithViewLifecycle {
@@ -49,7 +51,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                         when (bluetoothState) {
                             is BluetoothState.Error -> Toast.makeText(
                                 requireContext(),
-                                bluetoothState.exception?.localizedMessage,
+                                bluetoothState.scanFailure?.name
+                                    ?: bluetoothState.exception?.localizedMessage,
                                 Toast.LENGTH_SHORT
                             ).show()
 

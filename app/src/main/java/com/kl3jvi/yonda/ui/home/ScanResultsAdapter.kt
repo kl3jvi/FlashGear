@@ -7,8 +7,16 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.kl3jvi.yonda.databinding.ItemBluetoothBinding
+import com.kl3jvi.yonda.models.BleDevice
+import com.welie.blessed.BluetoothPeripheral
 
-internal class ScanResultsAdapter : ListAdapter<BleDevice, ScanResultsAdapter.ViewHolder>(
+interface ConnectionListener {
+    fun connect(pheripheral: BluetoothPeripheral)
+}
+
+class ScanResultsAdapter(
+    private val connectionListener: ConnectionListener
+) : ListAdapter<BleDevice, ScanResultsAdapter.ViewHolder>(
     object : DiffUtil.ItemCallback<BleDevice>() {
         override fun areItemsTheSame(oldItem: BleDevice, newItem: BleDevice): Boolean {
             return oldItem == newItem
@@ -16,13 +24,18 @@ internal class ScanResultsAdapter : ListAdapter<BleDevice, ScanResultsAdapter.Vi
 
         @SuppressLint("DiffUtilEquals")
         override fun areContentsTheSame(oldItem: BleDevice, newItem: BleDevice): Boolean {
-            return oldItem.macAddress == newItem.macAddress
+            return oldItem.peripheral == newItem.peripheral
         }
     }
 ) {
 
+
     inner class ViewHolder(private val binding: ItemBluetoothBinding) :
         RecyclerView.ViewHolder(binding.root) {
+        init {
+            binding.connectListener = connectionListener
+        }
+
         fun bind(bleDevice: BleDevice) {
             binding.apply {
                 this.bleDevice = bleDevice
