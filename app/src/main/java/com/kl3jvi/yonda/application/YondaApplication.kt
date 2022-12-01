@@ -1,8 +1,7 @@
 package com.kl3jvi.yonda.application
 
 import android.app.Application
-import com.kl3jvi.yonda.di.bleModule
-import com.kl3jvi.yonda.di.viewmodelModule
+import com.kl3jvi.yonda.di.allModules
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -16,7 +15,9 @@ class YondaApplication : Application() {
             // Using Level.ERROR is a workaround until it's fixed.
             androidLogger(Level.ERROR)
             androidContext(this@YondaApplication)
-            modules(bleModule, viewmodelModule)
+            modules(
+                allModules
+            )
         }
     }
 }

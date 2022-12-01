@@ -1,40 +1,15 @@
 package com.kl3jvi.yonda.ext
 
-import android.Manifest.permission.BLUETOOTH_CONNECT
-import android.Manifest.permission.BLUETOOTH_SCAN
-import android.app.Activity
-import android.content.pm.PackageManager
-import android.os.Build
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import kotlin.random.Random
+import android.content.Context
+import android.widget.Toast
 
-fun Activity.checkSelfPermissions(
-    vararg permissions: String
-) {
-    require(permissions.isNotEmpty()) {
-        "Permissions array can not be empty"
+fun Context.showToast(message: String) = Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+
+fun Context.showToastIf(vararg message: String, predicate: () -> Boolean) {
+    check(message.size == 2) {
+        "Please set 2 strings to use this method!, First shows if predicate is true, second shows if predicate is false."
     }
-    val (permissionForAndroidS, legacyPermissions) =
-        permissions.partition { it == BLUETOOTH_CONNECT || it == BLUETOOTH_SCAN }
-
-    val allNotGranted = permissions.map { permission ->
-        ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_DENIED
-    }.all { it }
-
-    if (allNotGranted) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            ActivityCompat.requestPermissions(
-                this,
-                permissionForAndroidS.toTypedArray(),
-                Random.nextInt(0, 100)
-            )
-        } else {
-            ActivityCompat.requestPermissions(
-                this,
-                legacyPermissions.toTypedArray(),
-                Random.nextInt(0, 100)
-            )
-        }
-    }
+    if (predicate()) {
+        showToast(message.first())
+    } else showToast(message.last())
 }

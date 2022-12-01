@@ -11,7 +11,7 @@ import com.kl3jvi.yonda.models.BleDevice
 import com.welie.blessed.BluetoothPeripheral
 
 interface ConnectionListener {
-    fun connect(pheripheral: BluetoothPeripheral)
+    fun connect(peripheral: BluetoothPeripheral)
 }
 
 class ScanResultsAdapter(
@@ -28,7 +28,6 @@ class ScanResultsAdapter(
         }
     }
 ) {
-
 
     inner class ViewHolder(private val binding: ItemBluetoothBinding) :
         RecyclerView.ViewHolder(binding.root) {

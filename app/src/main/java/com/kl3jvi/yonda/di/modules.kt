@@ -15,3 +15,5 @@ val bleModule = module {
 val viewmodelModule = module {
     viewModel { HomeViewModel(get()) }
 }
+
+val allModules = bleModule + viewmodelModule
