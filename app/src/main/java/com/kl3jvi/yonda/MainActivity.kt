@@ -59,10 +59,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 askToTurnOnBluetooth()
                 return@setOnClickListener
             }
-            binding.fab.isActivated = !binding.fab.isActivated
+            binding.fab.isActivated = !connectionService.isScanning()
             block(binding.fab.isActivated)
         }
     }
+
 
     private fun askToTurnOnBluetooth() {
         MaterialAlertDialogBuilder(this)

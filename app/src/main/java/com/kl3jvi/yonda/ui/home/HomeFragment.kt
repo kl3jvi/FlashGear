@@ -12,8 +12,6 @@ import com.kl3jvi.yonda.databinding.FragmentHomeBinding
 import com.kl3jvi.yonda.ext.launchAndRepeatWithViewLifecycle
 import com.kl3jvi.yonda.ext.showToast
 import com.kl3jvi.yonda.ext.showToastIf
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
@@ -43,39 +41,49 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 "Started Scanning",
                 "Stopped Scanning"
             ) { isScanning }
-            homeViewModel.scanStopped = !isScanning
+
             if (!isScanning) {
                 homeViewModel.stopScanPressed()
             } else {
                 launchAndRepeatWithViewLifecycle {
-                    homeViewModel.connectedDevices
-                        .collect { bluetoothState ->
-                            Log.e("Activity ", this.ensureActive().toString())
-                            when (bluetoothState) {
-                                is BluetoothState.Error -> requireContext()
-                                    .showToast(bluetoothState.errorMessage)
-
-                                BluetoothState.Idle -> {
-                                    binding.progress.isVisible = true
-                                    binding.rv.isVisible = false
-                                }
-
-                                is BluetoothState.Success -> {
-                                    binding.progress.isVisible = false
-                                    binding.rv.isVisible = true
-                                    Log.e(
-                                        "State",
-                                        bluetoothState.data.map { it.peripheral.address }.toString()
-                                    )
-                                    resultsAdapter.submitList(bluetoothState.data.sortedByDescending { it.peripheral.name })
-                                }
-                            }
-                        }
+                    homeViewModel.scannedDeviceList
+                        .collect(::showViewOnState)
+                }
+                launchAndRepeatWithViewLifecycle {
+                    homeViewModel.currentConnectState.collect {
+                        Log.e("Current ${it.first?.name} state:", it.second?.name.toString())
+                    }
                 }
             }
         }
     }
 
+    /**
+     * > Show the progress bar when the state is idle, show the recycler view when the state is
+     * success, and show a toast when the state is error
+     *
+     * @param bluetoothState This is the state of the bluetooth. It can be in one of the following
+     * states:
+     */
+    private fun showViewOnState(bluetoothState: BluetoothState) {
+        binding.apply {
+            binding.rv.isVisible = bluetoothState is BluetoothState.Success
+            binding.progress.isVisible = bluetoothState is BluetoothState.Idle
+        }
+        when (bluetoothState) {
+            is BluetoothState.Error -> requireContext()
+                .showToast(bluetoothState.errorMessage)
+
+            is BluetoothState.Success -> {
+                binding.progress.isVisible = false
+                binding.rv.isVisible = true
+                Log.e("Results", bluetoothState.data.toString())
+                resultsAdapter.submitList(bluetoothState.data)
+            }
+
+            else -> {}
+        }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

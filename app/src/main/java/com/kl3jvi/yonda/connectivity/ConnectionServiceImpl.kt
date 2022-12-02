@@ -4,6 +4,7 @@ import android.bluetooth.le.ScanResult
 import com.kl3jvi.yonda.ext.Error
 import com.welie.blessed.BluetoothCentralManager
 import com.welie.blessed.BluetoothPeripheral
+import com.welie.blessed.ScanFailure
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -31,6 +32,7 @@ class ConnectionServiceImpl : ConnectionService, KoinComponent {
                     onError(Error(scanFailure = it).getErrorMessage())
                 }
             )
+
         }.onFailure {
             onError(Error(throwable = it).getErrorMessage())
         }
@@ -42,7 +44,6 @@ class ConnectionServiceImpl : ConnectionService, KoinComponent {
 
     override fun isScanning() = central.isScanning
 
-
     override fun currentConnectState() = callbackFlow {
         central.observeConnectionState { peripheral, state ->
             trySend(peripheral to state)
@@ -50,8 +51,8 @@ class ConnectionServiceImpl : ConnectionService, KoinComponent {
         awaitClose { central.close() }
     }
 
-    private fun checkPeripheralIsConnected(peripheral: BluetoothPeripheral): Boolean {
-        return central.getConnectedPeripherals().contains(peripheral)
+    private fun BluetoothPeripheral.checkPeripheralIsConnected(): Boolean {
+        return central.getConnectedPeripherals().contains(this)
     }
 
     override suspend fun connectPeripheral(bluetoothPeripheral: BluetoothPeripheral) =
@@ -61,6 +62,7 @@ class ConnectionServiceImpl : ConnectionService, KoinComponent {
 }
 
 
-
-
-
+data class BluetoothScanResult(
+    val peripheral: BluetoothPeripheral? = null,
+    val scanFailure: ScanFailure? = null
+)

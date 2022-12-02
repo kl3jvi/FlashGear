@@ -11,5 +11,7 @@ fun Context.showToastIf(vararg message: String, predicate: () -> Boolean) {
     }
     if (predicate()) {
         showToast(message.first())
-    } else showToast(message.last())
+    } else {
+        showToast(message.last())
+    }
 }

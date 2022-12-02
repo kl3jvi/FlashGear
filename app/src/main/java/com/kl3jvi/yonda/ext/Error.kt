@@ -10,7 +10,7 @@ import com.welie.blessed.ScanFailure
  */
 data class Error(
     val scanFailure: ScanFailure? = null,
-    val throwable: Throwable? = null,
+    val throwable: Throwable? = null
 ) {
     /**
      * If throwable is not null, return its localized message, otherwise if scanFailure is not null,

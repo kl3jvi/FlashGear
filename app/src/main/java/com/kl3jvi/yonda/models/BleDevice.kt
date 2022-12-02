@@ -5,5 +5,5 @@ import com.welie.blessed.ConnectionState
 
 data class BleDevice(
     val peripheral: BluetoothPeripheral,
-//    var connectionState: ConnectionState
+    var connectionState: ConnectionState = ConnectionState.DISCONNECTED
 )

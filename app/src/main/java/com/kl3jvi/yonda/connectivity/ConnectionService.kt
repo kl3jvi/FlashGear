@@ -42,7 +42,6 @@ interface ConnectionService {
      */
     suspend fun connectPeripheral(bluetoothPeripheral: BluetoothPeripheral): Result<Unit>
 
-
     /**
      * "This function returns a Flow of ConnectionState objects."
      *
@@ -50,6 +49,4 @@ interface ConnectionService {
      * that represents a stream of data
      */
     fun currentConnectState(): Flow<Pair<BluetoothPeripheral, ConnectionState>>
-
-
 }
