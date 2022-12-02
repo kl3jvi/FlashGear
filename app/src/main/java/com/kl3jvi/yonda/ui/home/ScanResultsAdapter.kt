@@ -10,12 +10,12 @@ import com.kl3jvi.yonda.databinding.ItemBluetoothBinding
 import com.kl3jvi.yonda.models.BleDevice
 import com.welie.blessed.BluetoothPeripheral
 
-interface ConnectionListener {
-    fun connect(peripheral: BluetoothPeripheral)
+interface ConnectListener {
+    fun connectToPeripheral(peripheral: BluetoothPeripheral)
 }
 
 class ScanResultsAdapter(
-    private val connectionListener: ConnectionListener
+    private val listener: ConnectListener
 ) : ListAdapter<BleDevice, ScanResultsAdapter.ViewHolder>(
     object : DiffUtil.ItemCallback<BleDevice>() {
         override fun areItemsTheSame(oldItem: BleDevice, newItem: BleDevice): Boolean {
@@ -32,7 +32,20 @@ class ScanResultsAdapter(
     inner class ViewHolder(private val binding: ItemBluetoothBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
-            binding.connectListener = connectionListener
+            binding.connectionListener = listener
+//            binding.setClickListener { view ->
+////                binding.bleDevice?.let {
+////                    Navigation.createNavigateOnClickListener(
+////                        R.id.to_details,
+////                        bundleOf(
+////                            "title" to view.context.resources.getString(
+////                                R.string.title_details,
+////                                it.peripheral.address
+////                            ),
+////                            "device" to it
+////                        )
+////                    ).onClick(view)
+//                }
         }
 
         fun bind(bleDevice: BleDevice) {
@@ -40,6 +53,7 @@ class ScanResultsAdapter(
                 this.bleDevice = bleDevice
                 executePendingBindings()
             }
+
         }
     }
 

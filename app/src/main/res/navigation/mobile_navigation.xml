@@ -9,7 +9,11 @@
         android:id="@+id/navigation_home"
         android:name="com.kl3jvi.yonda.ui.home.HomeFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/to_details"
+            app:destination="@id/navigation_notifications" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_dashboard"
@@ -23,7 +27,16 @@
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.kl3jvi.yonda.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:name="com.kl3jvi.yonda.ui.detail.DetailsFragment"
+        android:label="{title}"
+        tools:layout="@layout/fragment_details">
+
+        <argument
+            android:name="title"
+            app:argType="string" />
+
+        <argument
+            android:name="device"
+            app:argType="com.kl3jvi.yonda.models.BleDevice" />
+    </fragment>
 </navigation>

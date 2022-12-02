@@ -7,11 +7,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.kl3jvi.yonda.connectivity.ConnectionService
 import com.kl3jvi.yonda.databinding.ActivityMainBinding
@@ -21,9 +20,9 @@ import org.koin.core.component.inject
 
 class MainActivity : AppCompatActivity(), KoinComponent {
 
-    private val connectionService: ConnectionService by inject()
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,9 +37,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navView: BottomNavigationView = binding.bottomNavigationView
 
-        val navController = findNavController(R.id.nav_host_fragment_activity_main)
+        navController = findNavController(R.id.nav_host_fragment_activity_main)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
@@ -50,32 +48,18 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
-    }
-
-    fun scanBle(block: (Boolean) -> Unit) {
-        binding.fab.setOnClickListener {
-            if (!connectionService.isBluetoothEnabled()) {
-                askToTurnOnBluetooth()
-                return@setOnClickListener
-            }
-            binding.fab.isActivated = !connectionService.isScanning()
-            block(binding.fab.isActivated)
-        }
     }
 
 
-    private fun askToTurnOnBluetooth() {
-        MaterialAlertDialogBuilder(this)
-            .setTitle(getString(R.string.dialog_title))
-            .setMessage(getString(R.string.usage_message))
-            .setPositiveButton(getString(R.string.yes)) { dialog, _ ->
-                dialog.dismiss()
-                val intentOpenBluetoothSettings = Intent()
-                intentOpenBluetoothSettings.action = Settings.ACTION_BLUETOOTH_SETTINGS
-                startActivity(intentOpenBluetoothSettings)
-            }
-            .setCancelable(false)
-            .show()
+
+
+
+    /**
+     * If the navigation controller can navigate up, then navigate up. Otherwise, do the default action
+     *
+     * @return The return value is a boolean.
+     */
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 }

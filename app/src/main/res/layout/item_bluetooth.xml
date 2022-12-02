@@ -9,18 +9,19 @@
 
 
         <variable
-            name="connectListener"
-            type="com.kl3jvi.yonda.ui.home.ConnectionListener" />
+            name="connectionListener"
+            type="com.kl3jvi.yonda.ui.home.ConnectListener" />
+
     </data>
 
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         colorIf="@{bleDevice.connectionState}"
-        android:foreground="?android:attr/selectableItemBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="@{()->connectListener.connect(bleDevice.peripheral)}">
+        android:background="?android:attr/selectableItemBackground"
+        android:onClick="@{()->connectionListener.connectToPeripheral(bleDevice.peripheral)}">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
