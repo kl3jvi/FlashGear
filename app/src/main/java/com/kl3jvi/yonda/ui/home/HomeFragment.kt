@@ -37,28 +37,28 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
         binding.isScanning = isScanning
 
         /* Stopping the scan when the user presses the button again. */
-        if (!isScanning)
+        if (!isScanning) {
             homeViewModel.stopScanPressed()
-        else launchAndRepeatWithViewLifecycle {
-            homeViewModel.scannedDeviceList.collect {
-                when (it) {
-                    is BluetoothState.Error -> Log.e("Error", "happened ${it.errorMessage}")
-                    BluetoothState.Idle -> {
+        } else {
+            launchAndRepeatWithViewLifecycle {
+                homeViewModel.scannedDeviceList.collect {
+                    when (it) {
+                        is BluetoothState.Error -> Log.e("Error", "happened ${it.errorMessage}")
+                        BluetoothState.Idle -> {
+                        }
 
-                    }
-
-                    is BluetoothState.Success -> {
-                        Log.e(
-                            "Data",
-                            it.data.map { it.peripheral.address }.toString()
-                        )
-                        adapter.submitList(it.data)
+                        is BluetoothState.Success -> {
+                            Log.e(
+                                "Data",
+                                it.data.map { it.peripheral.address }.toString()
+                            )
+                            adapter.submitList(it.data)
+                        }
                     }
                 }
             }
         }
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -73,7 +73,9 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
      * play or not.
      */
     private fun LottieAnimationView.playAnimationIf(predicate: Boolean) {
-        if (predicate) playAnimation() else {
+        if (predicate) {
+            playAnimation()
+        } else {
             cancelAnimation()
             playAnimation()
             cancelAnimation()

@@ -35,7 +35,6 @@ class PermissionFragment : Fragment(R.layout.fragment_permission) {
         }
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentPermissionBinding.bind(view)
@@ -47,7 +46,6 @@ class PermissionFragment : Fragment(R.layout.fragment_permission) {
             )
         }
     }
-
 
     /**
      * If the user has granted both location and bluetooth permissions, then change the color of the
@@ -62,7 +60,6 @@ class PermissionFragment : Fragment(R.layout.fragment_permission) {
             compoundDrawableTintList = colorList
         }
     }
-
 
     /**
      * "Check if the button should be enabled, and if so, enable it."

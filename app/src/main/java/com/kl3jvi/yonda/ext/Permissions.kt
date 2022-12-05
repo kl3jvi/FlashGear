@@ -13,7 +13,6 @@ val blePermissions = arrayOf(
     BLUETOOTH_SCAN
 )
 
-
 fun Fragment.enableBluetooth() {
     if (!isBluetoothGranted()) {
         ActivityCompat.requestPermissions(
