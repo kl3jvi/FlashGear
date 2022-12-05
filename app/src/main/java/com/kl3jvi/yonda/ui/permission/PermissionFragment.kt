@@ -12,7 +12,8 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.kl3jvi.yonda.R
 import com.kl3jvi.yonda.databinding.FragmentPermissionBinding
-import com.kl3jvi.yonda.ext.checkBluetoothPermissions
+import com.kl3jvi.yonda.ext.enableBluetooth
+import com.kl3jvi.yonda.ext.enableLocation
 import com.kl3jvi.yonda.ext.isBluetoothGranted
 import com.kl3jvi.yonda.ext.isLocationGranted
 
@@ -39,7 +40,7 @@ class PermissionFragment : Fragment(R.layout.fragment_permission) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentPermissionBinding.bind(view)
         binding.bluetooth.setOnClickListener { enableBluetooth() }
-        binding.location.setOnClickListener { enableLocations() }
+        binding.location.setOnClickListener { enableLocation() }
         binding.proceedButton.setOnClickListener {
             findNavController().navigate(
                 PermissionFragmentDirections.toHome()
@@ -47,9 +48,6 @@ class PermissionFragment : Fragment(R.layout.fragment_permission) {
         }
     }
 
-    private fun enableBluetooth() = checkBluetoothPermissions()
-
-    private fun enableLocations() {}
 
     /**
      * If the user has granted both location and bluetooth permissions, then change the color of the

@@ -31,7 +31,9 @@ class HomeViewModel(
             trySend(BluetoothState.Idle)
             connectionService.scanBleDevices(
                 onSuccess = { bluetoothPeripheral ->
-                    bluetoothDevices += BleDevice(bluetoothPeripheral)
+                    if (bluetoothPeripheral.name.isNullOrEmpty())
+                        return@scanBleDevices
+                    else bluetoothDevices += BleDevice(bluetoothPeripheral)
                     trySend(BluetoothState.Success(bluetoothDevices.toList()))
                 },
                 onError = { errorMessage -> trySend(BluetoothState.Error(errorMessage)) }

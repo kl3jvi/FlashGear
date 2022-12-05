@@ -1,62 +1,82 @@
 package com.kl3jvi.yonda.ui.home
 
-import android.content.Intent
 import android.os.Bundle
-import android.provider.Settings
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.airbnb.lottie.LottieAnimationView
 import com.kl3jvi.yonda.R
 import com.kl3jvi.yonda.databinding.FragmentHomeBinding
-import com.kl3jvi.yonda.ui.scanner.ScanBottomSheet
+import com.kl3jvi.yonda.ext.launchAndRepeatWithViewLifecycle
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.component.KoinComponent
 
 class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
-    private var _binding: FragmentHomeBinding? = null
 
+    private lateinit var adapter: ScanResultsAdapter
+    private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private val homeViewModel: HomeViewModel by viewModel()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentHomeBinding.bind(view)
+        adapter = ScanResultsAdapter(homeViewModel)
+        binding.rv.layoutManager = LinearLayoutManager(requireContext())
+        binding.rv.adapter = adapter
+
         binding.fab.setOnClickListener {
-            if (!homeViewModel.isBluetoothEnabled()) {
-                askToTurnOnBluetooth()
-                return@setOnClickListener
-            } else {
-                scanBle()
+            binding.fab.isActivated = !binding.fab.isActivated
+            scanBle(binding.fab.isActivated)
+        }
+    }
+
+    private fun scanBle(isScanning: Boolean) {
+        binding.lottieAnimationView.playAnimationIf(isScanning)
+        binding.isScanning = isScanning
+
+        /* Stopping the scan when the user presses the button again. */
+        if (!isScanning)
+            homeViewModel.stopScanPressed()
+        else launchAndRepeatWithViewLifecycle {
+            homeViewModel.scannedDeviceList.collect {
+                when (it) {
+                    is BluetoothState.Error -> Log.e("Error", "happened ${it.errorMessage}")
+                    BluetoothState.Idle -> {
+
+                    }
+
+                    is BluetoothState.Success -> {
+                        Log.e(
+                            "Data",
+                            it.data.map { it.peripheral.address }.toString()
+                        )
+                        adapter.submitList(it.data)
+                    }
+                }
             }
         }
     }
 
-    private fun scanBle() {
-        val sheet = ScanBottomSheet()
-        sheet.isCancelable = false
-        sheet.show(requireContext()) {
-            title("Scanning List")
-            behavior(BottomSheetBehavior.STATE_EXPANDED)
-        }
-    }
-
-    private fun askToTurnOnBluetooth() {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.dialog_title))
-            .setMessage(getString(R.string.usage_message))
-            .setPositiveButton(getString(R.string.yes)) { dialog, _ ->
-                dialog.dismiss()
-                val intentOpenBluetoothSettings = Intent()
-                intentOpenBluetoothSettings.action = Settings.ACTION_BLUETOOTH_SETTINGS
-                startActivity(intentOpenBluetoothSettings)
-            }
-            .setCancelable(false)
-            .show()
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    /**
+     * > If the predicate is true, play the animation. Otherwise, cancel the animation, play it, and
+     * then cancel it again
+     *
+     * @param predicate Boolean - This is the condition that will determine whether the animation will
+     * play or not.
+     */
+    private fun LottieAnimationView.playAnimationIf(predicate: Boolean) {
+        if (predicate) playAnimation() else {
+            cancelAnimation()
+            playAnimation()
+            cancelAnimation()
+        }
     }
 }
