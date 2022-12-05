@@ -1,13 +1,17 @@
 package com.kl3jvi.yonda.ui.scanner
 
+import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.WindowManager
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.kl3jvi.yonda.connectivity.ConnectionService
 import com.kl3jvi.yonda.databinding.ScanRecyclerBinding
 import com.kl3jvi.yonda.ext.launchAndRepeatWithViewLifecycle
@@ -43,13 +47,27 @@ class ScanBottomSheet : Sheet(), KoinComponent {
         binding.rv.layoutManager = LinearLayoutManager(requireContext())
         binding.rv.adapter = adapter
 
-
         launchAndRepeatWithViewLifecycle { homeViewModel.scannedDeviceList.collect(::showViewOnState) }
         setButtonPositiveListener { homeViewModel.stopScanPressed() }
 //        setButtonPositiveListener {  } If you want to override the default positive click listener
 //        displayButtonsView() If you want to change the visibility of the buttons view
 //        displayButtonPositive() Hiding the positive button will prevent clicks
 //        hideToolbar() Hide the toolbar of the sheet, the title and the icon
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = BottomSheetDialog(requireContext(), theme)
+        dialog.setOnShowListener {
+            val bottomSheetDialog = it as BottomSheetDialog
+            val parentLayout =
+                bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+            parentLayout?.let { it ->
+                val behaviour = BottomSheetBehavior.from(it)
+                setupFullHeight(it)
+                behaviour.state = BottomSheetBehavior.STATE_EXPANDED
+            }
+        }
+        return dialog
     }
 
     private fun showViewOnState(bluetoothState: BluetoothState) {
@@ -71,6 +89,11 @@ class ScanBottomSheet : Sheet(), KoinComponent {
         homeViewModel.stopScanPressed()
     }
 
+    private fun setupFullHeight(bottomSheet: View) {
+        val layoutParams = bottomSheet.layoutParams
+        layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT
+        bottomSheet.layoutParams = layoutParams
+    }
 
     /** Build [CustomSheet] and show it later. */
     fun build(ctx: Context, width: Int? = null, func: ScanBottomSheet.() -> Unit): ScanBottomSheet {
@@ -84,7 +107,7 @@ class ScanBottomSheet : Sheet(), KoinComponent {
     fun show(
         ctx: Context,
         width: Int? = null,
-        func: ScanBottomSheet.() -> Unit,
+        func: ScanBottomSheet.() -> Unit
     ): ScanBottomSheet {
         this.windowContext = ctx
         this.width = width

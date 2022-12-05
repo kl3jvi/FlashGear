@@ -20,7 +20,7 @@
         colorIf="@{bleDevice.connectionState}"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/selectableItemBackground"
+        android:background="@color/transparent"
         android:onClick="@{()->connectionListener.connectToPeripheral(bleDevice.peripheral)}">
 
         <androidx.cardview.widget.CardView

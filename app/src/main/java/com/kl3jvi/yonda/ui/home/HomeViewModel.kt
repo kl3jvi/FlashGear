@@ -24,6 +24,7 @@ class HomeViewModel(
 
     private var bluetoothDevices: Set<BleDevice> = emptySet()
 
+    fun isBluetoothEnabled() = connectionService.isBluetoothEnabled()
 
     val scannedDeviceList: Flow<BluetoothState> =
         callbackFlow {
@@ -42,7 +43,6 @@ class HomeViewModel(
             }.takeWhile {
                 connectionService.isScanning()
             }.flowOn(Dispatchers.Default)
-
 
     fun stopScanPressed() {
         connectionService.stopScanning()
@@ -68,10 +68,8 @@ class HomeViewModel(
         }
     }
 
-
     val isScanning = connectionService.isScanning()
 }
-
 
 sealed interface BluetoothState {
     data class Success(

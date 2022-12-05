@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/navigation_permissions">
 
     <fragment
         android:id="@+id/navigation_home"
@@ -16,10 +16,10 @@
     </fragment>
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.kl3jvi.yonda.ui.dashboard.DashboardFragment"
+        android:id="@+id/navigation_permissions"
+        android:name="com.kl3jvi.yonda.ui.permission.PermissionFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard">
+        tools:layout="@layout/fragment_permission">
         <action
             android:id="@+id/to_home"
             app:destination="@id/navigation_home" />

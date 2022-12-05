@@ -7,4 +7,8 @@
     <string name="usage_message">Turn on bluetooth to scan for devices.</string>
     <string name="yes">OK</string>
     <string name="title_scan">Scan</string>
+    <string name="ble_hint"><![CDATA[Select `Yes` or `Allow all the time` in the next few steps so that this app can run in background & help to trace people.]]></string>
+    <string name="permission_title">Please set up necessary app permissions</string>
+    <string name="bluetooth">Bluetooth</string>
+    <string name="location">Location</string>
 </resources>

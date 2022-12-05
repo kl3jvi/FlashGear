@@ -11,5 +11,7 @@
     <color name="stop">#EC0B43</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="transparent">#00FFFFFF</color>
     <color name="grey">#868686</color>
+    <color name="inactive">#B6B6B6</color>
 </resources>

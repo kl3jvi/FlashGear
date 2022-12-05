@@ -12,7 +12,6 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.kl3jvi.yonda.R
 import com.welie.blessed.ConnectionState
 
-
 @BindingAdapter("colorIf")
 fun ConstraintLayout.setBackgroundColor(connectionState: ConnectionState) {
     background = when (connectionState) {
@@ -41,5 +40,3 @@ fun ExtendedFloatingActionButton.bgColor(isScanning: Boolean) {
 
     text = if (isScanning) "Stop" else "Scan"
 }
-
-

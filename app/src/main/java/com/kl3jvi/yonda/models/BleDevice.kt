@@ -6,7 +6,6 @@ import com.welie.blessed.ConnectionState
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.RawValue
 
-
 @Parcelize
 data class BleDevice(
     val peripheral: @RawValue BluetoothPeripheral,

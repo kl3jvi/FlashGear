@@ -34,17 +34,17 @@ class ScanResultsAdapter(
         init {
             binding.connectionListener = listener
 //            binding.setClickListener { view ->
-////                binding.bleDevice?.let {
-////                    Navigation.createNavigateOnClickListener(
-////                        R.id.to_details,
-////                        bundleOf(
-////                            "title" to view.context.resources.getString(
-////                                R.string.title_details,
-////                                it.peripheral.address
-////                            ),
-////                            "device" to it
-////                        )
-////                    ).onClick(view)
+// //                binding.bleDevice?.let {
+// //                    Navigation.createNavigateOnClickListener(
+// //                        R.id.to_details,
+// //                        bundleOf(
+// //                            "title" to view.context.resources.getString(
+// //                                R.string.title_details,
+// //                                it.peripheral.address
+// //                            ),
+// //                            "device" to it
+// //                        )
+// //                    ).onClick(view)
 //                }
         }
 
@@ -53,7 +53,6 @@ class ScanResultsAdapter(
                 this.bleDevice = bleDevice
                 executePendingBindings()
             }
-
         }
     }
 

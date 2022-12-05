@@ -20,10 +20,6 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
         _binding = FragmentDetailsBinding.bind(view)
     }
 
-
-
-
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

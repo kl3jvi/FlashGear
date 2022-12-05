@@ -32,7 +32,6 @@ class ConnectionServiceImpl : ConnectionService, KoinComponent {
                     onError(Error(scanFailure = it).getErrorMessage())
                 }
             )
-
         }.onFailure {
             onError(Error(throwable = it).getErrorMessage())
         }
@@ -60,7 +59,6 @@ class ConnectionServiceImpl : ConnectionService, KoinComponent {
             runCatching { central.connectPeripheral(bluetoothPeripheral) }
         }
 }
-
 
 data class BluetoothScanResult(
     val peripheral: BluetoothPeripheral? = null,
