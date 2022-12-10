@@ -12,4 +12,5 @@
     <string name="bluetooth">Bluetooth</string>
     <string name="location">Location</string>
     <string name="connect">Connect</string>
+    <string name="connecting">Connecting</string>
 </resources>

@@ -30,11 +30,17 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
             binding.fab.isActivated = !binding.fab.isActivated
             scanBle(binding.fab.isActivated)
         }
+
+        launchAndRepeatWithViewLifecycle {
+            homeViewModel.connState.collect {
+                binding.state.text = "${it.second.name} to ${it.first.name}"
+            }
+        }
     }
 
     private fun scanBle(isScanning: Boolean) {
         binding.lottieAnimationView.playAnimationIf(isScanning)
-        binding.isScanning = isScanning
+        binding.isScanning = isScanning && !homeViewModel.isScanning
 
         /* Stopping the scan when the user presses the button again. */
         if (!isScanning) {

@@ -26,16 +26,14 @@ class HomeViewModel(
 
     fun isBluetoothEnabled() = connectionService.isBluetoothEnabled()
 
+    val connState = connectionService.currentConnectState()
+
     val scannedDeviceList: Flow<BluetoothState> =
         callbackFlow {
             trySend(BluetoothState.Idle)
             connectionService.scanBleDevices(
                 onSuccess = { bluetoothPeripheral ->
-                    if (bluetoothPeripheral.name.isNullOrEmpty()) {
-                        return@scanBleDevices
-                    } else {
-                        bluetoothDevices += BleDevice(bluetoothPeripheral)
-                    }
+                    bluetoothDevices += BleDevice(bluetoothPeripheral)
                     trySend(BluetoothState.Success(bluetoothDevices.toList()))
                 },
                 onError = { errorMessage -> trySend(BluetoothState.Error(errorMessage)) }
@@ -48,6 +46,9 @@ class HomeViewModel(
                 connectionService.isScanning()
             }.flowOn(Dispatchers.Default)
 
+    /**
+     * The function stops the scanning process and clears the list of scanned devices
+     */
     fun stopScanPressed() {
         connectionService.stopScanning()
         scannedDeviceList.drop(bluetoothDevices.size)
@@ -61,7 +62,7 @@ class HomeViewModel(
      */
     override fun connectToPeripheral(peripheral: BluetoothPeripheral) {
         viewModelScope.launch(Dispatchers.IO) {
-            Log.e("Clicked", "pizza")
+            stopScanPressed()
             connectionService.connectPeripheral(peripheral)
                 .onSuccess {
                     Log.e("Connecting to ${peripheral.name} at", "${System.currentTimeMillis()}")
