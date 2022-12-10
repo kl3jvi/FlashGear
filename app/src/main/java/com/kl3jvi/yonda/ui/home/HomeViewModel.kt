@@ -24,9 +24,13 @@ class HomeViewModel(
 
     private var bluetoothDevices: Set<BleDevice> = emptySet()
 
-    fun isBluetoothEnabled() = connectionService.isBluetoothEnabled()
-
     val connState = connectionService.currentConnectState()
+    val isScanning = connectionService.isScanning()
+    val isBleEnabled = connectionService.isBluetoothEnabled()
+
+
+
+
 
     val scannedDeviceList: Flow<BluetoothState> =
         callbackFlow {
@@ -43,8 +47,9 @@ class HomeViewModel(
             .onEach {
                 delay(1000)
             }.takeWhile {
-                connectionService.isScanning()
+                connectionService.isScanning
             }.flowOn(Dispatchers.Default)
+
 
     /**
      * The function stops the scanning process and clears the list of scanned devices
@@ -65,7 +70,10 @@ class HomeViewModel(
             stopScanPressed()
             connectionService.connectPeripheral(peripheral)
                 .onSuccess {
-                    Log.e("Connecting to ${peripheral.name} at", "${System.currentTimeMillis()}")
+                    Log.e(
+                        "Connecting to ${peripheral.name} at",
+                        "${System.currentTimeMillis()}"
+                    )
                 }.onFailure {
                     Log.e("Error occurred", "when connecting", it)
                     return@launch
@@ -73,7 +81,7 @@ class HomeViewModel(
         }
     }
 
-    val isScanning = connectionService.isScanning()
+
 }
 
 sealed interface BluetoothState {

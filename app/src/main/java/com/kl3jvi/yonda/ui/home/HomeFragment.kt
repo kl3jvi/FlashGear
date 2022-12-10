@@ -27,39 +27,43 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
         binding.rv.adapter = adapter
 
         binding.fab.setOnClickListener {
-            binding.fab.isActivated = !binding.fab.isActivated
-            scanBle(binding.fab.isActivated)
+            scanBle()
         }
+//        launchAndRepeatWithViewLifecycle {
+//            homeViewModel.isScanning.collect { isScanning ->
+//                Log.e("isScanning",isScanning.toString())
+//                binding.fab.isActivated = !isScanning
+//                binding.lottieAnimationView.playAnimationIf(isScanning)
+//                binding.isScanning = isScanning
+////                if (isScanning) {
+////                    homeViewModel.stopScanPressed()
+////                } else {
+//
+////                }
+//            }
+//        }
 
-        launchAndRepeatWithViewLifecycle {
-            homeViewModel.connState.collect {
-                binding.state.text = "${it.second.name} to ${it.first.name}"
-            }
-        }
     }
 
-    private fun scanBle(isScanning: Boolean) {
-        binding.lottieAnimationView.playAnimationIf(isScanning)
-        binding.isScanning = isScanning && !homeViewModel.isScanning
+    private fun scanBle() {
 
-        /* Stopping the scan when the user presses the button again. */
-        if (!isScanning) {
-            homeViewModel.stopScanPressed()
-        } else {
-            launchAndRepeatWithViewLifecycle {
-                homeViewModel.scannedDeviceList.collect {
-                    when (it) {
-                        is BluetoothState.Error -> Log.e("Error", "happened ${it.errorMessage}")
-                        BluetoothState.Idle -> {
-                        }
 
-                        is BluetoothState.Success -> {
-                            Log.e(
-                                "Data",
-                                it.data.map { it.peripheral.address }.toString()
-                            )
-                            adapter.submitList(it.data)
-                        }
+        launchAndRepeatWithViewLifecycle {
+            homeViewModel.scannedDeviceList.collect { bluetoothState ->
+                when (bluetoothState) {
+                    is BluetoothState.Error -> Log.e(
+                        "Error",
+                        "happened ${bluetoothState.errorMessage}"
+                    )
+
+                    BluetoothState.Idle -> {}
+
+                    is BluetoothState.Success -> {
+                        Log.e(
+                            "Data",
+                            bluetoothState.data.map { it.peripheral.address }.toString()
+                        )
+                        adapter.submitList(bluetoothState.data)
                     }
                 }
             }

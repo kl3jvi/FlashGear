@@ -23,7 +23,7 @@ interface ConnectionService {
     /**
      * Returns true if Bluetooth is enabled, false otherwise.
      */
-    fun isBluetoothEnabled(): Boolean
+     fun isBluetoothEnabled(): Flow<Boolean>
 
     /**
      * Stop scanning for peripherals
@@ -33,7 +33,7 @@ interface ConnectionService {
     /**
      * It returns a boolean value.
      */
-    fun isScanning(): Boolean
+    fun isScanning(): Flow<Boolean>
 
     /**
      * This function connects to a Bluetooth peripheral
@@ -49,4 +49,6 @@ interface ConnectionService {
      * that represents a stream of data
      */
     fun currentConnectState(): Flow<Pair<BluetoothPeripheral, ConnectionState>>
+    suspend fun readFromScooter(peripheral: BluetoothPeripheral): ByteArray
+    val isScanning: Boolean
 }

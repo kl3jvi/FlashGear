@@ -10,7 +10,7 @@ import org.koin.dsl.module
 
 private val bleModule = module {
     single { BluetoothCentralManager(get()) }
-    single<ConnectionService> { ConnectionServiceImpl() }
+    single<ConnectionService> { ConnectionServiceImpl(get()) }
 }
 
 private val viewmodelModule = module {

@@ -28,7 +28,7 @@ class Ampere : ScooterCommand() {
      * @param result The string that is returned from the bluetooth device.
      * @return The current ampere value is being returned.
      */
-    private fun getCurrentAmpere(result: String): Double {
+    fun getCurrentAmpere(result: String): Double {
         val temp = result[7].toString().plus(result[6])
         val amps: Int = temp.toInt(16)
         var c = amps.toDouble()
