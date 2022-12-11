@@ -4,16 +4,17 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kl3jvi.yonda.connectivity.ConnectionService
+import com.kl3jvi.yonda.ext.Result
+import com.kl3jvi.yonda.ext.asResult
 import com.kl3jvi.yonda.models.BleDevice
 import com.welie.blessed.BluetoothPeripheral
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
@@ -28,28 +29,24 @@ class HomeViewModel(
     val isScanning = connectionService.isScanning()
     val isBleEnabled = connectionService.isBluetoothEnabled()
 
-
-
-
-
-    val scannedDeviceList: Flow<BluetoothState> =
-        callbackFlow {
-            trySend(BluetoothState.Idle)
-            connectionService.scanBleDevices(
-                onSuccess = { bluetoothPeripheral ->
-                    bluetoothDevices += BleDevice(bluetoothPeripheral)
-                    trySend(BluetoothState.Success(bluetoothDevices.toList()))
-                },
-                onError = { errorMessage -> trySend(BluetoothState.Error(errorMessage)) }
-            )
-            awaitClose(::stopScanPressed)
-        }.distinctUntilChanged()
-            .onEach {
-                delay(1000)
-            }.takeWhile {
-                connectionService.isScanning
-            }.flowOn(Dispatchers.Default)
-
+    val scannedDeviceList: Flow<BluetoothState> = connectionService.scanBleDevices()
+        .asResult()
+        .map {
+            when (it) {
+                is Result.Error -> BluetoothState.Error(it.exception?.localizedMessage ?: "")
+                Result.Loading -> BluetoothState.Idle
+                is Result.Success -> {
+                    bluetoothDevices += BleDevice(it.data)
+                    BluetoothState.Success(bluetoothDevices.toList())
+                }
+            }
+        }
+        .distinctUntilChanged()
+        .onEach {
+            delay(1000)
+        }.takeWhile {
+            connectionService.isScanning
+        }.flowOn(Dispatchers.Default)
 
     /**
      * The function stops the scanning process and clears the list of scanned devices
@@ -80,8 +77,6 @@ class HomeViewModel(
                 }
         }
     }
-
-
 }
 
 sealed interface BluetoothState {

@@ -35,19 +35,16 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
 //                binding.fab.isActivated = !isScanning
 //                binding.lottieAnimationView.playAnimationIf(isScanning)
 //                binding.isScanning = isScanning
-////                if (isScanning) {
-////                    homeViewModel.stopScanPressed()
-////                } else {
+// //                if (isScanning) {
+// //                    homeViewModel.stopScanPressed()
+// //                } else {
 //
-////                }
+// //                }
 //            }
 //        }
-
     }
 
     private fun scanBle() {
-
-
         launchAndRepeatWithViewLifecycle {
             homeViewModel.scannedDeviceList.collect { bluetoothState ->
                 when (bluetoothState) {

@@ -5,8 +5,10 @@ import com.kl3jvi.yonda.ext.Error
 import com.welie.blessed.BluetoothCentralManager
 import com.welie.blessed.BluetoothPeripheral
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
@@ -21,18 +23,21 @@ class ConnectionServiceImpl(
         central.enableLogging()
     }
 
-    override fun scanBleDevices(
-        onSuccess: (BluetoothPeripheral) -> Unit, onError: (String) -> Unit
-    ) {
+    override fun scanBleDevices(): Flow<BluetoothPeripheral> = callbackFlow {
         runCatching {
             central.scanForPeripherals(resultCallback = { bluetoothPeripheral: BluetoothPeripheral, _: ScanResult ->
-                onSuccess(bluetoothPeripheral)
+                // Emit the BluetoothPeripheral object
+                trySend(bluetoothPeripheral)
             }, scanError = {
-                onError(Error(scanFailure = it).getErrorMessage())
-            })
+                    // Cancel the Flow if an error occurs during the scan
+                    cancel(Error(scanFailure = it).getErrorMessage())
+                })
         }.onFailure {
-            onError(Error(throwable = it).getErrorMessage())
+            // Cancel the Flow if an error occurs when starting the scan
+            cancel(Error(throwable = it).getErrorMessage())
         }
+        // Close the Flow when the scan is finished or canceled
+        awaitClose()
     }
 
     /**
@@ -54,9 +59,7 @@ class ConnectionServiceImpl(
 
     override val isScanning = central.isScanning
 
-
     override fun stopScanning() = central.stopScan()
-
 
     override fun currentConnectState() = callbackFlow {
         central.observeConnectionState { peripheral, state ->
@@ -75,7 +78,7 @@ class ConnectionServiceImpl(
     }
 
     companion object {
-        val CHAR_WRITE: UUID = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e") //WRITE
-        val CHAR_READ: UUID = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e") //READ
+        val CHAR_WRITE: UUID = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e") // WRITE
+        val CHAR_READ: UUID = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e") // READ
     }
 }

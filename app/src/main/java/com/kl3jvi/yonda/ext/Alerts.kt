@@ -13,5 +13,7 @@ package com.kl3jvi.yonda.ext
 public inline fun executeIf(predicate: Boolean, block: () -> Unit) {
     if (predicate) {
         block()
-    } else return
+    } else {
+        return
+    }
 }

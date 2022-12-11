@@ -18,11 +18,15 @@ class DeviceConnection(
 ) {
     private val rawResponseCache = mutableMapOf<ScooterCommand, RawResponse>()
 
+    /**
+     * Used run blocking because we are sending commands one after the other and we need to block
+     * the thread we are currently working.
+     */
     suspend fun run(
         command: ScooterCommand,
         useCache: Boolean = false,
         delayTime: Long = 0
-    ): ScooterResponse = withContext(Dispatchers.IO) {
+    ): ScooterResponse = runBlocking {
         val deviceRawResponse =
             if (useCache && rawResponseCache[command] != null) {
                 rawResponseCache.getValue(command)

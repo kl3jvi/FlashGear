@@ -6,24 +6,19 @@ import kotlinx.coroutines.flow.Flow
 
 interface ConnectionService {
 
+    /* It's a property that returns the value of the isScanning variable. */
+    val isScanning: Boolean
+
     /**
-     * "Scan for BLE devices and call the onSuccess function when a device is found, or call the
-     * onError function if there's an error."
-     *
-     *
-     * @param onSuccess This is a callback that will be called when a device is found. It will be
-     * called with a Pair of BluetoothPeripheral and ScanResult.
-     * @param onError (ScanFailure) -> Unit
+     * "This function returns a Flow of BluetoothPeripheral objects, which are the devices that are
+     * found by the scan."
      */
-    fun scanBleDevices(
-        onSuccess: (BluetoothPeripheral) -> Unit,
-        onError: (String) -> Unit
-    )
+    fun scanBleDevices(): Flow<BluetoothPeripheral>
 
     /**
      * Returns true if Bluetooth is enabled, false otherwise.
      */
-     fun isBluetoothEnabled(): Flow<Boolean>
+    fun isBluetoothEnabled(): Flow<Boolean>
 
     /**
      * Stop scanning for peripherals
@@ -49,6 +44,11 @@ interface ConnectionService {
      * that represents a stream of data
      */
     fun currentConnectState(): Flow<Pair<BluetoothPeripheral, ConnectionState>>
+
+    /**
+     * "Reads the data from the scooter and returns it as a byte array."
+     *
+     * @param peripheral The BluetoothPeripheral object that you want to read from.
+     */
     suspend fun readFromScooter(peripheral: BluetoothPeripheral): ByteArray
-    val isScanning: Boolean
 }

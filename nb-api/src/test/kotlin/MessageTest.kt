@@ -37,9 +37,6 @@ class MessageTest {
             .setPayload(0x02)
             .build()
 
-
         assertEquals(message, "5cff")
     }
-
-
 }
