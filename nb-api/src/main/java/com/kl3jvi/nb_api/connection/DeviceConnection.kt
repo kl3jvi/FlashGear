@@ -22,7 +22,7 @@ class DeviceConnection(
         command: ScooterCommand,
         useCache: Boolean = false,
         delayTime: Long = 0
-    ): ScooterResponse = runBlocking {
+    ): ScooterResponse = withContext(Dispatchers.IO) {
         val deviceRawResponse =
             if (useCache && rawResponseCache[command] != null) {
                 rawResponseCache.getValue(command)

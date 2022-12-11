@@ -31,7 +31,6 @@ class AmpereTest {
     fun testHandler() {
         // Call the handler property and pass it the RawResponse object
         val currentAmpere = ampere.handler(rawResponse)
-
         // Verify that the correct current ampere value is returned
         assertEquals("0.5", currentAmpere)
     }
