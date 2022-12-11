@@ -4,20 +4,19 @@ import android.bluetooth.le.ScanResult
 import com.kl3jvi.yonda.ext.Error
 import com.welie.blessed.BluetoothCentralManager
 import com.welie.blessed.BluetoothPeripheral
-import kotlinx.coroutines.Dispatchers
+import com.welie.blessed.ConnectionState
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.util.UUID
 
-class ConnectionServiceImpl(
-    private val central: BluetoothCentralManager
-) : ConnectionService, KoinComponent {
+class ConnectionServiceImpl : ConnectionService, KoinComponent {
+    private val central: BluetoothCentralManager by inject()
 
     init {
         central.enableLogging()
@@ -25,18 +24,17 @@ class ConnectionServiceImpl(
 
     override fun scanBleDevices(): Flow<BluetoothPeripheral> = callbackFlow {
         runCatching {
-            central.scanForPeripherals(resultCallback = { bluetoothPeripheral: BluetoothPeripheral, _: ScanResult ->
-                // Emit the BluetoothPeripheral object
-                trySend(bluetoothPeripheral)
-            }, scanError = {
-                    // Cancel the Flow if an error occurs during the scan
+            central.scanForPeripherals(
+                resultCallback = { bluetoothPeripheral: BluetoothPeripheral, _: ScanResult ->
+                    trySend(bluetoothPeripheral)
+                },
+                scanError = {
                     cancel(Error(scanFailure = it).getErrorMessage())
-                })
+                }
+            )
         }.onFailure {
-            // Cancel the Flow if an error occurs when starting the scan
             cancel(Error(throwable = it).getErrorMessage())
         }
-        // Close the Flow when the scan is finished or canceled
         awaitClose()
     }
 
@@ -50,14 +48,14 @@ class ConnectionServiceImpl(
         }
     }
 
-    override fun isScanning() = flow {
+    override fun isScanning() = central.isScanning
+
+    override fun isScanningFlow() = flow {
         while (true) {
             delay(1000)
-            emit(isScanning)
+            emit(isScanning())
         }
     }
-
-    override val isScanning = central.isScanning
 
     override fun stopScanning() = central.stopScan()
 
@@ -65,12 +63,20 @@ class ConnectionServiceImpl(
         central.observeConnectionState { peripheral, state ->
             trySend(peripheral to state)
         }
-        awaitClose { central.close() }
+        awaitClose()
     }
 
-    override suspend fun connectPeripheral(bluetoothPeripheral: BluetoothPeripheral) =
-        withContext(Dispatchers.IO) {
-            runCatching { central.connectPeripheral(bluetoothPeripheral) }
+    override fun connectToPeripheral(peripheral: BluetoothPeripheral): Flow<Pair<BluetoothPeripheral, ConnectionState>> =
+        callbackFlow {
+            runCatching {
+                central.connectPeripheral(peripheral)
+            }.onFailure {
+                cancel(it.message ?: "Error Connecting!")
+            }
+            central.observeConnectionState { peripheral, state ->
+                trySend(peripheral to state)
+            }
+            awaitClose()
         }
 
     override suspend fun readFromScooter(peripheral: BluetoothPeripheral): ByteArray {

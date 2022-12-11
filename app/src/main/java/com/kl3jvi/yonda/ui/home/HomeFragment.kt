@@ -9,6 +9,7 @@ import com.airbnb.lottie.LottieAnimationView
 import com.kl3jvi.yonda.R
 import com.kl3jvi.yonda.databinding.FragmentHomeBinding
 import com.kl3jvi.yonda.ext.launchAndRepeatWithViewLifecycle
+import kotlinx.coroutines.Job
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.component.KoinComponent
 
@@ -18,6 +19,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private val homeViewModel: HomeViewModel by viewModel()
+    private lateinit var job: Job
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -27,25 +29,26 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
         binding.rv.adapter = adapter
 
         binding.fab.setOnClickListener {
+            binding.fab.isActivated = !binding.fab.isActivated
             scanBle()
         }
 //        launchAndRepeatWithViewLifecycle {
 //            homeViewModel.isScanning.collect { isScanning ->
 //                Log.e("isScanning",isScanning.toString())
-//                binding.fab.isActivated = !isScanning
+//                binding.fab.isActivated = isScanning
 //                binding.lottieAnimationView.playAnimationIf(isScanning)
 //                binding.isScanning = isScanning
-// //                if (isScanning) {
-// //                    homeViewModel.stopScanPressed()
-// //                } else {
+//                 if (isScanning) {
+//                     homeViewModel.stopScanPressed()
+//                 } else {
 //
-// //                }
+//                 }
 //            }
 //        }
     }
 
     private fun scanBle() {
-        launchAndRepeatWithViewLifecycle {
+        job = launchAndRepeatWithViewLifecycle {
             homeViewModel.scannedDeviceList.collect { bluetoothState ->
                 when (bluetoothState) {
                     is BluetoothState.Error -> Log.e(

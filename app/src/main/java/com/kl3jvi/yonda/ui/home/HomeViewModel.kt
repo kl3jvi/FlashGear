@@ -5,18 +5,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kl3jvi.yonda.connectivity.ConnectionService
 import com.kl3jvi.yonda.ext.Result
-import com.kl3jvi.yonda.ext.asResult
+import com.kl3jvi.yonda.ext.convertToResultAndMapTo
+import com.kl3jvi.yonda.ext.delayEachFor
 import com.kl3jvi.yonda.models.BleDevice
 import com.welie.blessed.BluetoothPeripheral
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
@@ -25,35 +22,27 @@ class HomeViewModel(
 
     private var bluetoothDevices: Set<BleDevice> = emptySet()
 
-    val connState = connectionService.currentConnectState()
-    val isScanning = connectionService.isScanning()
-    val isBleEnabled = connectionService.isBluetoothEnabled()
-
-    val scannedDeviceList: Flow<BluetoothState> = connectionService.scanBleDevices()
-        .asResult()
-        .map {
-            when (it) {
-                is Result.Error -> BluetoothState.Error(it.exception?.localizedMessage ?: "")
+    var scannedDeviceList: Flow<BluetoothState> = connectionService.scanBleDevices()
+        .convertToResultAndMapTo { result ->
+            when (result) {
+                is Result.Error -> BluetoothState.Error(result.exception?.localizedMessage ?: "")
                 Result.Loading -> BluetoothState.Idle
                 is Result.Success -> {
-                    bluetoothDevices += BleDevice(it.data)
+                    bluetoothDevices += BleDevice(result.data)
                     BluetoothState.Success(bluetoothDevices.toList())
                 }
             }
         }
         .distinctUntilChanged()
-        .onEach {
-            delay(1000)
-        }.takeWhile {
-            connectionService.isScanning
-        }.flowOn(Dispatchers.Default)
+        .delayEachFor(1000)
+        .flowOn(Dispatchers.Default)
 
     /**
      * The function stops the scanning process and clears the list of scanned devices
      */
     fun stopScanPressed() {
         connectionService.stopScanning()
-        scannedDeviceList.drop(bluetoothDevices.size)
+        scannedDeviceList = scannedDeviceList.drop(bluetoothDevices.size)
         bluetoothDevices = emptySet()
     }
 
@@ -65,16 +54,9 @@ class HomeViewModel(
     override fun connectToPeripheral(peripheral: BluetoothPeripheral) {
         viewModelScope.launch(Dispatchers.IO) {
             stopScanPressed()
-            connectionService.connectPeripheral(peripheral)
-                .onSuccess {
-                    Log.e(
-                        "Connecting to ${peripheral.name} at",
-                        "${System.currentTimeMillis()}"
-                    )
-                }.onFailure {
-                    Log.e("Error occurred", "when connecting", it)
-                    return@launch
-                }
+            connectionService.connectToPeripheral(peripheral).collect {
+                Log.e("Device-${it.first.address}", "is ${it.second}")
+            }
         }
     }
 }

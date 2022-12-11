@@ -6,9 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface ConnectionService {
 
-    /* It's a property that returns the value of the isScanning variable. */
-    val isScanning: Boolean
-
     /**
      * "This function returns a Flow of BluetoothPeripheral objects, which are the devices that are
      * found by the scan."
@@ -28,14 +25,16 @@ interface ConnectionService {
     /**
      * It returns a boolean value.
      */
-    fun isScanning(): Flow<Boolean>
+    fun isScanning(): Boolean
+
+    fun isScanningFlow(): Flow<Boolean>
 
     /**
-     * This function connects to a Bluetooth peripheral
+     * It returns a Flow of Pairs of BluetoothPeripheral and ConnectionState
      *
-     * @param bluetoothPeripheral The BluetoothPeripheral object that you want to connect to.
+     * @param peripheral The peripheral to connect to.
      */
-    suspend fun connectPeripheral(bluetoothPeripheral: BluetoothPeripheral): Result<Unit>
+    fun connectToPeripheral(peripheral: BluetoothPeripheral): Flow<Pair<BluetoothPeripheral, ConnectionState>>
 
     /**
      * "This function returns a Flow of ConnectionState objects."

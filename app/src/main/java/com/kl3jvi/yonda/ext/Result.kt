@@ -11,11 +11,10 @@ sealed interface Result<out T> {
     object Loading : Result<Nothing>
 }
 
-/* Converting a Flow<T> to a Flow<Result<T>>. */
 /**
  * Part of Now In Android google Sample
  */
-fun <T> Flow<T>.asResult(): Flow<Result<T>> {
+private fun <T> Flow<T>.asResult(): Flow<Result<T>> {
     return map<T, Result<T>> {
         Result.Success(it)
     }.onStart {
@@ -23,4 +22,9 @@ fun <T> Flow<T>.asResult(): Flow<Result<T>> {
     }.catch {
         emit(Result.Error(it))
     }
+}
+
+/* A function that takes a Flow<T> and returns a Flow<R> */
+fun <T, R> Flow<T>.convertToResultAndMapTo(transform: suspend (value: Result<T>) -> R): Flow<R> {
+    return asResult().map(transform)
 }
