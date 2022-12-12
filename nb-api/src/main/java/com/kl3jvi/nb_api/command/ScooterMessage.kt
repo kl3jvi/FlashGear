@@ -1,6 +1,6 @@
 package com.kl3jvi.nb_api.command
 
-class Message {
+class ScooterMessage {
     private var msg: MutableList<Int> = mutableListOf()
     private var direction = 0
     private var rw = 0
@@ -8,26 +8,26 @@ class Message {
     private var payload: MutableList<Int> = mutableListOf()
     private var checksum = 0
 
-    fun setDirection(drct: Commands): Message {
+    fun setDirection(drct: Commands): ScooterMessage {
         direction = drct.command
         checksum += direction
         return this
     }
 
-    fun setRW(readOrWrite: Commands): Message { // read or write
+    fun setReadOrWrite(readOrWrite: Commands): ScooterMessage { // read or write
         rw = readOrWrite.command
         checksum += rw
         return this
     }
 
-    fun setPosition(pos: Int): Message {
+    fun setPosition(pos: Int): ScooterMessage {
         position = pos
         checksum += position
         return this
     }
 
-    fun setPayload(bytesToSend: ByteArray): Message {
-        payload = mutableListOf<Int>()
+    fun setPayload(bytesToSend: ByteArray): ScooterMessage {
+        payload = mutableListOf()
         checksum += bytesToSend.size + 2
         for (b in bytesToSend) {
             payload.add(b.toInt())
@@ -36,7 +36,7 @@ class Message {
         return this
     }
 
-    fun setPayload(bytesToSend: MutableList<Int>): Message {
+    fun setPayload(bytesToSend: MutableList<Int>): ScooterMessage {
         payload = bytesToSend
         checksum += payload.size + 2
         for (i in payload) {
@@ -45,7 +45,7 @@ class Message {
         return this
     }
 
-    fun setPayload(singleByteToSend: Int): Message {
+    fun setPayload(singleByteToSend: Int): ScooterMessage {
         payload = mutableListOf()
         payload.add(singleByteToSend)
         checksum += 3
@@ -61,7 +61,7 @@ class Message {
     }
 
     private fun setupHeaders() {
-        msg = mutableListOf(0)
+        msg = mutableListOf()
         msg.add(0x55)
         msg.add(0xAA)
     }
@@ -82,6 +82,11 @@ class Message {
         msg.add(checksum shr 8)
     }
 
+    /**
+     * It converts a byte array into a hexadecimal string.
+     *
+     * @return The message is being returned as a string of hexadecimal values.
+     */
     private fun construct(): String {
         return msg.joinToString("") { it.toString(16).padStart(2, '0') }
     }

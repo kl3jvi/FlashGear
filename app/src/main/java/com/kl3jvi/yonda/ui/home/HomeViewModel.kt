@@ -9,13 +9,16 @@ import com.kl3jvi.yonda.ext.convertToResultAndMapTo
 import com.kl3jvi.yonda.ext.delayEachFor
 import com.kl3jvi.yonda.models.BleDevice
 import com.welie.blessed.BluetoothPeripheral
+import com.welie.blessed.asHexString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class HomeViewModel(
     private val connectionService: ConnectionService
@@ -23,6 +26,7 @@ class HomeViewModel(
 
     private var bluetoothDevices: MutableSet<BleDevice> = mutableSetOf()
     var checkForAnimation = MutableStateFlow(false)
+    val currentConnectivityState = MutableStateFlow("State: N/A")
 
     var scannedDeviceList: Flow<BluetoothState> = connectionService.scanBleDevices()
         .convertToResultAndMapTo { result ->
@@ -44,6 +48,7 @@ class HomeViewModel(
      */
     fun stopScanPressed() {
         connectionService.stopScanning()
+        checkForAnimation.update { false }
         scannedDeviceList = scannedDeviceList.drop(bluetoothDevices.size)
         bluetoothDevices = mutableSetOf()
     }
@@ -56,18 +61,32 @@ class HomeViewModel(
     override fun connectToPeripheral(peripheral: BluetoothPeripheral) {
         viewModelScope.launch(Dispatchers.IO) {
             stopScanPressed()
-            connectionService.connectToPeripheral(peripheral).collect {
-                Log.e("Device-${it.first.address}", "is ${it.second}")
+            connectionService.connectToPeripheral(peripheral).collect { (peripheral, state) ->
+                currentConnectivityState.update {
+                    "State" +
+                            if (peripheral.name.isNullOrEmpty()
+                                    .not()
+                            ) "of ${peripheral.name}" else {
+                                ""
+                            } + ": $state"
+                }
+                peripheral.services.forEach { Log.e("Services", "${it.uuid}") }
+
             }
+        }
+    }
+
+    override fun sendCommandToPeripheral(peripheral: BluetoothPeripheral) {
+        Log.e("CLicked ", "sendCimmand")
+        viewModelScope.launch {
+            val a = connectionService.sendCommand(peripheral)
+            currentConnectivityState.update { "State: ${a.asHexString()}" }
         }
     }
 }
 
 sealed interface BluetoothState {
-    data class Success(
-        val data: List<BleDevice>
-    ) : BluetoothState
-
+    data class Success(val data: List<BleDevice>) : BluetoothState
     data class Error(val errorMessage: String) : BluetoothState
     object Idle : BluetoothState
 }

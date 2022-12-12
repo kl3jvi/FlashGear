@@ -1,11 +1,10 @@
 package com.kl3jvi.nb_api.command.cruise
 
 import com.kl3jvi.nb_api.command.Commands
-import com.kl3jvi.nb_api.command.Message
+import com.kl3jvi.nb_api.command.ScooterMessage
 import com.kl3jvi.nb_api.command.RawResponse
 import com.kl3jvi.nb_api.command.RequestType
 import com.kl3jvi.nb_api.command.ScooterCommand
-import com.kl3jvi.nb_api.command.util.hexToBytes
 
 class CheckCruise : ScooterCommand() {
     override val tag: String = "Cruise"
@@ -17,9 +16,9 @@ class CheckCruise : ScooterCommand() {
 
     override val handler = { it: RawResponse -> cruiseState(it.result) }
 
-    override fun getRequestString() = Message()
+    override fun getRequestString() = ScooterMessage()
         .setDirection(Commands.MASTER_TO_M365)
-        .setRW(Commands.READ)
+        .setReadOrWrite(Commands.READ)
         .setPosition(0x7C)
         .setPayload(0x02)
         .build()

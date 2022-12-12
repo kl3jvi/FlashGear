@@ -1,18 +1,17 @@
-package com.kl3jvi.nb_api.command.cruise
+package com.kl3jvi.nb_api.command.locking
 
 import com.kl3jvi.nb_api.command.Commands
 import com.kl3jvi.nb_api.command.ScooterMessage
 import com.kl3jvi.nb_api.command.RequestType
 import com.kl3jvi.nb_api.command.ScooterCommand
 
-class CruiseOff : ScooterCommand() {
-    override val tag: String = "Cruise"
-    override val name: String = "Turn Off Cruise"
+class LockOff : ScooterCommand() {
+    override val tag: String = "Lock"
+    override val name: String = "Remove Lock"
     override val requestType: RequestType = RequestType.NOCOUNT
 
-    override val requestBit: String = "7C"
-    override val defaultUnit: String
-        get() = ""
+    override val requestBit: String = "71"
+    override val defaultUnit: String = ""
 
     override fun getRequestString(): String = ScooterMessage()
         .setDirection(Commands.MASTER_TO_M365)

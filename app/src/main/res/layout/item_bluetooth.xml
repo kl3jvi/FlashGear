@@ -14,6 +14,10 @@
             name="connectionListener"
             type="com.kl3jvi.yonda.ui.home.ConnectListener" />
 
+
+        <variable
+            name="clickListener"
+            type="android.view.View.OnClickListener" />
     </data>
 
 
@@ -38,6 +42,7 @@
             <ImageView
                 android:layout_width="50dp"
                 android:layout_height="50dp"
+
                 android:padding="8dp"
                 android:src="@drawable/ic_search" />
         </androidx.cardview.widget.CardView>
@@ -74,6 +79,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
+            android:onClick="@{()->connectionListener.sendCommandToPeripheral(bleDevice.peripheral)}"
             android:text="@string/connect"
             app:layout_constraintBottom_toBottomOf="@+id/mac_address"
             app:layout_constraintEnd_toEndOf="parent"

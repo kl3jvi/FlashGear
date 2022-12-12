@@ -1,10 +1,10 @@
 package com.kl3jvi.nb_api.command.ampere
 
 import com.kl3jvi.nb_api.command.Commands
-import com.kl3jvi.nb_api.command.Message
 import com.kl3jvi.nb_api.command.RawResponse
 import com.kl3jvi.nb_api.command.RequestType
 import com.kl3jvi.nb_api.command.ScooterCommand
+import com.kl3jvi.nb_api.command.ScooterMessage
 
 class Ampere : ScooterCommand() {
     override val tag: String = "Ampere"
@@ -15,9 +15,9 @@ class Ampere : ScooterCommand() {
 
     override val handler = { it: RawResponse -> "%.1f".format(getCurrentAmpere(it.result)) }
 
-    override fun getRequestString(): String = Message()
+    override fun getRequestString(): String = ScooterMessage()
         .setDirection(Commands.MASTER_TO_BATTERY)
-        .setRW(Commands.READ)
+        .setReadOrWrite(Commands.READ)
         .setPosition(0x33)
         .setPayload(0x02)
         .build()

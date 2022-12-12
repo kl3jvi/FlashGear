@@ -10,8 +10,6 @@ import com.kl3jvi.yonda.R
 import com.kl3jvi.yonda.databinding.FragmentHomeBinding
 import com.kl3jvi.yonda.ext.launchAndRepeatWithViewLifecycle
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.component.KoinComponent
@@ -29,6 +27,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentHomeBinding.bind(view)
         adapter = ScanResultsAdapter(homeViewModel)
+
         binding.rv.layoutManager = LinearLayoutManager(requireContext())
         binding.rv.adapter = adapter
 
@@ -38,16 +37,22 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
                 homeViewModel.checkForAnimation.collect { checkForAnimation ->
                     binding.isScanning = checkForAnimation
                     binding.lottieAnimationView.playAnimationIf(checkForAnimation)
+                    scanBle(checkForAnimation)
                 }
             }
-            scanBle()
-
+        }
+        launchAndRepeatWithViewLifecycle {
+            homeViewModel.currentConnectivityState.collect {
+                binding.textView5.text = it
+            }
         }
     }
 
-    private fun scanBle() {
-
-        launchAndRepeatWithViewLifecycle {
+    private fun scanBle(isScanning: Boolean) {
+        if (!isScanning) {
+            homeViewModel.stopScanPressed()
+            homeViewModel.checkForAnimation.update { false }
+        } else launchAndRepeatWithViewLifecycle {
             homeViewModel.scannedDeviceList.collect { bluetoothState ->
                 when (bluetoothState) {
                     is BluetoothState.Error -> Log.e(
@@ -66,9 +71,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
                     else -> {}
                 }
             }
-            delay(15000)
-            cancel()
-            homeViewModel.checkForAnimation.update { false }
+
         }
     }
 

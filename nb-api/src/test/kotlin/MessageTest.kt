@@ -1,16 +1,15 @@
 import com.kl3jvi.nb_api.command.Commands
-import com.kl3jvi.nb_api.command.Message
+import com.kl3jvi.nb_api.command.ScooterMessage
 import org.junit.Test
-import java.util.HexFormat
 import kotlin.test.assertEquals
 
 class MessageTest {
 
     @Test
     fun testMessageBuilder() {
-        val message = Message()
+        val message = ScooterMessage()
             .setDirection(Commands.MASTER_TO_M365)
-            .setRW(Commands.READ)
+            .setReadOrWrite(Commands.READ)
             .setPosition(0x7C)
             .setPayload(0x02)
             .build()
@@ -19,9 +18,9 @@ class MessageTest {
 
     @Test
     fun checkCruiseOffString() {
-        val message = Message()
+        val message = ScooterMessage()
             .setDirection(Commands.MASTER_TO_M365)
-            .setRW(Commands.WRITE)
+            .setReadOrWrite(Commands.WRITE)
             .setPosition(0x7C)
             .setPayload(0x0000)
             .build()
@@ -32,9 +31,9 @@ class MessageTest {
     /* A test to check the lights message string. */
     @Test
     fun checkLightsMessageString() {
-        val message = Message()
+        val message = ScooterMessage()
             .setDirection(Commands.MASTER_TO_M365)
-            .setRW(Commands.READ)
+            .setReadOrWrite(Commands.READ)
             .setPosition(0x7D)
             .setPayload(0x02)
             .build()

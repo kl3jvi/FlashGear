@@ -21,7 +21,7 @@
             android:id="@+id/lottieAnimationView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
+            android:adjustViewBounds="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -30,6 +30,7 @@
             app:lottie_rawRes="@raw/search_ble" />
 
         <TextView
+            android:id="@+id/textView4"
             style="@style/TextAppearance.AppCompat.SearchResult.Title"
             scanningText="@{isScanning}"
             android:layout_width="match_parent"
@@ -44,9 +45,9 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:scrollbars="vertical"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layout_constraintBottom_toTopOf="@+id/fab"
-            app:layout_constraintTop_toBottomOf="@+id/lottieAnimationView"
+            app:layout_constraintTop_toBottomOf="@+id/textView4"
             tools:listitem="@layout/item_bluetooth" />
 
         <TextView
@@ -77,6 +78,28 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="Scan" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="8dp"
+            app:cardBackgroundColor="#CC6767"
+            app:cardCornerRadius="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:letterSpacing="0.1"
+                android:textColor="#FBFBFB"
+                android:textStyle="bold" />
+        </androidx.cardview.widget.CardView>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

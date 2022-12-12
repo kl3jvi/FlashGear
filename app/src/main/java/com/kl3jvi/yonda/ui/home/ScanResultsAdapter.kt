@@ -12,10 +12,11 @@ import com.welie.blessed.BluetoothPeripheral
 
 interface ConnectListener {
     fun connectToPeripheral(peripheral: BluetoothPeripheral)
+    fun sendCommandToPeripheral(peripheral: BluetoothPeripheral)
 }
 
 class ScanResultsAdapter(
-    private val listener: ConnectListener
+    private val listener: ConnectListener,
 ) : ListAdapter<BleDevice, ScanResultsAdapter.ViewHolder>(
     object : DiffUtil.ItemCallback<BleDevice>() {
         override fun areItemsTheSame(oldItem: BleDevice, newItem: BleDevice): Boolean {
@@ -33,19 +34,6 @@ class ScanResultsAdapter(
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.connectionListener = listener
-//            binding.setClickListener { view ->
-// //                binding.bleDevice?.let {
-// //                    Navigation.createNavigateOnClickListener(
-// //                        R.id.to_details,
-// //                        bundleOf(
-// //                            "title" to view.context.resources.getString(
-// //                                R.string.title_details,
-// //                                it.peripheral.address
-// //                            ),
-// //                            "device" to it
-// //                        )
-// //                    ).onClick(view)
-//                }
         }
 
         fun bind(bleDevice: BleDevice) {
