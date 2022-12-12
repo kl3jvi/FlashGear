@@ -12,6 +12,7 @@ abstract class ScooterCommand {
     open val handler: (RawResponse) -> String = { it.result }
 
     abstract fun getRequestString(): String
+
     fun format(response: ScooterResponse): String = "${response.value}${response.unit}"
 
     fun handleResponse(deviceRawRawResponse: RawResponse): ScooterResponse {

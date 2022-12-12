@@ -13,13 +13,14 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
+        bgColor="@{isScanning}"
         android:layout_height="match_parent">
 
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/lottieAnimationView"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -28,11 +29,22 @@
             app:lottie_loop="true"
             app:lottie_rawRes="@raw/search_ble" />
 
+        <TextView
+            style="@style/TextAppearance.AppCompat.SearchResult.Title"
+            scanningText="@{isScanning}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lottieAnimationView" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:scrollbars="vertical"
+            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@+id/fab"
             app:layout_constraintTop_toBottomOf="@+id/lottieAnimationView"
             tools:listitem="@layout/item_bluetooth" />
@@ -44,18 +56,19 @@
             android:layout_marginBottom="40dp"
             android:text="@string/connecting"
             android:textStyle="bold"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/lottieAnimationView"
             app:layout_constraintEnd_toEndOf="@+id/lottieAnimationView"
             app:layout_constraintStart_toStartOf="@+id/lottieAnimationView" />
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/fab"
-            bgColor="@{isScanning}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:textAlignment="center"
             android:textColor="@color/white"
+            android:visibility="gone"
             app:fabSize="auto"
             app:icon="@drawable/ic_search_state"
             app:iconGravity="textEnd"

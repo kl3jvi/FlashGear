@@ -15,7 +15,7 @@ class Ampere : ScooterCommand() {
 
     override val handler = { it: RawResponse -> "%.1f".format(getCurrentAmpere(it.result)) }
 
-    override fun getRequestString(): String = Message.Builder()
+    override fun getRequestString(): String = Message()
         .setDirection(Commands.MASTER_TO_BATTERY)
         .setRW(Commands.READ)
         .setPosition(0x33)
@@ -23,16 +23,15 @@ class Ampere : ScooterCommand() {
         .build()
 
     /**
-     * It converts the hexadecimal value of the current to a decimal value.
+     * It takes the result from ble response and returns a double that tells the current ampere on
+     * scooter device.
      *
-     * @param result The string that is returned from the bluetooth device.
+     * @param result The result of the command sent to the device.
      * @return The current ampere value is being returned.
      */
     fun getCurrentAmpere(result: String): Double {
-        val temp = result[7].toString().plus(result[6])
-        val amps: Int = temp.toInt(16)
-        var c = amps.toDouble()
-        c /= 100
-        return c
+        val temp = result.substring(6..7)
+        val amps: Int = Integer.parseInt(temp, 16)
+        return amps.toDouble() / 100
     }
 }

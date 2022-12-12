@@ -10,6 +10,9 @@ import com.kl3jvi.yonda.R
 import com.kl3jvi.yonda.databinding.FragmentHomeBinding
 import com.kl3jvi.yonda.ext.launchAndRepeatWithViewLifecycle
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.update
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.component.KoinComponent
 
@@ -21,6 +24,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
     private val homeViewModel: HomeViewModel by viewModel()
     private lateinit var job: Job
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentHomeBinding.bind(view)
@@ -28,35 +32,28 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
         binding.rv.layoutManager = LinearLayoutManager(requireContext())
         binding.rv.adapter = adapter
 
-        binding.fab.setOnClickListener {
-            binding.fab.isActivated = !binding.fab.isActivated
+        binding.lottieAnimationView.setOnClickListener {
+            launchAndRepeatWithViewLifecycle {
+                homeViewModel.checkForAnimation.update { !it }
+                homeViewModel.checkForAnimation.collect { checkForAnimation ->
+                    binding.isScanning = checkForAnimation
+                    binding.lottieAnimationView.playAnimationIf(checkForAnimation)
+                }
+            }
             scanBle()
+
         }
-//        launchAndRepeatWithViewLifecycle {
-//            homeViewModel.isScanning.collect { isScanning ->
-//                Log.e("isScanning",isScanning.toString())
-//                binding.fab.isActivated = isScanning
-//                binding.lottieAnimationView.playAnimationIf(isScanning)
-//                binding.isScanning = isScanning
-//                 if (isScanning) {
-//                     homeViewModel.stopScanPressed()
-//                 } else {
-//
-//                 }
-//            }
-//        }
     }
 
     private fun scanBle() {
-        job = launchAndRepeatWithViewLifecycle {
+
+        launchAndRepeatWithViewLifecycle {
             homeViewModel.scannedDeviceList.collect { bluetoothState ->
                 when (bluetoothState) {
                     is BluetoothState.Error -> Log.e(
                         "Error",
                         "happened ${bluetoothState.errorMessage}"
                     )
-
-                    BluetoothState.Idle -> {}
 
                     is BluetoothState.Success -> {
                         Log.e(
@@ -65,8 +62,13 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
                         )
                         adapter.submitList(bluetoothState.data)
                     }
+
+                    else -> {}
                 }
             }
+            delay(15000)
+            cancel()
+            homeViewModel.checkForAnimation.update { false }
         }
     }
 

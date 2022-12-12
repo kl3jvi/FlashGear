@@ -25,6 +25,6 @@ private fun <T> Flow<T>.asResult(): Flow<Result<T>> {
 }
 
 /* A function that takes a Flow<T> and returns a Flow<R> */
-fun <T, R> Flow<T>.convertToResultAndMapTo(transform: suspend (value: Result<T>) -> R): Flow<R> {
-    return asResult().map(transform)
-}
+fun <T, R> Flow<T>.convertToResultAndMapTo(
+    transform: suspend (value: Result<T>) -> R
+): Flow<R> = asResult().map(transform)

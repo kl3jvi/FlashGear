@@ -25,13 +25,12 @@ fun String.hexToBytes(): ByteArray {
     require(this.length % 2 != 1) { "hexToBytes requires an even-length String parameter" }
     val len = this.length
     val data = ByteArray(len / 2)
-    var i = 0
-    while (i < len) {
-        data[i / 2] = (
-            (this[i].digitToIntOrNull(16) ?: (-1 shl 4)) +
-                this[i + 1].digitToIntOrNull(16)!!
-            ).toByte()
-        i += 2
+    for (i in 0 until len step 2) {
+        this[i].digitToIntOrNull(16)?.let { hn ->
+            this[i + 1].digitToIntOrNull(16)?.let { ln ->
+                data[i / 2] = ((hn shl 4) + ln).toByte()
+            }
+        }
     }
     return data
 }

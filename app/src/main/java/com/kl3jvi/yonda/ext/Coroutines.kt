@@ -23,5 +23,7 @@ inline fun Fragment.launchAndRepeatWithViewLifecycle(
 }
 
 fun <T> Flow<T>.delayEachFor(amount: Long) = apply {
-    onEach { delay(amount) }
+    this.onEach {
+        delay(amount)
+    }
 }

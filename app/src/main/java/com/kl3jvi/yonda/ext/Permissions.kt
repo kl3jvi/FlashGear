@@ -2,6 +2,8 @@ package com.kl3jvi.yonda.ext
 
 import android.Manifest.permission.BLUETOOTH_CONNECT
 import android.Manifest.permission.BLUETOOTH_SCAN
+import android.bluetooth.BluetoothManager
+import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -23,14 +25,16 @@ fun Fragment.enableBluetooth() {
     }
 }
 
-/* Checking if the permissions are granted. */
 fun Fragment.isBluetoothGranted(): Boolean {
+    val bluetoothManager =
+        requireContext().getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+
     return blePermissions.map {
         ContextCompat.checkSelfPermission(
             requireContext(),
             it
         ) == PackageManager.PERMISSION_GRANTED
-    }.all { it }
+    }.all { it } && bluetoothManager.adapter != null
 }
 
 fun Fragment.enableLocation() {

@@ -35,7 +35,7 @@ class ConnectionServiceImpl : ConnectionService, KoinComponent {
         }.onFailure {
             cancel(Error(throwable = it).getErrorMessage())
         }
-        awaitClose()
+        awaitClose(::stopScanning)
     }
 
     /**
@@ -59,13 +59,6 @@ class ConnectionServiceImpl : ConnectionService, KoinComponent {
 
     override fun stopScanning() = central.stopScan()
 
-    override fun currentConnectState() = callbackFlow {
-        central.observeConnectionState { peripheral, state ->
-            trySend(peripheral to state)
-        }
-        awaitClose()
-    }
-
     override fun connectToPeripheral(peripheral: BluetoothPeripheral): Flow<Pair<BluetoothPeripheral, ConnectionState>> =
         callbackFlow {
             runCatching {
@@ -79,8 +72,8 @@ class ConnectionServiceImpl : ConnectionService, KoinComponent {
             awaitClose()
         }
 
-    override suspend fun readFromScooter(peripheral: BluetoothPeripheral): ByteArray {
-        return peripheral.readCharacteristic(CHAR_READ, CHAR_WRITE)
+    override suspend fun readFromScooter(peripheral: BluetoothPeripheral): Result<ByteArray> {
+        return runCatching { peripheral.readCharacteristic(CHAR_READ, CHAR_WRITE) }
     }
 
     companion object {

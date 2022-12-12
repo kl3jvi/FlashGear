@@ -1,3 +1,5 @@
+package ampere
+
 import com.kl3jvi.nb_api.command.RawResponse
 import com.kl3jvi.nb_api.command.ampere.Ampere
 import org.junit.Before
@@ -6,6 +8,8 @@ import kotlin.test.assertEquals
 
 class AmpereTest {
 
+    private val rawValue: String = "12345678"
+    private val rawResponse = RawResponse(rawValue, 1000)
     lateinit var ampere: Ampere
 
     @Before
@@ -16,22 +20,28 @@ class AmpereTest {
     @Test
     fun testGetRequestString() {
         val requestString = ampere.getRequestString()
-        assertEquals("a4ff", requestString)
+        assertEquals("0055aa0322013302a4ff", requestString)
     }
 
     @Test
     fun testGetCurrentAmpere() {
-        val currentAmpere = ampere.getCurrentAmpere("123456678")
-        assertEquals(1.18, currentAmpere)
+        val currentAmpere = ampere.getCurrentAmpere("12345678")
+        assertEquals(1.2, currentAmpere)
     }
-
-    private val rawResponse = RawResponse("0016093300F401", 1000)
 
     @Test
     fun testHandler() {
         // Call the handler property and pass it the RawResponse object
         val currentAmpere = ampere.handler(rawResponse)
         // Verify that the correct current ampere value is returned
-        assertEquals("0.5", currentAmpere)
+        assertEquals("1.2", currentAmpere)
+    }
+
+    @Test
+    fun `test valid ampere response handler`() {
+        val scooterResponse = Ampere().run {
+            handleResponse(rawResponse)
+        }
+        assertEquals("1.2A", scooterResponse.formattedValue)
     }
 }

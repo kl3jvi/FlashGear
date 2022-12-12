@@ -11,6 +11,7 @@ import com.kl3jvi.yonda.models.BleDevice
 import com.welie.blessed.BluetoothPeripheral
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOn
@@ -20,7 +21,8 @@ class HomeViewModel(
     private val connectionService: ConnectionService
 ) : ViewModel(), ConnectListener {
 
-    private var bluetoothDevices: Set<BleDevice> = emptySet()
+    private var bluetoothDevices: MutableSet<BleDevice> = mutableSetOf()
+    var checkForAnimation = MutableStateFlow(false)
 
     var scannedDeviceList: Flow<BluetoothState> = connectionService.scanBleDevices()
         .convertToResultAndMapTo { result ->
@@ -28,14 +30,14 @@ class HomeViewModel(
                 is Result.Error -> BluetoothState.Error(result.exception?.localizedMessage ?: "")
                 Result.Loading -> BluetoothState.Idle
                 is Result.Success -> {
-                    bluetoothDevices += BleDevice(result.data)
+                    bluetoothDevices.add(BleDevice(result.data))
                     BluetoothState.Success(bluetoothDevices.toList())
                 }
             }
         }
         .distinctUntilChanged()
         .delayEachFor(1000)
-        .flowOn(Dispatchers.Default)
+        .flowOn(Dispatchers.IO)
 
     /**
      * The function stops the scanning process and clears the list of scanned devices
@@ -43,7 +45,7 @@ class HomeViewModel(
     fun stopScanPressed() {
         connectionService.stopScanning()
         scannedDeviceList = scannedDeviceList.drop(bluetoothDevices.size)
-        bluetoothDevices = emptySet()
+        bluetoothDevices = mutableSetOf()
     }
 
     /**
