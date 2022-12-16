@@ -1,9 +1,9 @@
 package com.kl3jvi.nb_api.command.version
 
 import com.kl3jvi.nb_api.command.Commands
-import com.kl3jvi.nb_api.command.ScooterMessage
 import com.kl3jvi.nb_api.command.RequestType
 import com.kl3jvi.nb_api.command.ScooterCommand
+import com.kl3jvi.nb_api.command.ScooterMessage
 
 class CheckVersion : ScooterCommand() {
     override val tag: String

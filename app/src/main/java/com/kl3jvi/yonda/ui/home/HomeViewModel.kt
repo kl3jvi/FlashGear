@@ -9,7 +9,6 @@ import com.kl3jvi.yonda.ext.convertToResultAndMapTo
 import com.kl3jvi.yonda.ext.delayEachFor
 import com.kl3jvi.yonda.models.BleDevice
 import com.welie.blessed.BluetoothPeripheral
-import com.welie.blessed.asHexString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +17,6 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 class HomeViewModel(
     private val connectionService: ConnectionService
@@ -61,26 +59,14 @@ class HomeViewModel(
     override fun connectToPeripheral(peripheral: BluetoothPeripheral) {
         viewModelScope.launch(Dispatchers.IO) {
             stopScanPressed()
-            connectionService.connectToPeripheral(peripheral).collect { (peripheral, state) ->
-                currentConnectivityState.update {
-                    "State" +
-                            if (peripheral.name.isNullOrEmpty()
-                                    .not()
-                            ) "of ${peripheral.name}" else {
-                                ""
-                            } + ": $state"
-                }
-                peripheral.services.forEach { Log.e("Services", "${it.uuid}") }
-
-            }
+            connectionService.connectToPeripheral(peripheral)
         }
     }
 
     override fun sendCommandToPeripheral(peripheral: BluetoothPeripheral) {
         Log.e("CLicked ", "sendCimmand")
-        viewModelScope.launch {
-            val a = connectionService.sendCommand(peripheral)
-            currentConnectivityState.update { "State: ${a.asHexString()}" }
+        viewModelScope.launch(Dispatchers.IO) {
+            connectionService.readFromScooter(peripheral)
         }
     }
 }

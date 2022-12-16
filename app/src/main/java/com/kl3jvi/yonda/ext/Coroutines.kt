@@ -22,8 +22,9 @@ inline fun Fragment.launchAndRepeatWithViewLifecycle(
     }
 }
 
-fun <T> Flow<T>.delayEachFor(amount: Long) = apply {
-    this.onEach {
+/* It's a function that takes a Flow of type T and returns a Flow of type T. */
+fun <T> Flow<T>.delayEachFor(amount: Long): Flow<T> {
+    return onEach {
         delay(amount)
     }
 }

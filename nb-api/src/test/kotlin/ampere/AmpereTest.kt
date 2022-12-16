@@ -8,7 +8,7 @@ import kotlin.test.assertEquals
 
 class AmpereTest {
 
-    private val rawValue: String = "12345678"
+    private val rawValue: String = "e6070c10100015059401"
     private val rawResponse = RawResponse(rawValue, 1000)
     lateinit var ampere: Ampere
 
@@ -26,8 +26,8 @@ class AmpereTest {
 
     @Test
     fun testGetCurrentAmpere() {
-        val currentAmpere = ampere.getCurrentAmpere("55aa2025014002100a100b10091006100d100e10")
-        assertEquals(0.37, currentAmpere)
+        val currentAmpere = ampere.getCurrentAmpere("e6070c10100015059401")
+        assertEquals(0.16, currentAmpere)
     }
 
     @Test
@@ -35,7 +35,7 @@ class AmpereTest {
         // Call the handler property and pass it the RawResponse object
         val currentAmpere = ampere.handler(rawResponse)
         // Verify that the correct current ampere value is returned
-        assertEquals("1.2", currentAmpere)
+        assertEquals("0.2", currentAmpere)
     }
 
     @Test

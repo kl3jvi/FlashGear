@@ -22,7 +22,6 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
     private val homeViewModel: HomeViewModel by viewModel()
     private lateinit var job: Job
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentHomeBinding.bind(view)
@@ -52,26 +51,27 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
         if (!isScanning) {
             homeViewModel.stopScanPressed()
             homeViewModel.checkForAnimation.update { false }
-        } else launchAndRepeatWithViewLifecycle {
-            homeViewModel.scannedDeviceList.collect { bluetoothState ->
-                when (bluetoothState) {
-                    is BluetoothState.Error -> Log.e(
-                        "Error",
-                        "happened ${bluetoothState.errorMessage}"
-                    )
-
-                    is BluetoothState.Success -> {
-                        Log.e(
-                            "Data",
-                            bluetoothState.data.map { it.peripheral.address }.toString()
+        } else {
+            launchAndRepeatWithViewLifecycle {
+                homeViewModel.scannedDeviceList.collect { bluetoothState ->
+                    when (bluetoothState) {
+                        is BluetoothState.Error -> Log.e(
+                            "Error",
+                            "happened ${bluetoothState.errorMessage}"
                         )
-                        adapter.submitList(bluetoothState.data)
-                    }
 
-                    else -> {}
+                        is BluetoothState.Success -> {
+                            Log.e(
+                                "Data",
+                                bluetoothState.data.map { it.peripheral.address }.toString()
+                            )
+                            adapter.submitList(bluetoothState.data)
+                        }
+
+                        else -> {}
+                    }
                 }
             }
-
         }
     }
 

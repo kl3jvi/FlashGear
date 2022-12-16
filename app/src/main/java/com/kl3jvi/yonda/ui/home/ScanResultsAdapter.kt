@@ -16,7 +16,7 @@ interface ConnectListener {
 }
 
 class ScanResultsAdapter(
-    private val listener: ConnectListener,
+    private val listener: ConnectListener
 ) : ListAdapter<BleDevice, ScanResultsAdapter.ViewHolder>(
     object : DiffUtil.ItemCallback<BleDevice>() {
         override fun areItemsTheSame(oldItem: BleDevice, newItem: BleDevice): Boolean {

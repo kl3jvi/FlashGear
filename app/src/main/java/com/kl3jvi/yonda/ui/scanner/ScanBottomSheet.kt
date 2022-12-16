@@ -12,7 +12,6 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.kl3jvi.nb_api.command.ampere.Ampere
 import com.kl3jvi.yonda.connectivity.ConnectionService
 import com.kl3jvi.yonda.databinding.ScanRecyclerBinding
 import com.kl3jvi.yonda.ext.launchAndRepeatWithViewLifecycle
