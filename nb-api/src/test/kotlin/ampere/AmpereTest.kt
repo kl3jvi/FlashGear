@@ -20,7 +20,6 @@ class AmpereTest {
     @Test
     fun testGetRequestString() {
         val requestString = ampere.getRequestString()
-
         assertEquals("55aa0322013302a4ff", requestString)
     }
 

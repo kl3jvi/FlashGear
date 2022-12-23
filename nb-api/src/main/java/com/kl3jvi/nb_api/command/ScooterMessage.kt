@@ -2,10 +2,10 @@ package com.kl3jvi.nb_api.command
 
 class ScooterMessage {
     private var msg: MutableList<Int> = mutableListOf()
-    private var direction = 0
-    private var rw = 0
-    private var position = 0
-    private var payload: MutableList<Int> = mutableListOf()
+    var direction = 0
+    var rw = 0
+    var position = 0
+    var payload: MutableList<Int> = mutableListOf()
     private var checksum = 0
 
     fun setDirection(drct: Commands): ScooterMessage {
