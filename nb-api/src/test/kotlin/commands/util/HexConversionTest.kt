@@ -1,4 +1,4 @@
-package util
+package commands.util
 
 import com.kl3jvi.nb_api.command.util.bytesToHex
 import com.kl3jvi.nb_api.command.util.hexToBytes

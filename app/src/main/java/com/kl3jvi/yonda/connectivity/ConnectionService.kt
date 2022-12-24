@@ -29,5 +29,11 @@ interface ConnectionService {
      * @param peripheral The BluetoothPeripheral object that you want to send the command to.
      */
     suspend fun sendCommand(peripheral: BluetoothPeripheral): ByteArray
+
+    /**
+     * It reads the data from the scooter and returns it as a `ScooterData` object
+     *
+     * @param peripheral The BluetoothPeripheral object that you want to read from.
+     */
     suspend fun readFromScooter(peripheral: BluetoothPeripheral)
 }

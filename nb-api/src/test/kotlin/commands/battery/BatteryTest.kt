@@ -1,4 +1,4 @@
-package battery
+package commands.battery
 
 import com.kl3jvi.nb_api.command.Commands
 import com.kl3jvi.nb_api.command.RawResponse
@@ -31,7 +31,6 @@ class BatteryTest {
         assertEquals("32", battery.requestBit)
     }
 
-
     @Test
     fun testGetRequestString() {
         val expectedMessage = ScooterMessage()
@@ -55,7 +54,6 @@ class BatteryTest {
 
     @Test
     fun testHandler() {
-
         val rawResponse = RawResponse("abcdef01", 1000L)
         val expectedResult = "1 %"
         val actualResult = battery.handler(rawResponse)
@@ -63,5 +61,3 @@ class BatteryTest {
         assertEquals(expectedResult, actualResult)
     }
 }
-
-

@@ -41,7 +41,7 @@ class DeviceConnection(
         command.handleResponse(deviceRawResponse)
     }
 
-    private suspend fun runCommand(command: ScooterCommand, delayTime: Long): RawResponse {
+    suspend fun runCommand(command: ScooterCommand, delayTime: Long): RawResponse {
         var rawData = ""
         val elapsedTime = measureTimeMillis {
             sendCommand(command, delayTime)

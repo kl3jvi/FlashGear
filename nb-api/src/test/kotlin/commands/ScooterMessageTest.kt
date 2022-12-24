@@ -1,3 +1,5 @@
+package commands
+
 import com.kl3jvi.nb_api.command.Commands
 import com.kl3jvi.nb_api.command.ScooterMessage
 import org.junit.Test

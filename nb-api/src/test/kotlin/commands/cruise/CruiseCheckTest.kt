@@ -1,4 +1,4 @@
-package cruise
+package commands.cruise
 
 import com.kl3jvi.nb_api.command.Commands
 import com.kl3jvi.nb_api.command.RawResponse

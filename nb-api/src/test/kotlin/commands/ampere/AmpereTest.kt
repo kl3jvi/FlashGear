@@ -1,4 +1,4 @@
-package ampere
+package commands.ampere
 
 import com.kl3jvi.nb_api.command.RawResponse
 import com.kl3jvi.nb_api.command.ampere.Ampere
