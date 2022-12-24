@@ -5,10 +5,8 @@ import com.kl3jvi.nb_api.command.RawResponse
 import com.kl3jvi.nb_api.command.RequestType
 import com.kl3jvi.nb_api.command.ScooterMessage
 import com.kl3jvi.nb_api.command.locking.CheckLock
-import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
-
 
 class CheckLockTest {
     private val checkLock = CheckLock()

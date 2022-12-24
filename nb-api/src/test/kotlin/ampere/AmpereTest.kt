@@ -42,6 +42,6 @@ class AmpereTest {
         val scooterResponse = Ampere().run {
             handleResponse(rawResponse)
         }
-        assertEquals("1.2A", scooterResponse.formattedValue)
+        assertEquals("0.2A", scooterResponse.formattedValue)
     }
 }

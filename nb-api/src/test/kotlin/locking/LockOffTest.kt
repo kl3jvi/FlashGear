@@ -22,7 +22,7 @@ class LockOffTest {
 
     @Test
     fun testRequestType() {
-        assertEquals(RequestType.NOCOUNT, lockOff.requestType)
+        assertEquals(RequestType.NO_COUNT, lockOff.requestType)
     }
 
     @Test

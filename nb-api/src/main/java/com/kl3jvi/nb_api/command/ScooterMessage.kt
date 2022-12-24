@@ -1,7 +1,7 @@
 package com.kl3jvi.nb_api.command
 
 class ScooterMessage {
-    private var msg: MutableList<Int> = mutableListOf()
+    var msg: MutableList<Int> = mutableListOf()
     var direction = 0
     var rw = 0
     var position = 0

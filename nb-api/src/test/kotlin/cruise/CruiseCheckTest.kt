@@ -5,8 +5,8 @@ import com.kl3jvi.nb_api.command.RawResponse
 import com.kl3jvi.nb_api.command.RequestType
 import com.kl3jvi.nb_api.command.ScooterMessage
 import com.kl3jvi.nb_api.command.cruise.CheckCruise
-import kotlin.test.assertEquals
 import org.junit.Test
+import kotlin.test.assertEquals
 
 class CheckCruiseTest {
     private val checkCruise = CheckCruise()

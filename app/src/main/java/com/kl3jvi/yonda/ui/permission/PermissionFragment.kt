@@ -52,11 +52,13 @@ class PermissionFragment : Fragment(R.layout.fragment_permission) {
      * text and the drawable to teal
      */
     @SuppressLint("UseCompatTextViewDrawableApis")
-    private fun TextView.checkShouldEnable() = apply {
+    private fun TextView.checkShouldEnable() {
+        val context = requireContext()
+        val color = ContextCompat.getColor(context, R.color.teal_700)
+        val colorList = ColorStateList.valueOf(color)
+
         if (isBluetoothGranted() && isLocationGranted()) {
-            setTextColor(ContextCompat.getColor(requireContext(), R.color.teal_700))
-            val color = ContextCompat.getColor(context, R.color.teal_700)
-            val colorList = ColorStateList.valueOf(color)
+            setTextColor(color)
             compoundDrawableTintList = colorList
         }
     }

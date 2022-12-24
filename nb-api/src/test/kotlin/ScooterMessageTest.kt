@@ -3,7 +3,6 @@ import com.kl3jvi.nb_api.command.ScooterMessage
 import org.junit.Test
 import kotlin.test.assertEquals
 
-
 class ScooterMessageTest {
     private val scooterMessage = ScooterMessage()
 
@@ -59,7 +58,8 @@ class ScooterMessageTest {
     fun testBuild() {
         val expectedMessage = "55aa0320037c015cff"
         assertEquals(
-            expectedMessage, scooterMessage
+            expectedMessage,
+            scooterMessage
                 .setDirection(Commands.MASTER_TO_M365)
                 .setReadOrWrite(Commands.WRITE)
                 .setPosition(0x7C)

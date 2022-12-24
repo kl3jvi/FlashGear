@@ -8,7 +8,7 @@ import com.kl3jvi.nb_api.command.ScooterMessage
 class LockOff : ScooterCommand() {
     override val tag: String = "Lock"
     override val name: String = "Remove Lock"
-    override val requestType: RequestType = RequestType.NOCOUNT
+    override val requestType: RequestType = RequestType.NO_COUNT
 
     override val requestBit: String = "71"
     override val defaultUnit: String = ""

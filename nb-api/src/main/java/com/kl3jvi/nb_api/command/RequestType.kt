@@ -8,12 +8,12 @@ enum class RequestType {
     AMEPERE,
     DISTANCE,
     SPEED,
-    SUPERMASTER,
-    SUPERBATTERY,
+    SUPER_MASTER,
+    SUPER_BATTERY,
     LOCK,
     CRUISE,
     LIGHT,
     RECOVERY,
-    BATTERYLIFE,
-    NOCOUNT
+    BATTERY_LIFE,
+    NO_COUNT
 }

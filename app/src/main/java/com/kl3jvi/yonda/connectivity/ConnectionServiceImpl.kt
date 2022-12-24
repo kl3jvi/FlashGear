@@ -51,6 +51,13 @@ class ConnectionServiceImpl : ConnectionService, KoinComponent {
         }
     }
 
+    /**
+     * It connects to the device, sets the connection priority to high, writes the request string to
+     * the write characteristic, enables notifications on the read characteristic and then logs the
+     * value of the read characteristic.
+     *
+     * @param peripheral BluetoothPeripheral
+     */
     private fun handlePeripheral(peripheral: BluetoothPeripheral) {
         scope.launch {
             peripheral.requestConnectionPriority(ConnectionPriority.HIGH)
@@ -61,6 +68,17 @@ class ConnectionServiceImpl : ConnectionService, KoinComponent {
                         Ampere().getRequestString().hexToBytes(),
                         WriteType.WITH_RESPONSE
                     )
+                }
+            }
+            peripheral.getCharacteristic(XIAOMI_SERVICE, CHAR_READ)?.let {
+                val descriptor = it.getDescriptor(CHAR_WRITE)
+                if (descriptor != null) {
+                    peripheral.writeDescriptor(descriptor, byteArrayOf(0x01))
+                }
+                peripheral.observe(it) { value ->
+                    // Process the updated value of the characteristic
+                    // ...
+                    Log.e("value", value.asHexString())
                 }
             }
         }
@@ -98,7 +116,7 @@ class ConnectionServiceImpl : ConnectionService, KoinComponent {
         }
     }
 
-    private suspend fun readFromScooter(peripheral: BluetoothPeripheral) {
+    override suspend fun readFromScooter(peripheral: BluetoothPeripheral) {
         scope.launch {
             peripheral.getCharacteristic(XIAOMI_SERVICE, CHAR_READ)?.let {
                 peripheral.observe(it) { value ->

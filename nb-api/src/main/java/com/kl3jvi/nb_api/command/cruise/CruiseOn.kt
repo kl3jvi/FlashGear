@@ -8,7 +8,7 @@ import com.kl3jvi.nb_api.command.ScooterMessage
 class CruiseOn : ScooterCommand() {
     override val tag: String = "Cruise"
     override val name: String = "Turn On Cruise"
-    override val requestType: RequestType = RequestType.NOCOUNT
+    override val requestType: RequestType = RequestType.NO_COUNT
 
     override val requestBit: String = "7C"
     override val defaultUnit: String = ""

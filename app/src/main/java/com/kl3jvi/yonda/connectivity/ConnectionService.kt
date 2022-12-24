@@ -29,4 +29,5 @@ interface ConnectionService {
      * @param peripheral The BluetoothPeripheral object that you want to send the command to.
      */
     suspend fun sendCommand(peripheral: BluetoothPeripheral): ByteArray
+    suspend fun readFromScooter(peripheral: BluetoothPeripheral)
 }
