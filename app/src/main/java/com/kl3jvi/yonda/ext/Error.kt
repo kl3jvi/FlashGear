@@ -18,7 +18,6 @@ data class Error(
      *
      * @return The error message
      */
-    fun getErrorMessage(): String {
-        return throwable?.localizedMessage ?: scanFailure?.name ?: "Error Occurred"
-    }
+    fun getErrorMessage(): String =
+        throwable?.localizedMessage ?: scanFailure?.name ?: "Error Occurred"
 }

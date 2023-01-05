@@ -1,7 +1,9 @@
 package com.kl3jvi.yonda.connectivity
 
 import com.welie.blessed.BluetoothPeripheral
+import com.welie.blessed.ConnectionState
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 interface ConnectionService {
 
@@ -36,4 +38,5 @@ interface ConnectionService {
      * @param peripheral The BluetoothPeripheral object that you want to read from.
      */
     suspend fun readFromScooter(peripheral: BluetoothPeripheral)
+    val connectionState: MutableStateFlow<ConnectionState>
 }

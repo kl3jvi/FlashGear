@@ -20,7 +20,9 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -30,10 +32,12 @@ class ConnectionServiceImpl : ConnectionService, KoinComponent {
 
     private val central: BluetoothCentralManager by inject()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    override val connectionState = MutableStateFlow(ConnectionState.DISCONNECTED)
 
     init {
         central.observeConnectionState { peripheral: BluetoothPeripheral, state: ConnectionState ->
             Log.e("Peripheral '${peripheral.name}'", "is $state")
+            connectionState.update { state }
             when (state) {
                 ConnectionState.CONNECTED -> handlePeripheral(peripheral)
                 ConnectionState.DISCONNECTED -> scope.launch {
@@ -51,13 +55,6 @@ class ConnectionServiceImpl : ConnectionService, KoinComponent {
         }
     }
 
-    /**
-     * It connects to the device, sets the connection priority to high, writes the request string to
-     * the write characteristic, enables notifications on the read characteristic and then logs the
-     * value of the read characteristic.
-     *
-     * @param peripheral BluetoothPeripheral
-     */
     private fun handlePeripheral(peripheral: BluetoothPeripheral) {
         scope.launch {
             peripheral.requestConnectionPriority(ConnectionPriority.HIGH)
@@ -73,7 +70,7 @@ class ConnectionServiceImpl : ConnectionService, KoinComponent {
             peripheral.getCharacteristic(XIAOMI_SERVICE, CHAR_READ)?.let {
                 val descriptor = it.getDescriptor(CHAR_WRITE)
                 if (descriptor != null) {
-                    peripheral.writeDescriptor(descriptor, byteArrayOf(0x01))
+                    peripheral.writeDescriptor(descriptor, Ampere().getRequestString().hexToBytes())
                 }
                 peripheral.observe(it) { value ->
                     // Process the updated value of the characteristic

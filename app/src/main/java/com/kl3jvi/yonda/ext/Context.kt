@@ -7,7 +7,8 @@ fun Context.showToast(message: String) = Toast.makeText(this, message, Toast.LEN
 
 fun Context.showToastIf(vararg message: String, predicate: () -> Boolean) {
     check(message.size == 2) {
-        "Please set 2 strings to use this method!, First shows if predicate is true, second shows if predicate is false."
+        "Please set 2 strings to use this method!, First shows if predicate is true, second shows if " +
+            "predicate is false."
     }
     if (predicate()) {
         showToast(message.first())

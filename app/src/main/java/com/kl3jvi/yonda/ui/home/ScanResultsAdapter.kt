@@ -25,7 +25,7 @@ class ScanResultsAdapter(
 
         @SuppressLint("DiffUtilEquals")
         override fun areContentsTheSame(oldItem: BleDevice, newItem: BleDevice): Boolean {
-            return oldItem.peripheral == newItem.peripheral
+            return oldItem.peripheral.address == newItem.peripheral.address
         }
     }
 ) {

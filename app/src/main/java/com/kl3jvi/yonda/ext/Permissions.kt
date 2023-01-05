@@ -15,6 +15,7 @@ val blePermissions = arrayOf(
     BLUETOOTH_SCAN
 )
 
+/* Checking if the bluetooth permission is granted, if not it will request the permission. */
 fun Fragment.enableBluetooth() {
     if (!isBluetoothGranted()) {
         ActivityCompat.requestPermissions(
