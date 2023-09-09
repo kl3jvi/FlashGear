@@ -5,5 +5,5 @@ enum class Commands(val command: Int) {
     MASTER_TO_M365(0x20),
     MASTER_TO_BATTERY(0x22),
     READ(0x01),
-    WRITE(0x03);
+    WRITE(0x03),
 }

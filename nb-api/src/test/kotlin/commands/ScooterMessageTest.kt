@@ -14,7 +14,7 @@ class ScooterMessageTest {
             .setDirection(Commands.MASTER_TO_M365)
         assertEquals(
             expectedMessage.direction,
-            scooterMessage.setDirection(Commands.MASTER_TO_M365).direction
+            scooterMessage.setDirection(Commands.MASTER_TO_M365).direction,
         )
     }
 
@@ -66,7 +66,7 @@ class ScooterMessageTest {
                 .setReadOrWrite(Commands.WRITE)
                 .setPosition(0x7C)
                 .setPayload(0x01)
-                .build()
+                .build(),
         )
     }
 }

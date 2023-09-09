@@ -7,5 +7,5 @@ import kotlinx.parcelize.RawValue
 
 @Parcelize
 data class BleDevice(
-    val peripheral: @RawValue BluetoothPeripheral
+    val peripheral: @RawValue BluetoothPeripheral,
 ) : Parcelable

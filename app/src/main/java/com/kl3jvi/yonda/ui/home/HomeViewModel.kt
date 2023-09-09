@@ -14,38 +14,35 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.scan
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val connectionService: ConnectionService
+    private val connectionService: ConnectionService,
 ) : ViewModel(), ConnectListener {
 
     var checkForAnimation = MutableStateFlow(false)
     val currentConnectivityState = connectionService.connectionState.asStateFlow()
 
     var scannedDeviceList: Flow<BluetoothState> = connectionService.scanBleDevices()
+        .filterScooter {
+            it.name.contains("Ninebot") ||
+                it.name.contains("Xiaomi") ||
+                it.name.contains("Scooter")
+        }
         .scan(emptySet<BluetoothPeripheral>()) { acc, value -> acc.plus(value) }
         .convertToResultAndMapTo { result ->
             when (result) {
-                is Result.Error -> {
-                    Log.e("Error retrying", "scan", result.exception)
-                    BluetoothState.Error(result.exception?.localizedMessage ?: "")
-                }
-
+                is Result.Error -> BluetoothState.Error(result.exception?.localizedMessage ?: "")
                 Result.Loading -> BluetoothState.Idle
-                is Result.Success -> {
-                    val listOfDevices = result.data.map(::BleDevice)
-                    BluetoothState.Success(listOfDevices)
-                }
+                is Result.Success -> BluetoothState.Success(result.data.map(::BleDevice))
             }
         }
         .distinctUntilChanged()
-        .delayEachFor(1000)
+        .delayEachFor(1_000)
         .flowOn(Dispatchers.IO)
 
     /**
@@ -54,7 +51,7 @@ class HomeViewModel(
     fun stopScanPressed() {
         connectionService.stopScanning()
         scannedDeviceList
-        checkForAnimation.update { false }
+        checkForAnimation.update { state -> !state }
     }
 
     /**
@@ -70,16 +67,15 @@ class HomeViewModel(
     }
 
     override fun sendCommandToPeripheral(peripheral: BluetoothPeripheral) {
-        Log.e("CLicked ", "sendCimmand")
+        Log.e("CLicked ", "sendCommand")
         viewModelScope.launch(Dispatchers.IO) {
             connectionService.readFromScooter(peripheral)
         }
     }
 }
 
-private suspend fun <T> Flow<T>.dropAll(): Flow<T> {
-    val size = toList().size
-    return drop(size)
+private fun <T> Flow<T>.filterScooter(function: (T) -> Boolean) = apply {
+    filter(function)
 }
 
 sealed interface BluetoothState {

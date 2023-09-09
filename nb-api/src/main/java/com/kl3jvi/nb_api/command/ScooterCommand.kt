@@ -20,7 +20,7 @@ abstract class ScooterCommand {
             command = this,
             rawResponse = deviceRawRawResponse,
             value = handler(deviceRawRawResponse),
-            unit = defaultUnit
+            unit = defaultUnit,
         )
     }
 }

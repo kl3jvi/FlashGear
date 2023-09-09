@@ -16,7 +16,7 @@ class YondaApplication : Application() {
             androidLogger(Level.ERROR)
             androidContext(this@YondaApplication)
             modules(
-                allModules
+                allModules,
             )
         }
     }

@@ -13,4 +13,5 @@
     <string name="location">Location</string>
     <string name="connect">Connect</string>
     <string name="connecting">Connecting</string>
+    <string name="message_no_scooter_found">Can\'t find your scooter?</string>
 </resources>

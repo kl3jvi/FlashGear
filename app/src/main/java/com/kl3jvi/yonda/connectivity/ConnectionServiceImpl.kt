@@ -44,7 +44,7 @@ class ConnectionServiceImpl : ConnectionService, KoinComponent {
                     delay(15000)
                     // Check if this peripheral should still be auto connected
                     if (central.getPeripheral(peripheral.address)
-                        .getState() == ConnectionState.DISCONNECTED
+                            .getState() == ConnectionState.DISCONNECTED
                     ) {
                         central.autoConnectPeripheral(peripheral)
                     }
@@ -63,7 +63,7 @@ class ConnectionServiceImpl : ConnectionService, KoinComponent {
                     peripheral.writeCharacteristic(
                         it,
                         Ampere().getRequestString().hexToBytes(),
-                        WriteType.WITH_RESPONSE
+                        WriteType.WITH_RESPONSE,
                     )
                 }
             }
@@ -89,7 +89,7 @@ class ConnectionServiceImpl : ConnectionService, KoinComponent {
                 },
                 scanError = {
                     cancel(Error(scanFailure = it).getErrorMessage())
-                }
+                },
             )
         }.onFailure {
             cancel(Error(throwable = it).getErrorMessage())

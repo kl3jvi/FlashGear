@@ -30,7 +30,7 @@ class PermissionFragment : Fragment(R.layout.fragment_permission) {
         super.onStart()
         if (isBluetoothGranted() && isLocationGranted()) {
             findNavController().navigate(
-                PermissionFragmentDirections.toHome()
+                PermissionFragmentDirections.toHome(),
             )
         }
     }
@@ -42,7 +42,7 @@ class PermissionFragment : Fragment(R.layout.fragment_permission) {
         binding.location.setOnClickListener { enableLocation() }
         binding.proceedButton.setOnClickListener {
             findNavController().navigate(
-                PermissionFragmentDirections.toHome()
+                PermissionFragmentDirections.toHome(),
             )
         }
     }

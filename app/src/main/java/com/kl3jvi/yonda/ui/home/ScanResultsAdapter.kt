@@ -1,6 +1,5 @@
 package com.kl3jvi.yonda.ui.home
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -16,18 +15,17 @@ interface ConnectListener {
 }
 
 class ScanResultsAdapter(
-    private val listener: ConnectListener
+    private val listener: ConnectListener,
 ) : ListAdapter<BleDevice, ScanResultsAdapter.ViewHolder>(
     object : DiffUtil.ItemCallback<BleDevice>() {
         override fun areItemsTheSame(oldItem: BleDevice, newItem: BleDevice): Boolean {
             return oldItem == newItem
         }
 
-        @SuppressLint("DiffUtilEquals")
         override fun areContentsTheSame(oldItem: BleDevice, newItem: BleDevice): Boolean {
             return oldItem.peripheral.address == newItem.peripheral.address
         }
-    }
+    },
 ) {
 
     inner class ViewHolder(private val binding: ItemBluetoothBinding) :

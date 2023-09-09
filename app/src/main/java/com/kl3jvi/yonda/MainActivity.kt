@@ -26,8 +26,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         val appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.navigation_home,
-                R.id.navigation_permissions
-            )
+                R.id.navigation_permissions,
+            ),
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
     }

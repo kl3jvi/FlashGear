@@ -12,7 +12,7 @@ import kotlin.random.Random
 
 val blePermissions = arrayOf(
     BLUETOOTH_CONNECT,
-    BLUETOOTH_SCAN
+    BLUETOOTH_SCAN,
 )
 
 /* Checking if the bluetooth permission is granted, if not it will request the permission. */
@@ -21,7 +21,7 @@ fun Fragment.enableBluetooth() {
         ActivityCompat.requestPermissions(
             requireActivity(),
             blePermissions,
-            Random.nextInt(0, 100)
+            Random.nextInt(0, 100),
         )
     }
 }
@@ -33,7 +33,7 @@ fun Fragment.isBluetoothGranted(): Boolean {
     return blePermissions.map {
         ContextCompat.checkSelfPermission(
             requireContext(),
-            it
+            it,
         ) == PackageManager.PERMISSION_GRANTED
     }.all { it } && bluetoothManager.adapter != null
 }

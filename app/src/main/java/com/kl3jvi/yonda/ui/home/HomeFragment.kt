@@ -5,12 +5,10 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.airbnb.lottie.LottieAnimationView
 import com.kl3jvi.yonda.R
 import com.kl3jvi.yonda.databinding.FragmentHomeBinding
 import com.kl3jvi.yonda.ext.launchAndRepeatWithViewLifecycle
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.component.KoinComponent
@@ -30,22 +28,6 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
 
         binding.rv.layoutManager = LinearLayoutManager(requireContext())
         binding.rv.adapter = adapter
-
-        binding.lottieAnimationView.setOnClickListener {
-            launchAndRepeatWithViewLifecycle {
-                homeViewModel.checkForAnimation.update { !it }
-                homeViewModel.checkForAnimation.collectLatest { checkForAnimation ->
-                    binding.isScanning = checkForAnimation
-                    binding.lottieAnimationView.playAnimationIf(checkForAnimation)
-                    scanBle(checkForAnimation)
-                }
-            }
-        }
-        launchAndRepeatWithViewLifecycle {
-            homeViewModel.currentConnectivityState.collect {
-                binding.textView5.text = it.name
-            }
-        }
     }
 
     private fun scanBle(isScanning: Boolean) {
@@ -61,13 +43,13 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
                     when (bluetoothState) {
                         is BluetoothState.Error -> Log.e(
                             "Error",
-                            "happened ${bluetoothState.errorMessage}"
+                            "happened ${bluetoothState.errorMessage}",
                         )
 
                         is BluetoothState.Success -> {
                             Log.e(
                                 "Data",
-                                bluetoothState.data.map { it.peripheral.address }.toString()
+                                bluetoothState.data.map { it.peripheral.address }.toString(),
                             )
                             adapter.submitList(bluetoothState.data.sortedBy { it.peripheral.address })
                         }
@@ -83,21 +65,5 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
         super.onDestroyView()
         job = null
         _binding = null
-    }
-
-    /**
-     * > If the predicate is true, play the animation. Otherwise, cancel the animation, play it, and
-     * then cancel it again
-     *
-     * @param predicate Boolean - This is the condition that will determine whether the animation will
-     * play or not.
-     */
-    private fun LottieAnimationView.playAnimationIf(predicate: Boolean) {
-        if (predicate) {
-            playAnimation()
-        } else {
-            progress = 0f
-            cancelAnimation()
-        }
     }
 }

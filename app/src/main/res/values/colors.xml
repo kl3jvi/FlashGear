@@ -15,4 +15,6 @@
     <color name="transparent">#00FFFFFF</color>
     <color name="grey">#868686</color>
     <color name="inactive">#B6B6B6</color>
+
+    <color name="blue">#1F41D1</color>
 </resources>

@@ -15,5 +15,5 @@ enum class RequestType {
     LIGHT,
     RECOVERY,
     BATTERY_LIFE,
-    NO_COUNT
+    NO_COUNT,
 }

@@ -14,7 +14,7 @@ import kotlin.system.measureTimeMillis
 
 class DeviceConnection(
     private val inputStream: InputStream,
-    private val outputStream: OutputStream
+    private val outputStream: OutputStream,
 ) {
     private val rawResponseCache = mutableMapOf<ScooterCommand, RawResponse>()
 
@@ -25,7 +25,7 @@ class DeviceConnection(
     suspend fun run(
         command: ScooterCommand,
         useCache: Boolean = false,
-        delayTime: Long = 0
+        delayTime: Long = 0,
     ): ScooterResponse = runBlocking {
         val deviceRawResponse =
             if (useCache && rawResponseCache[command] != null) {

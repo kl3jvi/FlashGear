@@ -4,5 +4,5 @@ import androidx.lifecycle.ViewModel
 import com.kl3jvi.yonda.connectivity.ConnectionService
 
 class DetailsViewModel(
-    private val connectionService: ConnectionService
+    private val connectionService: ConnectionService,
 ) : ViewModel()
