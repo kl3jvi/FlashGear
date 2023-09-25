@@ -1,5 +1,6 @@
 package com.kl3jvi.yonda.ui.home
 
+import android.bluetooth.BluetoothDevice
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -16,14 +17,17 @@ interface ConnectListener {
 
 class ScanResultsAdapter(
     private val listener: ConnectListener,
-) : ListAdapter<BleDevice, ScanResultsAdapter.ViewHolder>(
-    object : DiffUtil.ItemCallback<BleDevice>() {
-        override fun areItemsTheSame(oldItem: BleDevice, newItem: BleDevice): Boolean {
+) : ListAdapter<BluetoothDevice, ScanResultsAdapter.ViewHolder>(
+    object : DiffUtil.ItemCallback<BluetoothDevice>() {
+        override fun areItemsTheSame(oldItem: BluetoothDevice, newItem: BluetoothDevice): Boolean {
             return oldItem == newItem
         }
 
-        override fun areContentsTheSame(oldItem: BleDevice, newItem: BleDevice): Boolean {
-            return oldItem.peripheral.address == newItem.peripheral.address
+        override fun areContentsTheSame(
+            oldItem: BluetoothDevice,
+            newItem: BluetoothDevice
+        ): Boolean {
+            return oldItem.address == newItem.address
         }
     },
 ) {
@@ -34,7 +38,7 @@ class ScanResultsAdapter(
             binding.connectionListener = listener
         }
 
-        fun bind(bleDevice: BleDevice) {
+        fun bind(bleDevice: BluetoothDevice) {
             binding.apply {
                 this.bleDevice = bleDevice
                 executePendingBindings()

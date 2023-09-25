@@ -28,11 +28,11 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
 
         binding.rv.layoutManager = LinearLayoutManager(requireContext())
         binding.rv.adapter = adapter
+        scanBle(true)
     }
 
     private fun scanBle(isScanning: Boolean) {
         if (!isScanning) {
-            Log.e("homeViewModel.stopScanPressed()", "-----")
             job?.cancel()
             homeViewModel.stopScanPressed()
             homeViewModel.checkForAnimation.update { false }
@@ -43,15 +43,11 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
                     when (bluetoothState) {
                         is BluetoothState.Error -> Log.e(
                             "Error",
-                            "happened ${bluetoothState.errorMessage}",
+                           "happened ${bluetoothState.errorMessage}",
                         )
 
                         is BluetoothState.Success -> {
-                            Log.e(
-                                "Data",
-                                bluetoothState.data.map { it.peripheral.address }.toString(),
-                            )
-                            adapter.submitList(bluetoothState.data.sortedBy { it.peripheral.address })
+                            adapter.submitList(bluetoothState.data.sortedBy { it.address })
                         }
 
                         else -> {}

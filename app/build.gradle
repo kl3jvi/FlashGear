@@ -48,6 +48,11 @@ dependencies {
     implementation "io.insert-koin:koin-android:3.3.0"
     implementation 'com.google.android.material:material:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    // Nordic semiconductor ble android libs
+    implementation 'no.nordicsemi.android:ble-ktx:2.6.1'
+    implementation 'no.nordicsemi.android:ble-common:2.6.1'
+    implementation 'no.nordicsemi.android.support.v18:scanner:1.6.0'
+
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'

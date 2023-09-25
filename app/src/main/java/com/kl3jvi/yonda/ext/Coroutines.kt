@@ -8,7 +8,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.launch
 
 /**
@@ -25,7 +27,7 @@ inline fun Fragment.launchAndRepeatWithViewLifecycle(
     crossinline block: suspend CoroutineScope.() -> Unit,
 ): Job {
     return viewLifecycleOwner.lifecycleScope.launch {
-        viewLifecycleOwner.lifecycle.repeatOnLifecycle(minActiveState) {
+        lifecycle.repeatOnLifecycle(minActiveState) {
             block()
         }
     }
@@ -38,3 +40,16 @@ inline fun Fragment.launchAndRepeatWithViewLifecycle(
  * @return a flow that delays the emission of each element in this flow by the specified number of milliseconds
  */
 fun <T> Flow<T>.delayEachFor(timeMillis: Long): Flow<T> = onEach { delay(timeMillis) }
+
+fun <T> Flow<T>.filterScooter(
+    vararg checks: String,
+    function: (T) -> Boolean = { true },
+) = apply {
+    filter { value -> checks.any { value.toString().contains(it) } }.filter(function)
+}
+
+fun <T> Flow<T>.aggregateAsSet(): Flow<Set<T>> {
+    return scan(setOf<T>()) { acc, value ->
+        acc + value
+    }
+}
