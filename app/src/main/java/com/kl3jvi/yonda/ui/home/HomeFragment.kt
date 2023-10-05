@@ -9,7 +9,6 @@ import com.kl3jvi.yonda.R
 import com.kl3jvi.yonda.databinding.FragmentHomeBinding
 import com.kl3jvi.yonda.ext.launchAndRepeatWithViewLifecycle
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.update
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.component.KoinComponent
 
@@ -28,32 +27,41 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
 
         binding.rv.layoutManager = LinearLayoutManager(requireContext())
         binding.rv.adapter = adapter
-        scanBle(true)
+        scanBle()
+//        setup floating button action when clicked it either starts the search or stop it
+        binding.fab.setOnClickListener {
+            if (binding.fab.tag == "start") {
+                binding.fab.tag = "stop"
+                binding.fab.setImageResource(R.drawable.ic_stop_search)
+                homeViewModel.connectionService.startScanning()
+                scanBle()
+            } else {
+                binding.fab.tag = "start"
+                binding.fab.setImageResource(R.drawable.ic_search)
+                job?.cancel()
+            }
+        }
     }
 
-    private fun scanBle(isScanning: Boolean) {
-        if (!isScanning) {
-            job?.cancel()
-            homeViewModel.stopScanPressed()
-            homeViewModel.checkForAnimation.update { false }
-        } else {
-            job?.cancel()
-            job = launchAndRepeatWithViewLifecycle {
-                homeViewModel.scannedDeviceList.collect { bluetoothState ->
-                    when (bluetoothState) {
-                        is BluetoothState.Error -> Log.e(
-                            "Error",
-                           "happened ${bluetoothState.errorMessage}",
-                        )
+    private fun scanBle() {
+        job?.cancel()
+        job = launchAndRepeatWithViewLifecycle {
+            homeViewModel.scannedDeviceList.collect { bluetoothState ->
+                when (bluetoothState) {
+                    is BluetoothState.Error -> Log.e(
+                        "Error",
+                        "happened ${bluetoothState.errorMessage}",
+                    )
 
-                        is BluetoothState.Success -> {
-                            adapter.submitList(bluetoothState.data.sortedBy { it.address })
-                        }
-
-                        else -> {}
+                    is BluetoothState.Success -> {
+                        Log.e("Success", "happened ${bluetoothState.data}")
+                        adapter.submitList(bluetoothState.data.sortedBy { it.device?.name == null })
                     }
+
+                    else -> {}
                 }
             }
+
         }
     }
 

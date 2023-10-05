@@ -7,7 +7,7 @@
 
         <variable
             name="bleDevice"
-            type="android.bluetooth.BluetoothDevice" />
+            type="com.kl3jvi.yonda.models.ScanHolder" />
 
 
         <variable
@@ -24,7 +24,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/transparent">
+        android:background="@color/transparent"
+        android:onClick="@{()->connectionListener.connectToPeripheral(bleDevice)}">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
@@ -53,7 +54,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
             android:maxLines="1"
-            android:text="@{bleDevice.name}"
+            android:text="@{bleDevice.device.name}"
             app:layout_constraintStart_toEndOf="@+id/cardView"
             app:layout_constraintTop_toTopOf="@+id/cardView"
             tools:text="@tools:sample/cities" />
@@ -63,7 +64,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="@{bleDevice.address}"
+            android:text="@{bleDevice.device.address}"
             android:textColor="@color/grey"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/cardView"
@@ -71,6 +72,21 @@
             app:layout_constraintTop_toBottomOf="@+id/name"
             tools:text="@tools:sample/us_phones" />
 
+        <TextView
+            android:id="@+id/rssi"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:layout_marginTop="4dp"
+            android:gravity="end"
+            android:text="@{bleDevice.rssi.toString()}"
+            android:textColor="@color/grey"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/cardView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/mac_address"
+            app:layout_constraintTop_toBottomOf="@+id/name"
+            tools:text="-72" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

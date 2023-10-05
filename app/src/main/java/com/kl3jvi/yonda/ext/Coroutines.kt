@@ -49,7 +49,7 @@ fun <T> Flow<T>.filterScooter(
 }
 
 fun <T> Flow<T>.aggregateAsSet(): Flow<Set<T>> {
-    return scan(setOf<T>()) { acc, value ->
+    return scan(setOf()) { acc, value ->
         acc + value
     }
 }

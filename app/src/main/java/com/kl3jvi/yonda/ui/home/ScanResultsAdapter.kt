@@ -8,26 +8,27 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.kl3jvi.yonda.databinding.ItemBluetoothBinding
 import com.kl3jvi.yonda.models.BleDevice
+import com.kl3jvi.yonda.models.ScanHolder
 import com.welie.blessed.BluetoothPeripheral
 
 interface ConnectListener {
-    fun connectToPeripheral(peripheral: BluetoothPeripheral)
-    fun sendCommandToPeripheral(peripheral: BluetoothPeripheral)
+    fun connectToPeripheral(peripheral: ScanHolder)
+    fun sendCommandToPeripheral(peripheral: ScanHolder)
 }
 
 class ScanResultsAdapter(
     private val listener: ConnectListener,
-) : ListAdapter<BluetoothDevice, ScanResultsAdapter.ViewHolder>(
-    object : DiffUtil.ItemCallback<BluetoothDevice>() {
-        override fun areItemsTheSame(oldItem: BluetoothDevice, newItem: BluetoothDevice): Boolean {
+) : ListAdapter<ScanHolder, ScanResultsAdapter.ViewHolder>(
+    object : DiffUtil.ItemCallback<ScanHolder>() {
+        override fun areItemsTheSame(oldItem: ScanHolder, newItem: ScanHolder): Boolean {
             return oldItem == newItem
         }
 
         override fun areContentsTheSame(
-            oldItem: BluetoothDevice,
-            newItem: BluetoothDevice
+            oldItem: ScanHolder,
+            newItem: ScanHolder
         ): Boolean {
-            return oldItem.address == newItem.address
+            return oldItem.device == newItem.device
         }
     },
 ) {
@@ -38,7 +39,7 @@ class ScanResultsAdapter(
             binding.connectionListener = listener
         }
 
-        fun bind(bleDevice: BluetoothDevice) {
+        fun bind(bleDevice: ScanHolder) {
             binding.apply {
                 this.bleDevice = bleDevice
                 executePendingBindings()

@@ -1,107 +1,191 @@
 package com.kl3jvi.yonda.connectivity
 
-//class ConnectionServiceImpl : ConnectionService, KoinComponent {
-//
-//    private val central: BluetoothCentralManager by inject()
-//    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-//    override val connectionState = MutableStateFlow(ConnectionState.DISCONNECTED)
-//
-//    init {
-//        central.observeConnectionState { peripheral: BluetoothPeripheral, state: ConnectionState ->
-//            Log.e("Peripheral '${peripheral.name}'", "is $state")
-//            connectionState.update { state }
-//            when (state) {
-//                ConnectionState.CONNECTED -> handlePeripheral(peripheral)
-//                ConnectionState.DISCONNECTED -> scope.launch {
-//                    delay(15000)
-//                    // Check if this peripheral should still be auto connected
-//                    if (central.getPeripheral(peripheral.address)
-//                            .getState() == ConnectionState.DISCONNECTED
-//                    ) {
-//                        central.autoConnectPeripheral(peripheral)
-//                    }
-//                }
-//
-//                else -> {}
-//            }
-//        }
-//    }
-//
-//    private fun handlePeripheral(peripheral: BluetoothPeripheral) {
-//        scope.launch {
-//            peripheral.requestConnectionPriority(ConnectionPriority.HIGH)
-//            peripheral.getCharacteristic(XIAOMI_SERVICE, CHAR_WRITE)?.let {
-//                if (it.supportsWritingWithResponse()) {
-//                    peripheral.writeCharacteristic(
-//                        it,
-//                        Ampere().getRequestString().hexToBytes(),
-//                        WriteType.WITH_RESPONSE,
-//                    )
-//                }
-//            }
-//            peripheral.getCharacteristic(XIAOMI_SERVICE, CHAR_READ)?.let {
-//                val descriptor = it.getDescriptor(CHAR_WRITE)
-//                if (descriptor != null) {
-//                    peripheral.writeDescriptor(descriptor, Ampere().getRequestString().hexToBytes())
-//                }
-//                peripheral.observe(it) { value ->
-//                    // Process the updated value of the characteristic
-//                    // ...
-//                    Log.e("value", value.asHexString())
-//                }
-//            }
-//        }
-//    }
-//
-//    override fun scanBleDevices(): Flow<BluetoothPeripheral> = callbackFlow {
-//        runCatching {
-//            central.scanForPeripherals(
-//                resultCallback = { bluetoothPeripheral: BluetoothPeripheral, _: ScanResult ->
-//                    trySend(bluetoothPeripheral)
-//                },
-//                scanError = {
-//                    cancel(Error(scanFailure = it).getErrorMessage())
-//                },
-//            )
-//        }.onFailure {
-//            cancel(Error(throwable = it).getErrorMessage())
-//        }
-//        awaitClose(::stopScanning)
-//    }
-//
-//    override fun stopScanning() = central.stopScan()
-//
-//    override fun connectToPeripheral(peripheral: BluetoothPeripheral) {
-//        peripheral.observeBondState {
-//            Log.e("Bond state is", "$it")
-//        }
-//        scope.launch {
-//            try {
-//                stopScanning()
-//                central.connectPeripheral(peripheral)
-//            } catch (connectionFailed: ConnectionFailedException) {
-//                Log.e("connection", "failed")
-//            }
-//        }
-//    }
-//
-//    override suspend fun readFromScooter(peripheral: BluetoothPeripheral) {
-//        scope.launch {
-//            peripheral.getCharacteristic(XIAOMI_SERVICE, CHAR_READ)?.let {
-//                peripheral.observe(it) { value ->
-//                    Log.e("result", value.asHexString())
-//                }
-//            }
-//        }
-//    }
-//
-//    override suspend fun sendCommand(peripheral: BluetoothPeripheral): ByteArray {
-//        return ByteArray(0)
-//    }
-//
-//    companion object {
-//        val XIAOMI_SERVICE: UUID = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e") // WRITE
-//        val CHAR_WRITE: UUID = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e") // WRITE
-//        val CHAR_READ: UUID = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e") // READ
-//    }
-//}
+import android.bluetooth.BluetoothDevice
+import android.os.ParcelUuid
+import android.util.Log
+import com.kl3jvi.nb_api.command.ScooterCommand
+import com.kl3jvi.nb_api.command.battery.Battery
+import com.kl3jvi.nb_api.command.version.CheckVersion
+import com.kl3jvi.yonda.models.ScanHolder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
+import no.nordicsemi.android.ble.observer.ConnectionObserver
+import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat
+import no.nordicsemi.android.support.v18.scanner.ScanCallback
+import no.nordicsemi.android.support.v18.scanner.ScanFilter
+import no.nordicsemi.android.support.v18.scanner.ScanResult
+import no.nordicsemi.android.support.v18.scanner.ScanSettings
+import java.util.UUID
+
+
+class ConnectionServiceImpl(
+    private val bleManager: FlashGearBluetoothManager
+) : ConnectionService {
+
+    override val connectionState: Channel<ConnectionState>
+        get() = Channel(1, BufferOverflow.DROP_OLDEST)
+    private val scanCommands: Channel<ScanCommand> = Channel(1, BufferOverflow.DROP_OLDEST)
+
+
+    sealed class ScanCommand {
+        object Start : ScanCommand()
+        object Stop : ScanCommand()
+    }
+
+    override fun startScanning() {
+        scanCommands.trySend(ScanCommand.Start)
+    }
+
+    override fun stopScanning() {
+        scanCommands.trySend(ScanCommand.Stop)
+    }
+
+    override fun scanBleDevices(): Flow<ScanHolder> = callbackFlow {
+        val scanner = BluetoothLeScannerCompat.getScanner()
+
+        val settings: ScanSettings = ScanSettings.Builder()
+            .setLegacy(false)
+            .setScanMode(ScanSettings.SCAN_MODE_BALANCED)
+            .setUseHardwareBatchingIfSupported(true)
+            .setReportDelay(1000)
+            .build()
+
+        val filter = listOf<ScanFilter>()
+
+        val callback = object : ScanCallback() {
+            override fun onScanResult(callbackType: Int, result: ScanResult) {
+                super.onScanResult(callbackType, result)
+                trySend(ScanHolder(result.device, result.rssi)).isSuccess
+            }
+
+            override fun onBatchScanResults(results: MutableList<ScanResult>) {
+                super.onBatchScanResults(results)
+                Log.e("Scan", results.toString())
+                results.toSet()
+                    .forEach { result ->
+                        trySend(ScanHolder(result.device, result.rssi)).isSuccess
+                    }
+            }
+
+            override fun onScanFailed(errorCode: Int) {
+                super.onScanFailed(errorCode)
+                trySend(ScanHolder(errorCode = errorCode)).isSuccess
+            }
+        }
+
+        val job = launch {
+            scanCommands
+                .receiveAsFlow()
+                .collectLatest { command ->
+                    when (command) {
+                        ScanCommand.Start -> {
+                            scanner.startScan(filter, settings, callback)
+                        }
+
+                        ScanCommand.Stop -> {
+                            scanner.stopScan(callback)
+                            close()
+                        }
+                    }
+                }
+        }
+
+        awaitClose {
+            job.cancel()
+            scanner.stopScan(callback)
+        }
+    }
+
+
+    override fun connectToPeripheral(
+        peripheral: BluetoothDevice,
+        callback: (BluetoothDevice) -> Unit
+    ) {
+        bleManager.connectionObserver = object : ConnectionObserver {
+            override fun onDeviceConnecting(device: BluetoothDevice) {
+                Log.e("Connecting", "Connecting")
+                connectionState.trySend(ConnectionState.Connecting).isSuccess
+            }
+
+            override fun onDeviceConnected(device: BluetoothDevice) {
+                Log.e("Connected", "Connected")
+                connectionState.trySend(ConnectionState.Connected).isSuccess
+            }
+
+            override fun onDeviceFailedToConnect(device: BluetoothDevice, reason: Int) {
+                Log.e("Failed", "Failed")
+                connectionState.trySend(ConnectionState.Failed(device, reason)).isSuccess
+            }
+
+            override fun onDeviceReady(device: BluetoothDevice) {
+                Log.e("Ready", "Ready")
+                connectionState.trySend(ConnectionState.Ready(device)).isSuccess
+                sendCommand(device, CheckVersion())
+            }
+
+            override fun onDeviceDisconnecting(device: BluetoothDevice) {
+                Log.e("Disconnecting", "Disconnecting")
+                connectionState.trySend(ConnectionState.Disconnecting).isSuccess
+            }
+
+            override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
+                Log.e("Disconnected", "Disconnected")
+                connectionState.trySend(ConnectionState.Disconnected).isSuccess
+            }
+
+        }
+
+        bleManager
+            .connect(peripheral)
+            .useAutoConnect(false)
+            .timeout(10000) // adjust as needed
+            .retry(3, 100)
+            .done {
+                callback(it)
+            }.fail { device, status ->
+                Log.e("Failed Connection", "Failed $device $status")
+            }.enqueue()
+
+
+    }
+
+    override fun disconnect(
+        peripheral: BluetoothDevice,
+        callback: (BluetoothDevice) -> Unit
+    ) {
+        bleManager
+            .disconnect()
+            .enqueue()
+    }
+
+    override fun sendCommand(peripheral: BluetoothDevice, scooterCommand: ScooterCommand) {
+
+        CoroutineScope(Dispatchers.IO).launch {
+            repeat(3) {
+                val result = it * 1000L
+                delay(result)
+                val command = scooterCommand.getRequestString().toByteArray()
+                (bleManager as? FlashGearBluetoothManager)?.sendCommandToDevice(command)
+            }
+        }
+    }
+
+
+    override suspend fun readFromScooter() {
+
+    }
+
+    companion object {
+        val XIAOMI_SERVICE: UUID = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e")
+    }
+}
+
