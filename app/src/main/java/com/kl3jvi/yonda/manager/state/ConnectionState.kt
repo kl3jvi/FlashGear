@@ -1,4 +1,4 @@
-package com.kl3jvi.yonda.connectivity
+package com.kl3jvi.yonda.manager
 
 import android.bluetooth.BluetoothDevice
 
