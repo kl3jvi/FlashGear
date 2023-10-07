@@ -8,7 +8,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.launch
@@ -41,15 +40,16 @@ inline fun Fragment.launchAndRepeatWithViewLifecycle(
  */
 fun <T> Flow<T>.delayEachFor(timeMillis: Long): Flow<T> = onEach { delay(timeMillis) }
 
-fun <T> Flow<T>.filterScooter(
-    vararg checks: String,
-    function: (T) -> Boolean = { true },
-) = apply {
-    filter { value -> checks.any { value.toString().contains(it) } }.filter(function)
-}
-
 fun <T> Flow<T>.aggregateAsSet(): Flow<Set<T>> {
     return scan(setOf()) { acc, value ->
         acc + value
+    }
+}
+
+inline fun <T> Iterable<T>.forEachIterable(block: (T) -> Unit) {
+    with(iterator()) {
+        while (hasNext()) {
+            block(next())
+        }
     }
 }

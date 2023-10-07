@@ -4,13 +4,11 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -23,12 +21,13 @@ class PermissionFragment : Fragment(R.layout.fragment_permission) {
     private var _binding: FragmentPermissionBinding? = null
     private val binding get() = _binding!!
     private val permissionRequestLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
+        ActivityResultContracts.RequestMultiplePermissions(),
     ) { permissions ->
         permissions.entries.forEach {
             when (it.key) {
                 Manifest.permission.BLUETOOTH_ADMIN,
-                Manifest.permission.BLUETOOTH -> {
+                Manifest.permission.BLUETOOTH,
+                -> {
                     // Handle Bluetooth Permissions
                     if (it.value) {
                         binding.bluetooth.checkShouldEnable()
@@ -36,7 +35,8 @@ class PermissionFragment : Fragment(R.layout.fragment_permission) {
                 }
 
                 Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION -> {
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                -> {
                     // Handle Location Permissions
                     if (it.value) {
                         binding.location.checkShouldEnable()
@@ -55,7 +55,6 @@ class PermissionFragment : Fragment(R.layout.fragment_permission) {
         super.onStart()
 
         if (!isBluetoothGranted() && !isLocationGranted()) {
-
             findNavController().navigate(
                 PermissionFragmentDirections.toHome(),
             )
@@ -80,8 +79,8 @@ class PermissionFragment : Fragment(R.layout.fragment_permission) {
                 Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN,
                 Manifest.permission.BLUETOOTH_SCAN,
-                Manifest.permission.BLUETOOTH_CONNECT
-            )
+                Manifest.permission.BLUETOOTH_CONNECT,
+            ),
         )
     }
 
@@ -89,35 +88,34 @@ class PermissionFragment : Fragment(R.layout.fragment_permission) {
         permissionRequestLauncher.launch(
             arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+            ),
         )
     }
-
 
     private fun isBluetoothGranted(): Boolean {
         val bluetoothPermission = ContextCompat.checkSelfPermission(
             requireContext(),
-            Manifest.permission.BLUETOOTH
+            Manifest.permission.BLUETOOTH,
         )
         val bluetoothAdminPermission = ContextCompat.checkSelfPermission(
             requireContext(),
-            Manifest.permission.BLUETOOTH_ADMIN
+            Manifest.permission.BLUETOOTH_ADMIN,
         )
 
         val bluetoothConnectPermission = ContextCompat.checkSelfPermission(
             requireContext(),
-            Manifest.permission.BLUETOOTH_CONNECT
+            Manifest.permission.BLUETOOTH_CONNECT,
         )
         return bluetoothPermission == PackageManager.PERMISSION_GRANTED &&
-                bluetoothAdminPermission == PackageManager.PERMISSION_GRANTED &&
-                bluetoothConnectPermission == PackageManager.PERMISSION_GRANTED
+            bluetoothAdminPermission == PackageManager.PERMISSION_GRANTED &&
+            bluetoothConnectPermission == PackageManager.PERMISSION_GRANTED
     }
 
     private fun isLocationGranted(): Boolean {
         return ContextCompat.checkSelfPermission(
             requireContext(),
-            Manifest.permission.ACCESS_FINE_LOCATION
+            Manifest.permission.ACCESS_FINE_LOCATION,
         ) == PackageManager.PERMISSION_GRANTED
     }
 
@@ -170,7 +168,6 @@ class PermissionFragment : Fragment(R.layout.fragment_permission) {
     private fun List<TextView>.checkTextViews() {
         forEach { it.checkShouldEnable() }
     }
-
 
     override fun onStop() {
         super.onStop()

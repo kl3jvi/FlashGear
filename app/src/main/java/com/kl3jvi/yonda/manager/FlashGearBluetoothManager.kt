@@ -1,69 +1,78 @@
-package com.kl3jvi.yonda.connectivity
+package com.kl3jvi.yonda.manager
 
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
 import android.util.Log
-import com.welie.blessed.supportsNotifying
-import no.nordicsemi.android.ble.BleManager
-import no.nordicsemi.android.ble.data.Data
-import java.util.UUID
+import com.kl3jvi.yonda.ext.withLock
+import com.kl3jvi.yonda.manager.service.BluetoothGattServiceWrapper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import no.nordicsemi.android.ble.ConnectRequest
+import no.nordicsemi.android.ble.ConnectionPriorityRequest
 
-class FlashGearBluetoothManager(context: Context) : BleManager(context) {
+class FlashGearBluetoothManager(
+    context: Context,
+    private val scope: CoroutineScope,
+    private val flashGearGattServiceHandler: BluetoothGattServiceWrapper,
+) : UnsafeBleManager(scope, context) {
 
-    private var commandCharacteristic: BluetoothGattCharacteristic? = null
-    private var readDataCharacteristic: BluetoothGattCharacteristic? = null
+    private var connectRequest: ConnectRequest? = null
+    private val bleMutex = Mutex()
 
-    override fun getGattCallback(): BleManagerGattCallback {
-        return FlashGearBleManagerGattCallback()
+    override suspend fun connectToDevice(device: BluetoothDevice) {
+        withLock(bleMutex, "connect") {
+            val connectRequestLocal = connect(device)
+                .retry(
+                    RECONNECT_COUNT,
+                    RECONNECT_TIME_MS.toInt(),
+                ).useAutoConnect(true)
+
+            connectRequestLocal.enqueue()
+
+            connectRequest = connectRequestLocal
+
+            return@withLock
+        }
     }
 
-    override fun log(priority: Int, message: String) {
-        Log.println(priority, "FlashGearLogger", message)
+    override suspend fun disconnectDevice() {
+        withLock(bleMutex, "disconnect") {
+            connectRequest?.cancelPendingConnection()
+            disconnect().enqueue()
+        }
     }
 
-    fun sendCommandToDevice(command: ByteArray) {
-        commandCharacteristic?.let { characteristic ->
-            writeCharacteristic(characteristic, Data(command))
-                .done { Log.i("BLE", "Done Writing: ${command.toString(Charsets.UTF_8)}") }
-                .fail { device, status -> Log.e("BLE", "Failed Writing: $device $status") }
-                .enqueue()
-        } ?: Log.e("BLE", "Command Characteristic is null!")
+    override fun initialize() {
+        if (!isBonded) {
+            Log.i("Ble Manager", "Start bond secure")
+            ensureBond().enqueue()
+        }
     }
 
-    private inner class FlashGearBleManagerGattCallback : BleManagerGattCallback() {
-
-        override fun initialize() {
-            readDataCharacteristic?.let { characteristic ->
-                setNotificationCallback(characteristic).with { device, data ->
-                    Log.d("NOTIFICATION", "Received from ${device.address}: ${data.value?.toString(Charsets.UTF_8)}")
-                }
-                enableNotifications(characteristic).enqueue()
-            } ?: run {
-                Log.e("BLE", "Read characteristic is null during initialization!")
-            }
+    override fun onDeviceReady() {
+        super.onDeviceReady()
+        requestConnectionPriority(
+            ConnectionPriorityRequest.CONNECTION_PRIORITY_HIGH,
+        ).enqueue()
+        scope.launch(Dispatchers.Default) {
+            flashGearGattServiceHandler
+                .initialize(
+                    this@FlashGearBluetoothManager,
+                )
         }
+    }
 
-        override fun isRequiredServiceSupported(gatt: BluetoothGatt): Boolean {
-            val service = gatt.getService(XIAOMI_SERVICE)
-            commandCharacteristic = service?.getCharacteristic(CHAR_WRITE)
-            readDataCharacteristic = service?.getCharacteristic(CHAR_READ)
-            gatt.setCharacteristicNotification(readDataCharacteristic, true)
-
-            return commandCharacteristic != null && readDataCharacteristic != null
+    override fun onServicesInvalidated() {
+        scope.launch(Dispatchers.Default) {
+            flashGearGattServiceHandler
+                .reset(this@FlashGearBluetoothManager)
         }
-
-        override fun onServicesInvalidated() {
-            readDataCharacteristic = null
-            commandCharacteristic = null
-        }
-
     }
 
     companion object {
-        val XIAOMI_SERVICE: UUID = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e")
-        val CHAR_WRITE: UUID = UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e")
-        val CHAR_READ: UUID = UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e")
+        const val RECONNECT_COUNT = 1
+        const val RECONNECT_TIME_MS = 100L
     }
 }

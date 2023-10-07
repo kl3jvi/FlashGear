@@ -3,24 +3,22 @@ package com.kl3jvi.yonda.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kl3jvi.nb_api.command.locking.LockOff
-import com.kl3jvi.yonda.connectivity.ConnectionService
-import com.kl3jvi.yonda.connectivity.ConnectionState
 import com.kl3jvi.yonda.ext.Result
 import com.kl3jvi.yonda.ext.aggregateAsSet
 import com.kl3jvi.yonda.ext.convertToResultAndMapTo
 import com.kl3jvi.yonda.ext.delayEachFor
+import com.kl3jvi.yonda.manager.ConnectionService
 import com.kl3jvi.yonda.models.ScanHolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val connectionService: ConnectionService
+    private val connectionService: ConnectionService,
 ) : ViewModel(), ConnectListener {
 
     val currentConnectivityState = connectionService
@@ -71,13 +69,11 @@ class HomeViewModel(
     }
 }
 
-
 sealed interface BluetoothState {
     data class Success(val data: Set<ScanHolder>) : BluetoothState
     data class Error(val errorMessage: String) : BluetoothState
     object Idle : BluetoothState
 }
-
 
 sealed class ScanCommand {
     object Start : ScanCommand()

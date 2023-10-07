@@ -24,7 +24,7 @@ class ScanResultsAdapter(
         override fun areContentsTheSame(oldItem: ScanHolder, newItem: ScanHolder): Boolean {
             return oldItem == newItem
         }
-    }
+    },
 ) {
 
     inner class ViewHolder(private val binding: ItemBluetoothBinding) :

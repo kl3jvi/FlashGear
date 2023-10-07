@@ -2,7 +2,7 @@ package com.kl3jvi.yonda.models
 
 import android.bluetooth.BluetoothDevice
 import android.os.Parcelable
-import com.kl3jvi.yonda.connectivity.ConnectionState
+import com.kl3jvi.yonda.manager.state.ConnectionState
 import com.welie.blessed.BluetoothPeripheral
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.RawValue
@@ -16,7 +16,7 @@ data class ScanHolder(
     val device: BluetoothDevice? = null,
     val rssi: Int? = null,
     val errorCode: Int? = null,
-    val state: ConnectionState= ConnectionState.Disconnected(device!!)
+    val state: ConnectionState = ConnectionState.Disconnected(device!!),
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

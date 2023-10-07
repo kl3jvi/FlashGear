@@ -10,10 +10,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.kl3jvi.yonda.R
-import com.kl3jvi.yonda.connectivity.ConnectionState
-import com.kl3jvi.yonda.connectivity.getStateAsString
 import com.kl3jvi.yonda.databinding.FragmentHomeBinding
 import com.kl3jvi.yonda.ext.launchAndRepeatWithViewLifecycle
+import com.kl3jvi.yonda.manager.state.ConnectionState
+import com.kl3jvi.yonda.manager.state.getStateAsString
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -70,7 +70,6 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
     }
 
     private fun setupFab() {
-
         binding.fab.setOnClickListener {
             when (it.tag) {
                 "stopped" -> {

@@ -1,8 +1,9 @@
-package com.kl3jvi.yonda.connectivity
+package com.kl3jvi.yonda.manager
 
 import android.bluetooth.BluetoothDevice
 import android.util.Log
 import com.kl3jvi.nb_api.command.ScooterCommand
+import com.kl3jvi.yonda.manager.state.ConnectionState
 import com.kl3jvi.yonda.models.ScanHolder
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -21,15 +22,13 @@ import no.nordicsemi.android.support.v18.scanner.ScanResult
 import no.nordicsemi.android.support.v18.scanner.ScanSettings
 import java.util.UUID
 
-
 class ConnectionServiceImpl(
-    private val bleManager: FlashGearBluetoothManager
+    private val bleManager: FlashGearBluetoothManager,
 ) : ConnectionService {
 
     private val _connectionState = Channel<ConnectionState>(1, BufferOverflow.DROP_OLDEST)
     override val connectionState: ReceiveChannel<ConnectionState> = _connectionState
     private val scanCommands: Channel<ScanCommand> = Channel(1, BufferOverflow.DROP_OLDEST)
-
 
     sealed class ScanCommand {
         object Start : ScanCommand()
@@ -45,7 +44,6 @@ class ConnectionServiceImpl(
     }
 
     override fun scanBleDevices(): Flow<ScanHolder> = callbackFlow {
-
         val scanner = BluetoothLeScannerCompat.getScanner()
 
         val settings: ScanSettings = ScanSettings.Builder()
@@ -105,10 +103,9 @@ class ConnectionServiceImpl(
         }
     }
 
-
     override fun connectToPeripheral(
         peripheral: BluetoothDevice,
-        callback: (BluetoothDevice) -> Unit
+        callback: (BluetoothDevice) -> Unit,
     ) {
         bleManager.connectionObserver = object : ConnectionObserver {
             override fun onDeviceConnecting(device: BluetoothDevice) {
@@ -154,16 +151,13 @@ class ConnectionServiceImpl(
 
     override fun sendCommand(peripheral: BluetoothDevice, scooterCommand: ScooterCommand) {
         val command = scooterCommand.getRequestString().toByteArray()
-        (bleManager as? FlashGearBluetoothManager)?.sendCommandToDevice(command)
+//        (bleManager as? FlashGearBluetoothManager)?.sendCommandToDevice(command)
     }
 
-
     override suspend fun readFromScooter() {
-
     }
 
     companion object {
         val XIAOMI_SERVICE: UUID = UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e")
     }
 }
-

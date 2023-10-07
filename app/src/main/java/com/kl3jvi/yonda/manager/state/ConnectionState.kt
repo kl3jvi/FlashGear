@@ -1,7 +1,6 @@
-package com.kl3jvi.yonda.manager
+package com.kl3jvi.yonda.manager.state
 
 import android.bluetooth.BluetoothDevice
-
 
 // Sealed class representation of connection state
 sealed class ConnectionState(val device: BluetoothDevice) {
@@ -12,7 +11,7 @@ sealed class ConnectionState(val device: BluetoothDevice) {
     class Disconnecting(device: BluetoothDevice) : ConnectionState(device)
     class Failed(
         device: BluetoothDevice,
-        private val status: Int
+        private val status: Int,
     ) : ConnectionState(device) {
         val error = when (status) {
             -1 -> "Device disconnected"
