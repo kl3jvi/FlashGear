@@ -1,41 +1,34 @@
 package com.kl3jvi.yonda.ui.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kl3jvi.nb_api.command.battery.Battery
+import com.kl3jvi.nb_api.command.locking.LockOff
 import com.kl3jvi.yonda.connectivity.ConnectionService
+import com.kl3jvi.yonda.connectivity.ConnectionState
 import com.kl3jvi.yonda.ext.Result
 import com.kl3jvi.yonda.ext.aggregateAsSet
 import com.kl3jvi.yonda.ext.convertToResultAndMapTo
 import com.kl3jvi.yonda.ext.delayEachFor
 import com.kl3jvi.yonda.models.ScanHolder
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    val connectionService: ConnectionService,
+    private val connectionService: ConnectionService
 ) : ViewModel(), ConnectListener {
 
-    private val currentConnectivityState = connectionService.connectionState.receiveAsFlow()
+    val currentConnectivityState = connectionService
+        .connectionState
+        .receiveAsFlow()
 
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            currentConnectivityState.collectLatest {
-                Log.e("State", it.toString())
-            }
-
-        }
-
-        viewModelScope.launch(Dispatchers.IO) {
-            delay(4000)
-        }
-    }
+    private val scanCommands = Channel<ScanCommand>(1, BufferOverflow.DROP_OLDEST)
+    fun commands(): Flow<ScanCommand> = scanCommands.receiveAsFlow()
 
     var scannedDeviceList: Flow<BluetoothState> = connectionService.scanBleDevices()
         .aggregateAsSet()
@@ -49,28 +42,31 @@ class HomeViewModel(
         .delayEachFor(1_000)
         .flowOn(Dispatchers.IO)
 
-    /**
-     * The function stops the scanning process and clears the list of scanned devices
-     */
-    private fun stopScanPressed() {
-        connectionService.stopScanning()
+    fun sendCommand(newCommand: ScanCommand) {
+        viewModelScope.launch {
+            scanCommands.send(newCommand)
+        }
     }
+
+    fun startScanning() = connectionService.startScanning()
+    fun stopScanning() = connectionService.stopScanning()
 
     override fun connectToPeripheral(peripheral: ScanHolder) {
         viewModelScope.launch(Dispatchers.IO) {
-            stopScanPressed()
-            val device = peripheral.device ?: return@launch
-            connectionService.connectToPeripheral(device) {
-                Log.i("Connected", "to ${it.address}")
-                stopScanPressed()
+            peripheral.device?.let { device ->
+                connectionService.connectToPeripheral(device) {
+                    stopScanning()
+                }
             }
         }
     }
 
     override fun sendCommandToPeripheral(peripheral: ScanHolder) {
-        Log.e("CLicked ", "sendCommand")
         viewModelScope.launch(Dispatchers.IO) {
-//            connectionService.sendCommand(peripheral.device ?: return@launch,Battery())
+            // Add your logic here if needed
+            peripheral.device?.let { device ->
+                connectionService.sendCommand(device, LockOff())
+            }
         }
     }
 }
@@ -80,4 +76,10 @@ sealed interface BluetoothState {
     data class Success(val data: Set<ScanHolder>) : BluetoothState
     data class Error(val errorMessage: String) : BluetoothState
     object Idle : BluetoothState
+}
+
+
+sealed class ScanCommand {
+    object Start : ScanCommand()
+    object Stop : ScanCommand()
 }

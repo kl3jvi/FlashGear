@@ -1,7 +1,7 @@
 package com.kl3jvi.nb_api.command
 
 class ScooterMessage {
-    var msg: MutableList<Int> = mutableListOf()
+    private var msg: MutableList<Int> = mutableListOf()
     var direction = 0
     var rw = 0
     var position = 0
@@ -14,7 +14,7 @@ class ScooterMessage {
         return this
     }
 
-    fun setReadOrWrite(readOrWrite: Commands): ScooterMessage { // read or write
+    fun setReadOrWrite(readOrWrite: Commands): ScooterMessage {
         rw = readOrWrite.command
         checksum += rw
         return this
@@ -88,6 +88,9 @@ class ScooterMessage {
      * @return The message is being returned as a string of hexadecimal values.
      */
     private fun construct(): String {
-        return msg.joinToString("") { it.toString(16).padStart(2, '0') }
+        return msg.joinToString("") {
+            it.toString(16)
+                .padStart(2, '0')
+        }
     }
 }

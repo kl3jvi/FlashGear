@@ -1,15 +1,12 @@
 package com.kl3jvi.yonda.ui.home
 
-import android.bluetooth.BluetoothDevice
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.kl3jvi.yonda.databinding.ItemBluetoothBinding
-import com.kl3jvi.yonda.models.BleDevice
 import com.kl3jvi.yonda.models.ScanHolder
-import com.welie.blessed.BluetoothPeripheral
 
 interface ConnectListener {
     fun connectToPeripheral(peripheral: ScanHolder)
@@ -21,16 +18,13 @@ class ScanResultsAdapter(
 ) : ListAdapter<ScanHolder, ScanResultsAdapter.ViewHolder>(
     object : DiffUtil.ItemCallback<ScanHolder>() {
         override fun areItemsTheSame(oldItem: ScanHolder, newItem: ScanHolder): Boolean {
-            return oldItem == newItem
+            return oldItem.device?.address == newItem.device?.address
         }
 
-        override fun areContentsTheSame(
-            oldItem: ScanHolder,
-            newItem: ScanHolder
-        ): Boolean {
-            return oldItem.device == newItem.device
+        override fun areContentsTheSame(oldItem: ScanHolder, newItem: ScanHolder): Boolean {
+            return oldItem == newItem
         }
-    },
+    }
 ) {
 
     inner class ViewHolder(private val binding: ItemBluetoothBinding) :

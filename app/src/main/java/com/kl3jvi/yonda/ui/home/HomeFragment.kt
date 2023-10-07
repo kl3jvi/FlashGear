@@ -4,13 +4,22 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.kl3jvi.yonda.R
+import com.kl3jvi.yonda.connectivity.ConnectionState
+import com.kl3jvi.yonda.connectivity.getStateAsString
 import com.kl3jvi.yonda.databinding.FragmentHomeBinding
 import com.kl3jvi.yonda.ext.launchAndRepeatWithViewLifecycle
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.component.KoinComponent
+import java.util.concurrent.CancellationException
 
 class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
 
@@ -23,51 +32,120 @@ class HomeFragment : Fragment(R.layout.fragment_home), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentHomeBinding.bind(view)
-        adapter = ScanResultsAdapter(homeViewModel)
+        initRecyclerView()
+        observeCommands()
+        observeConnectivityState()
+        setupFab()
+    }
 
-        binding.rv.layoutManager = LinearLayoutManager(requireContext())
-        binding.rv.adapter = adapter
-        scanBle()
-//        setup floating button action when clicked it either starts the search or stop it
+    private fun initRecyclerView() {
+        adapter = ScanResultsAdapter(homeViewModel)
+        binding.rv.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = this@HomeFragment.adapter
+        }
+    }
+
+    private fun observeCommands() {
+        homeViewModel.commands()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach(::processCommand)
+            .launchIn(lifecycleScope)
+    }
+
+    private fun observeConnectivityState() {
+        homeViewModel.currentConnectivityState
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach {
+                processConnectionState(it)
+                showSnackbar(it.getStateAsString())
+            }.launchIn(lifecycleScope)
+    }
+
+    private fun processConnectionState(connectionState: ConnectionState) {
+        when (connectionState) {
+            is ConnectionState.Ready -> homeViewModel.sendCommand(ScanCommand.Stop)
+            else -> {}
+        }
+    }
+
+    private fun setupFab() {
+
         binding.fab.setOnClickListener {
-            if (binding.fab.tag == "start") {
-                binding.fab.tag = "stop"
-                binding.fab.setImageResource(R.drawable.ic_stop_search)
-                homeViewModel.connectionService.startScanning()
-                scanBle()
-            } else {
-                binding.fab.tag = "start"
-                binding.fab.setImageResource(R.drawable.ic_search)
-                job?.cancel()
+            when (it.tag) {
+                "stopped" -> {
+                    homeViewModel.sendCommand(ScanCommand.Start)
+                    updateFabStatus("started", R.drawable.ic_stop_search)
+                    updateProgressVisibility(true)
+                }
+
+                "started" -> {
+                    homeViewModel.sendCommand(ScanCommand.Stop)
+                    updateFabStatus("stopped", R.drawable.ic_search)
+                    updateProgressVisibility(false)
+                }
             }
         }
     }
 
-    private fun scanBle() {
-        job?.cancel()
-        job = launchAndRepeatWithViewLifecycle {
-            homeViewModel.scannedDeviceList.collect { bluetoothState ->
-                when (bluetoothState) {
-                    is BluetoothState.Error -> Log.e(
-                        "Error",
-                        "happened ${bluetoothState.errorMessage}",
-                    )
+    private fun updateFabStatus(tag: String, iconRes: Int) {
+        binding.apply {
+            this.fab.tag = tag
+            this.fab.setImageResource(iconRes)
+        }
+    }
 
-                    is BluetoothState.Success -> {
-                        Log.e("Success", "happened ${bluetoothState.data}")
-                        adapter.submitList(bluetoothState.data.sortedBy { it.device?.name == null })
-                    }
+    private fun updateProgressVisibility(isVisible: Boolean) {
+        binding.progressBar.visibility = if (isVisible) View.VISIBLE else View.GONE
+    }
 
-                    else -> {}
-                }
+    private fun processCommand(scanCommand: ScanCommand) {
+        when (scanCommand) {
+            is ScanCommand.Start -> {
+                homeViewModel.startScanning()
+                collectBleDevices()
+                showSnackbar("Scanning started")
+                binding.fab.tag = "started"
             }
 
+            is ScanCommand.Stop -> {
+                homeViewModel.stopScanning()
+                job?.cancel()
+                showSnackbar("Scanning stopped")
+                binding.fab.tag = "stopped"
+            }
         }
+    }
+
+    private fun collectBleDevices() {
+        job?.cancel(CancellationException("Restarting scan"))
+        job = launchAndRepeatWithViewLifecycle {
+            homeViewModel.scannedDeviceList.collect { bluetoothState ->
+                handleBluetoothState(bluetoothState)
+            }
+        }
+    }
+
+    private fun handleBluetoothState(bluetoothState: BluetoothState) {
+        when (bluetoothState) {
+            is BluetoothState.Error -> Log.e("Error", "happened ${bluetoothState.errorMessage}")
+            is BluetoothState.Success -> {
+//                Log.e("Success", "happened ${bluetoothState.data.map { it.state to it.device?.name }}")
+                adapter.submitList(bluetoothState.data.sortedBy { it.device?.name == null })
+            }
+
+            else -> {}
+        }
+    }
+
+    private fun showSnackbar(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         job = null
+        binding.fab.tag = "stopped"
         _binding = null
     }
 }
