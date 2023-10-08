@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val connectionService: ConnectionService,
-) : ViewModel(), ConnectListener {
+) : ViewModel() {
 
     val currentConnectivityState = connectionService
         .connectionState
@@ -49,7 +49,7 @@ class HomeViewModel(
     fun startScanning() = connectionService.startScanning()
     fun stopScanning() = connectionService.stopScanning()
 
-    override fun connectToPeripheral(peripheral: ScanHolder) {
+    fun connectToPeripheral(peripheral: ScanHolder) {
         viewModelScope.launch(Dispatchers.IO) {
             peripheral.device?.let { device ->
                 connectionService.connectToPeripheral(device) {
@@ -59,7 +59,7 @@ class HomeViewModel(
         }
     }
 
-    override fun sendCommandToPeripheral(peripheral: ScanHolder) {
+    fun sendCommandToPeripheral(peripheral: ScanHolder) {
         viewModelScope.launch(Dispatchers.IO) {
             // Add your logic here if needed
             peripheral.device?.let { device ->

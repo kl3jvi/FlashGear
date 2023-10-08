@@ -1,16 +1,7 @@
 package com.kl3jvi.yonda.models
 
 import android.bluetooth.BluetoothDevice
-import android.os.Parcelable
 import com.kl3jvi.yonda.manager.state.ConnectionState
-import com.welie.blessed.BluetoothPeripheral
-import kotlinx.parcelize.Parcelize
-import kotlinx.parcelize.RawValue
-
-@Parcelize
-data class BleDevice(
-    val peripheral: @RawValue BluetoothPeripheral,
-) : Parcelable
 
 data class ScanHolder(
     val device: BluetoothDevice? = null,
