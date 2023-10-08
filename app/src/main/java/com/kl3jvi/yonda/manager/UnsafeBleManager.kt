@@ -19,7 +19,7 @@ abstract class UnsafeBleManager(
 ) : BleManager(context),
     ConnectionStateProvider,
     BondStateProvider,
-    YondaBleManager {
+    FlashGearBleManager {
 
     private val connectionObservers = ConnectionObserverComposite(scope = scope)
     private val bondingObservers = BondingObserverComposite()

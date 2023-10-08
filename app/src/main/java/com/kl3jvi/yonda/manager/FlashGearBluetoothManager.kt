@@ -71,6 +71,10 @@ class FlashGearBluetoothManager(
         }
     }
 
+    override fun log(priority: Int, message: String) {
+        Log.println(priority, "FlashGearLogger", message)
+    }
+
     companion object {
         const val RECONNECT_COUNT = 1
         const val RECONNECT_TIME_MS = 100L

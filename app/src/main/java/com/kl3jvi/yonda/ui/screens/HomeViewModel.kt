@@ -1,81 +1,79 @@
 package com.kl3jvi.yonda.ui.screens
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kl3jvi.nb_api.command.locking.LockOff
-import com.kl3jvi.yonda.ext.Result
-import com.kl3jvi.yonda.ext.aggregateAsSet
-import com.kl3jvi.yonda.ext.convertToResultAndMapTo
-import com.kl3jvi.yonda.ext.delayEachFor
-import com.kl3jvi.yonda.manager.ConnectionService
-import com.kl3jvi.yonda.models.ScanHolder
+import com.kl3jvi.yonda.manager.scanner.FlashGearScanner
+import com.kl3jvi.yonda.models.DiscoveredBluetoothDevice
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.concurrent.atomic.AtomicBoolean
+
+private const val TIMEOUT_MS = 30L * 1000
 
 class HomeViewModel(
-    private val connectionService: ConnectionService,
+    private val scanner: FlashGearScanner,
 ) : ViewModel() {
 
-    val currentConnectivityState = connectionService
-        .connectionState
-        .receiveAsFlow()
+    private val state = MutableStateFlow<ScanState>(ScanState.Stopped())
+    private val scanStarted = AtomicBoolean(false)
+    private var scanJob: Job? = null
 
-    private val scanCommands = Channel<ScanCommand>(1, BufferOverflow.DROP_OLDEST)
-    fun commands(): Flow<ScanCommand> = scanCommands.receiveAsFlow()
-
-    var scannedDeviceList: Flow<BluetoothState> = connectionService.scanBleDevices()
-        .aggregateAsSet()
-        .convertToResultAndMapTo { result ->
-            when (result) {
-                is Result.Error -> BluetoothState.Error(result.exception?.localizedMessage ?: "")
-                Result.Loading -> BluetoothState.Idle
-                is Result.Success -> BluetoothState.Success(result.data.toSet())
-            }
+    @Synchronized
+    fun startScan() {
+        if (!scanStarted.compareAndSet(false, true)) {
+            Log.i("Scan started", "already")
+            return
         }
-        .delayEachFor(1_000)
-        .flowOn(Dispatchers.IO)
 
-    fun sendCommand(newCommand: ScanCommand) {
-        viewModelScope.launch {
-            scanCommands.send(newCommand)
+        scanJob = viewModelScope.launch {
+            launch { startBLEDiscover() }
+            delay(TIMEOUT_MS)
+            if (state.value is ScanState.Searching) {
+                state.emit(ScanState.Timeout)
+                stopScanning()
+            }
         }
     }
 
-    fun startScanning() = connectionService.startScanning()
-    fun stopScanning() = connectionService.stopScanning()
-
-    fun connectToPeripheral(peripheral: ScanHolder) {
-        viewModelScope.launch(Dispatchers.IO) {
-            peripheral.device?.let { device ->
-                connectionService.connectToPeripheral(device) {
-                    stopScanning()
+    private suspend fun startBLEDiscover() = withContext(Dispatchers.IO) {
+        scanner.findScooterDevices()
+            .onStart {
+                state.emit(ScanState.Searching)
+            }.collect { devices ->
+                state.update {
+                    val devicesList = devices.toList()
+                    if ((it !is ScanState.Founded || it.devices != devices) &&
+                        devicesList.isNotEmpty()
+                    ) {
+                        ScanState.Founded(devicesList)
+                    } else {
+                        it
+                    }
                 }
             }
-        }
     }
 
-    fun sendCommandToPeripheral(peripheral: ScanHolder) {
-        viewModelScope.launch(Dispatchers.IO) {
-            // Add your logic here if needed
-            peripheral.device?.let { device ->
-                connectionService.sendCommand(device, LockOff())
-            }
+    @Synchronized
+    fun stopScanning() {
+        if (!scanStarted.compareAndSet(true, false)) {
+            return
         }
+        scanJob?.cancel()
+        scanJob = null
+        state.update { if (it !is ScanState.Stopped) ScanState.Stopped() else it }
     }
 }
 
-sealed interface BluetoothState {
-    data class Success(val data: Set<ScanHolder>) : BluetoothState
-    data class Error(val errorMessage: String) : BluetoothState
-    object Idle : BluetoothState
-}
-
-sealed class ScanCommand {
-    object Start : ScanCommand()
-    object Stop : ScanCommand()
+sealed class ScanState {
+    open class Stopped : ScanState()
+    data object Searching : ScanState()
+    class Founded(val devices: List<DiscoveredBluetoothDevice>) : ScanState()
+    object Timeout : Stopped()
 }

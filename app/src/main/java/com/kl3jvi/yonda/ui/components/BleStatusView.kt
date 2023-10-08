@@ -20,68 +20,71 @@ import com.kl3jvi.yonda.ui.theme.Typography
 @Composable
 fun BleStatusView(
     modifier: Modifier = Modifier,
+    onApplyPress: () -> Unit
 ) {
     Column(
-        modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             modifier = Modifier.padding(
-                start = 60.dp, end = 60.dp, top = 48.dp
+                start = 60.dp,
+                end = 60.dp,
+                top = 48.dp,
             ),
             text = stringResource(R.string.firstpair_tos_title),
             style = Typography.bodyMedium,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
 
         Column(
-            modifier = Modifier.weight(weight = 1f), verticalArrangement = Arrangement.Center
+            modifier = Modifier.weight(weight = 1f),
+            verticalArrangement = Arrangement.Center,
         ) {
             Image(
                 modifier = Modifier.fillMaxWidth(),
                 painter = painterResource(R.drawable.ic_search),
-                contentDescription = stringResource(R.string.firstpair_tos_title)
+                contentDescription = stringResource(R.string.firstpair_tos_title),
             )
 
             Image(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        horizontal = 40.dp, vertical = 8.dp
+                        horizontal = 40.dp,
+                        vertical = 8.dp,
                     ),
                 painter = painterResource(R.drawable.pic_instruction),
-                contentDescription = stringResource(R.string.firstpair_tos_description)
+                contentDescription = stringResource(R.string.firstpair_tos_description),
             )
-            ComposableFooter(onApplyPress = { /*TODO*/ })
+            ComposableFooter(onApplyPress = onApplyPress)
         }
-
     }
 }
-
 
 @Composable
 fun ComposableFooter(onApplyPress: () -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         FlashGearButton(
             modifier = Modifier
                 .padding(
                     horizontal = 24.dp,
-                    vertical = 18.dp
+                    vertical = 18.dp,
                 )
                 .fillMaxWidth(0.5f),
             onClick = onApplyPress,
-            text = stringResource(R.string.firstpair_tos_button)
+            text = stringResource(R.string.firstpair_tos_button),
         )
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
 fun BleStatusViewPreview() {
     Column {
-        BleStatusView(Modifier)
+        BleStatusView(Modifier){}
     }
 }
