@@ -1,4 +1,4 @@
-package com.kl3jvi.yonda.ui.home
+package com.kl3jvi.yonda.ui.screens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

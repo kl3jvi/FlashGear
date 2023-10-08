@@ -14,4 +14,7 @@
     <string name="connect">Connect</string>
     <string name="connecting">Connecting</string>
     <string name="message_no_scooter_found">Can\'t find your scooter?</string>
+    <string name="firstpair_tos_title">Turn On Bluetooth</string>
+    <string name="firstpair_tos_description"><![CDATA[Settings > Bluetooth > Switch On]]></string>
+    <string name="firstpair_tos_button">Connect</string>
 </resources>

@@ -5,7 +5,7 @@ import com.kl3jvi.yonda.manager.ConnectionServiceImpl
 import com.kl3jvi.yonda.manager.FlashGearBluetoothManager
 import com.kl3jvi.yonda.manager.service.BluetoothGattServiceWrapper
 import com.kl3jvi.yonda.manager.service.FlashGearGattServiceHandler
-import com.kl3jvi.yonda.ui.home.HomeViewModel
+import com.kl3jvi.yonda.ui.screens.HomeViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.koin.androidx.viewmodel.dsl.viewModel
