@@ -78,6 +78,7 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:2.7.3")
     implementation("com.airbnb.android:lottie:6.1.0")
     implementation("com.maxkeppeler.sheets:core:2.3.0")
+    implementation("androidx.navigation:navigation-compose:2.7.4")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

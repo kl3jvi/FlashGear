@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Yonda</string>
+    <string name="app_name">FlashGear</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_details">%s Details</string>
