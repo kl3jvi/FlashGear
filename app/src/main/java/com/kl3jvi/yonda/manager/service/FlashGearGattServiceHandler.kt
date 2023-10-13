@@ -3,6 +3,7 @@ package com.kl3jvi.yonda.manager.service
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.util.Log
+import com.kl3jvi.nb_api.command.ScooterCommand
 import com.kl3jvi.yonda.manager.UnsafeBleManager
 import java.util.UUID
 
@@ -27,10 +28,14 @@ class FlashGearGattServiceHandler : BluetoothGattServiceWrapper {
         bleManager.enableNotificationsUnsafe(readDataCharacteristic).enqueue()
     }
 
-    override suspend fun sendCommandToDevice(command: ByteArray, bleManager: UnsafeBleManager) {
+    override suspend fun sendCommandToDevice(
+        command: ScooterCommand,
+        bleManager: UnsafeBleManager
+    ) {
         commandCharacteristic?.let { characteristic ->
-            bleManager.writeCharacteristicUnsafe(characteristic, command)
-                .done { Log.i("BLE", "Done Writing: ${command.toString(Charsets.UTF_8)}") }
+            val commandInBytes = command.getRequestString().toByteArray(Charsets.UTF_8)
+            bleManager.writeCharacteristicUnsafe(characteristic, commandInBytes)
+                .done { Log.i("BLE", "Done Writing: $command") }
                 .fail { device, status -> Log.e("BLE", "Failed Writing: $device $status") }
                 .enqueue()
         } ?: Log.e("BLE", "Command Characteristic is null!")

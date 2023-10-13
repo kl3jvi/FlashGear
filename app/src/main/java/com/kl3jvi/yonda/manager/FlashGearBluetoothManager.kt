@@ -27,7 +27,8 @@ class FlashGearBluetoothManager(
                 .retry(
                     RECONNECT_COUNT,
                     RECONNECT_TIME_MS.toInt(),
-                ).useAutoConnect(true)
+                )
+                .useAutoConnect(true)
 
             connectRequestLocal.enqueue()
 
@@ -36,6 +37,7 @@ class FlashGearBluetoothManager(
             return@withLock
         }
     }
+
 
     override suspend fun disconnectDevice() {
         withLock(bleMutex, "disconnect") {

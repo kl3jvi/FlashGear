@@ -4,6 +4,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.kl3jvi.yonda.models.DiscoveredBluetoothDevice
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -40,10 +41,28 @@ inline fun Fragment.launchAndRepeatWithViewLifecycle(
  */
 fun <T> Flow<T>.delayEachFor(timeMillis: Long): Flow<T> = onEach { delay(timeMillis) }
 
-fun <T> Flow<T>.aggregateAsSet(): Flow<Set<T>> {
-    return scan(setOf()) { acc, value ->
-        acc + value
+fun Flow<DiscoveredBluetoothDevice>.accumulateUniqueDevices(): Flow<List<DiscoveredBluetoothDevice>> {
+    return this.scan<DiscoveredBluetoothDevice, MutableList<DiscoveredBluetoothDevice>>(
+        mutableListOf()
+    ) { acc, value ->
+        acc.find { it.address == value.address }?.apply {
+            update(value.scanResult!!)
+        } ?: acc.add(value)
+        acc
     }
+}
+fun List<DiscoveredBluetoothDevice>.sortDevices(): List<DiscoveredBluetoothDevice> {
+    return this.sortedWith(
+        compareBy<DiscoveredBluetoothDevice> { it.name == null }
+            .thenComparingInt { it.rssi }
+            .reversed()
+    )
+}
+
+
+
+private fun List<DiscoveredBluetoothDevice>.findDeviceByAddress(address: String): DiscoveredBluetoothDevice? {
+    return this.find { it.address == address }
 }
 
 inline fun <T> Iterable<T>.forEachIterable(block: (T) -> Unit) {

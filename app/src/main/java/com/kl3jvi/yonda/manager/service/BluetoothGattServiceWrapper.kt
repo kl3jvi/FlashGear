@@ -1,6 +1,7 @@
 package com.kl3jvi.yonda.manager.service
 
 import android.bluetooth.BluetoothGatt
+import com.kl3jvi.nb_api.command.ScooterCommand
 import com.kl3jvi.yonda.manager.UnsafeBleManager
 
 /**
@@ -19,7 +20,7 @@ interface BluetoothGattServiceWrapper {
      */
     suspend fun initialize(bleManager: UnsafeBleManager)
 
-    suspend fun sendCommandToDevice(command: ByteArray, bleManager: UnsafeBleManager)
+    suspend fun sendCommandToDevice(command: ScooterCommand, bleManager: UnsafeBleManager)
 
     /**
      * Reset stateflows and others stateful component

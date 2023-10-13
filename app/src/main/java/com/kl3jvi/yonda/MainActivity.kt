@@ -13,6 +13,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.kl3jvi.yonda.ui.screens.HomeScreen
 import com.kl3jvi.yonda.ui.screens.HomeViewModel
@@ -26,7 +27,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             val viewModel: HomeViewModel by viewModel()
-            viewModel.startScan()
+            val scooterData = viewModel.state.collectAsStateWithLifecycle()
             FlashGearTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -38,9 +39,17 @@ class MainActivity : ComponentActivity() {
                             colors = TopAppBarDefaults.topAppBarColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
                                 titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                            )
+                            ),
                         )
-                        HomeScreen(navController = navController, modifier = Modifier)
+                        HomeScreen(
+                            navController = navController,
+                            modifier = Modifier,
+                            scooterData.value,
+                        {
+                            viewModel.connect(it)
+                        }, {
+                            viewModel.startScan()
+                        })
                     }
                 }
             }

@@ -23,4 +23,5 @@ abstract class ScooterCommand {
             unit = defaultUnit,
         )
     }
+
 }

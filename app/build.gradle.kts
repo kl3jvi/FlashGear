@@ -56,7 +56,7 @@ dependencies {
     implementation(project(path = ":nb-api"))
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("io.insert-koin:koin-android:3.3.2")
-    implementation("com.google.android.material:material:1.9.0")
+    implementation("com.google.android.material:material:1.10.0")
 
     implementation("androidx.activity:activity-compose:1.8.0")
     implementation(platform("androidx.compose:compose-bom:2023.08.00"))
@@ -66,7 +66,7 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
     implementation("androidx.compose.runtime:runtime-android:1.5.3")
-
+    implementation("androidx.compose.material:material:1.5.3")
     implementation("io.coil-kt:coil-compose:2.4.0")
 
     // Nordic semiconductor ble android libs
@@ -79,6 +79,7 @@ dependencies {
     implementation("com.airbnb.android:lottie:6.1.0")
     implementation("com.maxkeppeler.sheets:core:2.3.0")
     implementation("androidx.navigation:navigation-compose:2.7.4")
+    implementation("androidx.wear.compose:compose-material:1.2.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

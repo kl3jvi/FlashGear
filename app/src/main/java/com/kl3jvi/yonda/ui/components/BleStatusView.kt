@@ -20,7 +20,7 @@ import com.kl3jvi.yonda.ui.theme.Typography
 @Composable
 fun BleStatusView(
     modifier: Modifier = Modifier,
-    onApplyPress: () -> Unit
+    onApplyPress: () -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -68,7 +68,7 @@ fun ComposableFooter(onApplyPress: () -> Unit, modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        FlashGearButton(
+        FlashGearButtonGradient(
             modifier = Modifier
                 .padding(
                     horizontal = 24.dp,
@@ -85,6 +85,6 @@ fun ComposableFooter(onApplyPress: () -> Unit, modifier: Modifier = Modifier) {
 @Composable
 fun BleStatusViewPreview() {
     Column {
-        BleStatusView(Modifier){}
+        BleStatusView(Modifier) {}
     }
 }
