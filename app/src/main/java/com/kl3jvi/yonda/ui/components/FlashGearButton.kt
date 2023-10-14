@@ -40,18 +40,21 @@ fun FlashGearButtonGradient(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     text: String,
+    enabled: Boolean = true,
     colors: List<Color> = listOf(Color(0xFFFFB73D), Color(0xFFFFA000)),
     cornerRadius: Dp = 8.dp,
 ) {
     Button(
         modifier = modifier
             .background(
-                Brush.linearGradient(colors),
+                Brush.linearGradient(
+                    if (enabled) colors else listOf(Color(0xFFFF3D3D), Color(0xFFFF0000)),
+                ),
                 shape = RoundedCornerShape(cornerRadius),
             ),
         onClick = onClick,
         colors = ButtonDefaults.textButtonColors(
-            contentColor = Color.Transparent,
+            contentColor = Color.Transparent
         ),
     ) {
         Text(text, color = Color.White)

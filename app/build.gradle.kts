@@ -68,12 +68,12 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-android:1.5.3")
     implementation("androidx.compose.material:material:1.5.3")
     implementation("io.coil-kt:coil-compose:2.4.0")
-    implementation ("androidx.compose.material:material-icons-extended:1.5.3")
+    implementation("androidx.compose.material:material-icons-extended:1.5.3")
     // Nordic semiconductor ble android libs
     implementation("no.nordicsemi.android:ble-ktx:2.6.1")
     implementation("no.nordicsemi.android:ble-common:2.7.0")
     implementation("no.nordicsemi.android.support.v18:scanner:1.6.0")
-
+    implementation("dev.shreyaspatil.permission-flow:permission-flow-compose:1.2.0")
     implementation("com.airbnb.android:lottie:6.1.0")
     implementation("androidx.navigation:navigation-compose:2.7.4")
     implementation("androidx.wear.compose:compose-material:1.2.0")
