@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kl3jvi.yonda.ext.accumulateUniqueDevices
+import com.kl3jvi.yonda.ext.delayEachFor
 import com.kl3jvi.yonda.manager.scanner.FlashGearScanner
 import com.kl3jvi.yonda.manager.service.FlashGearService
 import com.kl3jvi.yonda.models.DiscoveredBluetoothDevice
@@ -49,20 +50,26 @@ class HomeViewModel(
 
     private suspend fun startBLEDiscover() = withContext(Dispatchers.IO) {
         scanner.findScooterDevices()
-            .catch { throwable ->
-                Log.e("Scan error", throwable.message ?: "Unknown error")
-            }.accumulateUniqueDevices()
+            .accumulateUniqueDevices()
+            .delayEachFor(1000)
             .map<List<DiscoveredBluetoothDevice>, ScanState> {
                 ScanState.Founded(it)
-            }.onStart { emit(ScanState.Searching) }
+            }
+            .onStart { emit(ScanState.Searching) }
+            .catch { throwable ->
+                Log.e("Scan error", throwable.message ?: "Unknown error")
+                state.update { ScanState.Stopped() }
+            }
             .collect { devices ->
+                if (devices is ScanState.Founded)
+                    Log.i("Scan result", devices.devices.map { it.name to it.address }.toString())
                 state.update { devices }
-                Log.i("Scan result", devices.toString())
             }
     }
 
-    fun connect(device: DiscoveredBluetoothDevice) = viewModelScope.launch {
+    fun connect(device: DiscoveredBluetoothDevice) = viewModelScope.launch(Dispatchers.IO) {
         flashGearServiceApi.connect(device.device)
+        stopScanning()
     }
 
     @Synchronized
@@ -73,6 +80,16 @@ class HomeViewModel(
         scanJob?.cancel()
         scanJob = null
         state.update { if (it !is ScanState.Stopped) ScanState.Stopped() else it }
+    }
+
+    fun toggleScan(scanning: Boolean) {
+        if (scanning) {
+            Log.e("Scan", "stop")
+            stopScanning()
+        } else {
+            Log.e("Scan", "start")
+            startScan()
+        }
     }
 }
 

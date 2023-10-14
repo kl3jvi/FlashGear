@@ -9,6 +9,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
@@ -25,8 +29,11 @@ fun HomeScreen(
     onClick: (DiscoveredBluetoothDevice) -> Unit = {},
     restartScan: () -> Unit = {},
 ) {
+    var rememberedDevices by remember { mutableStateOf(listOf<DiscoveredBluetoothDevice>()) }
+
     when (scooterData) {
         is ScanState.Founded -> {
+            rememberedDevices = scooterData.devices
             LazyColumn {
                 items(
                     scooterData.devices.sortDevices(),
@@ -36,9 +43,7 @@ fun HomeScreen(
                         ScannedBleDeviceCard(
                             modifier = modifier,
                             discoveredBluetoothDevice = scooter,
-                        ) {
-                            onClick(scooter)
-                        }
+                        ) { onClick(scooter) }
                     }
                 }
             }
@@ -55,13 +60,13 @@ fun HomeScreen(
         }
 
         is ScanState.Stopped -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Scanning stopped. Tap to search again.",
-                    modifier = Modifier.clickable { restartScan() })
-            }
+            DisplayRememberedDevicesOrRetryMessage(
+                rememberedDevices,
+                modifier,
+                onClick,
+                "Scanning stopped. Tap to search again.",
+                restartScan
+            )
         }
 
         is ScanState.Timeout -> {
@@ -72,6 +77,40 @@ fun HomeScreen(
                 Text("Scanning timed out. Tap to try again.",
                     modifier = Modifier.clickable { restartScan() })
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun DisplayRememberedDevicesOrRetryMessage(
+    rememberedDevices: List<DiscoveredBluetoothDevice>,
+    modifier: Modifier = Modifier,
+    onClick: (DiscoveredBluetoothDevice) -> Unit = {},
+    message: String,
+    restartScan: () -> Unit = {},
+) {
+    if (rememberedDevices.isNotEmpty()) {
+        LazyColumn {
+            items(
+                rememberedDevices.sortDevices(),
+                key = { it.address }
+            ) { scooter ->
+                Box(modifier = Modifier.animateItemPlacement()) {
+                    ScannedBleDeviceCard(
+                        modifier = modifier,
+                        discoveredBluetoothDevice = scooter,
+                    ) { onClick(scooter) }
+                }
+            }
+        }
+    } else {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(message,
+                modifier = Modifier.clickable { restartScan() })
         }
     }
 }

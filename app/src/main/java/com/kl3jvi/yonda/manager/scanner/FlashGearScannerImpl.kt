@@ -4,12 +4,9 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import android.os.ParcelUuid
 import androidx.core.app.ActivityCompat
-import com.kl3jvi.yonda.manager.service.FlashGearGattServiceHandler.Companion.XIAOMI_SERVICE
 import com.kl3jvi.yonda.models.DiscoveredBluetoothDevice
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat
 import no.nordicsemi.android.support.v18.scanner.ScanFilter
@@ -31,25 +28,38 @@ class FlashGearScannerImpl(
             )
         }
 
-        return scanner.scanFlow(provideSettings())
-            .map { DiscoveredBluetoothDevice(it) }
-
+        return scanner.scanFlow(provideSettings(), provideFilterForDefaultScan())
+            .map {
+                DiscoveredBluetoothDevice(it)
+            }
     }
 
     private fun provideFilterForDefaultScan(): List<ScanFilter> {
-        return listOf<ScanFilter>(
-//            ScanFilter.Builder()
-//                .setServiceUuid(ParcelUuid.fromString(XIAOMI_SERVICE.toString()))
-//                .build(),
+        return listOf(
+            ScanFilter.Builder()
+                .setManufacturerData(
+                    16974,
+                    byteArrayOf(40, 2, 0, 0, 0, (-43).toByte()),
+                    byteArrayOf(0xff.toByte(), 0xff.toByte(), 0x00, 0x00, 0x00, 0xff.toByte())
+                )
+                .setManufacturerData(
+                    0x4e42, // Company Identifier Code
+                    byteArrayOf(0x21, 0x00, 0x00, 0x00, 0x00, 0xde.toByte()),
+                    byteArrayOf(0xff.toByte(), 0x00, 0x00, 0x00, 0x00, 0xff.toByte())
+                ).build()
+//            0x21 represented in number is 33
+//            0x4e42 represented in number is 20034
+//            16974 represented in byte is 0x424E
         )
     }
+
 
     private fun provideSettings(): ScanSettings {
         return ScanSettings.Builder()
             .setLegacy(false)
             .setScanMode(ScanSettings.SCAN_MODE_BALANCED)
             .setUseHardwareBatchingIfSupported(true)
-            .setReportDelay(5000)
+            .setReportDelay(1000)
             .build()
     }
 }

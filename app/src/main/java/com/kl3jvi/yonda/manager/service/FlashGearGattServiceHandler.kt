@@ -26,6 +26,8 @@ class FlashGearGattServiceHandler : BluetoothGattServiceWrapper {
             }
 
         bleManager.enableNotificationsUnsafe(readDataCharacteristic).enqueue()
+
+        readInformation(bleManager)
     }
 
     override suspend fun sendCommandToDevice(
@@ -39,6 +41,15 @@ class FlashGearGattServiceHandler : BluetoothGattServiceWrapper {
                 .fail { device, status -> Log.e("BLE", "Failed Writing: $device $status") }
                 .enqueue()
         } ?: Log.e("BLE", "Command Characteristic is null!")
+    }
+
+    private fun readInformation(bleManager: UnsafeBleManager) {
+        bleManager.readCharacteristicUnsafe(
+            readDataCharacteristic
+        ).with { _, data ->
+            val content = data.value ?: return@with
+            println("Received: ${String(content)}")
+        }.enqueue()
     }
 
     override suspend fun reset(bleManager: UnsafeBleManager) = Unit

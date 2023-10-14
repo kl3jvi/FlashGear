@@ -5,12 +5,21 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bluetooth
+import androidx.compose.material.icons.filled.BluetoothDisabled
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -28,6 +37,7 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val viewModel: HomeViewModel by viewModel()
             val scooterData = viewModel.state.collectAsStateWithLifecycle()
+            var isScanning by remember { mutableStateOf(false) }
             FlashGearTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -40,16 +50,28 @@ class MainActivity : ComponentActivity() {
                                 containerColor = MaterialTheme.colorScheme.primary,
                                 titleContentColor = MaterialTheme.colorScheme.onPrimary,
                             ),
+                            actions = {
+                                IconButton(onClick = {
+                                    viewModel.toggleScan(isScanning)
+                                    isScanning = !isScanning
+                                }) {
+                                    Icon(
+                                        imageVector = if (isScanning) Icons.Default.BluetoothDisabled else Icons.Default.Bluetooth,
+                                        contentDescription = stringResource(id = R.string.app_name),
+                                        tint = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                }
+                            }
                         )
                         HomeScreen(
                             navController = navController,
                             modifier = Modifier,
                             scooterData.value,
-                        {
-                            viewModel.connect(it)
-                        }, {
-                            viewModel.startScan()
-                        })
+                            {
+                                viewModel.connect(it)
+                            }, {
+                                viewModel.startScan()
+                            })
                     }
                 }
             }

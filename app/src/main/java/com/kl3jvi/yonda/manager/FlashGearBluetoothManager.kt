@@ -4,9 +4,13 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.util.Log
 import com.kl3jvi.yonda.ext.withLock
+import com.kl3jvi.yonda.manager.ktx.stateAsFlow
 import com.kl3jvi.yonda.manager.service.BluetoothGattServiceWrapper
+import com.kl3jvi.yonda.manager.state.ConnectionState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import no.nordicsemi.android.ble.ConnectRequest
@@ -28,7 +32,15 @@ class FlashGearBluetoothManager(
                     RECONNECT_COUNT,
                     RECONNECT_TIME_MS.toInt(),
                 )
-                .useAutoConnect(true)
+                .done { Log.i("Ble Manager", "Connected") }
+                .fail { device, status ->
+                    Log.i(
+                        "Ble Manager",
+                        "Failed to connect ${device.address} with reason $status"
+                    )
+                }
+                .useAutoConnect(false)
+                .timeout(10000)
 
             connectRequestLocal.enqueue()
 
@@ -36,6 +48,7 @@ class FlashGearBluetoothManager(
 
             return@withLock
         }
+        stateAsFlow().filter { it is ConnectionState.Initializing }.first()
     }
 
 
@@ -43,7 +56,10 @@ class FlashGearBluetoothManager(
         withLock(bleMutex, "disconnect") {
             connectRequest?.cancelPendingConnection()
             disconnect().enqueue()
+            return@withLock
         }
+
+        stateAsFlow().filter { it is ConnectionState.Disconnected }.first()
     }
 
     override fun initialize() {
@@ -78,7 +94,7 @@ class FlashGearBluetoothManager(
     }
 
     companion object {
-        const val RECONNECT_COUNT = 1
-        const val RECONNECT_TIME_MS = 100L
+        const val RECONNECT_COUNT = 3
+        const val RECONNECT_TIME_MS = 1000L
     }
 }

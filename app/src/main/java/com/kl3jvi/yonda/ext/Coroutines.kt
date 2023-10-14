@@ -51,14 +51,13 @@ fun Flow<DiscoveredBluetoothDevice>.accumulateUniqueDevices(): Flow<List<Discove
         acc
     }
 }
+
 fun List<DiscoveredBluetoothDevice>.sortDevices(): List<DiscoveredBluetoothDevice> {
     return this.sortedWith(
         compareBy<DiscoveredBluetoothDevice> { it.name == null }
-            .thenComparingInt { it.rssi }
-            .reversed()
+            .thenByDescending { it.rssi }
     )
 }
-
 
 
 private fun List<DiscoveredBluetoothDevice>.findDeviceByAddress(address: String): DiscoveredBluetoothDevice? {
