@@ -62,52 +62,52 @@ fun PermissionsScreen(
 
     if (locationState.allGranted && blePermission.allGranted) {
         navController.navigate(Screen.Home.route)
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-    ) {
-        Column(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+    } else {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .background(Color.White)
         ) {
-            Icon(
-                Icons.Default.BluetoothDisabled,
-                contentDescription = null,
-                tint = Color(0xFF589DFF),
-                modifier = Modifier.size(64.dp)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                "Essential Permissions Missing",
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Divider()
-            Spacer(modifier = Modifier.height(16.dp))
-            PermissionItem(
-                icon = Icons.Default.BluetoothDisabled,
-                text = "Bluetooth Permission",
-                enabledState = !blePermission.allGranted,
-                buttonText = if (!blePermission.allGranted) "Allow" else "Allowed"
+            Column(
+                modifier = modifier
+                    .align(Alignment.Center)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Log.d("Permission", "Requesting bluetooth permissions")
-                permissionLauncher.launch(bluetoothPermissions)
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            PermissionItem(
-                icon = Icons.Default.LocationOff,
-                text = "Location Permission",
-                enabledState = !locationState.allGranted,
-                buttonText = if (!locationState.allGranted) "Allow" else "Allowed"
-            ) {
-                Log.d("Permission", "Requesting location permissions")
-                permissionLauncher.launch(locationPermissions)
+                Icon(
+                    Icons.Default.BluetoothDisabled,
+                    contentDescription = null,
+                    tint = Color(0xFF589DFF),
+                    modifier = modifier.size(64.dp)
+                )
+                Spacer(modifier = modifier.height(16.dp))
+                Text(
+                    "Essential Permissions Missing",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+                Spacer(modifier = modifier.height(16.dp))
+                Divider()
+                Spacer(modifier = modifier.height(16.dp))
+                PermissionItem(
+                    icon = Icons.Default.BluetoothDisabled,
+                    text = "Bluetooth Permission",
+                    enabledState = !blePermission.allGranted,
+                    buttonText = if (!blePermission.allGranted) "Allow" else "Allowed"
+                ) {
+                    Log.d("Permission", "Requesting bluetooth permissions")
+                    permissionLauncher.launch(bluetoothPermissions)
+                }
+                Spacer(modifier = modifier.height(8.dp))
+                PermissionItem(
+                    icon = Icons.Default.LocationOff,
+                    text = "Location Permission",
+                    enabledState = !locationState.allGranted,
+                    buttonText = if (!locationState.allGranted) "Allow" else "Allowed"
+                ) {
+                    Log.d("Permission", "Requesting location permissions")
+                    permissionLauncher.launch(locationPermissions)
+                }
             }
         }
     }

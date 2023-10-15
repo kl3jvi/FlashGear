@@ -16,14 +16,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.kl3jvi.yonda.ext.sortDevices
 import com.kl3jvi.yonda.models.DiscoveredBluetoothDevice
+import com.kl3jvi.yonda.ui.components.FlashGearButtonGradient
 import com.kl3jvi.yonda.ui.components.ScannedBleDeviceCard
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
-    navController: NavController,
     modifier: Modifier = Modifier,
     scooterData: ScanState,
     onClick: (DiscoveredBluetoothDevice) -> Unit = {},
@@ -64,7 +66,6 @@ fun HomeScreen(
                 rememberedDevices,
                 modifier,
                 onClick,
-                "Scanning stopped. Tap to search again.",
                 restartScan
             )
         }
@@ -87,7 +88,6 @@ fun DisplayRememberedDevicesOrRetryMessage(
     rememberedDevices: List<DiscoveredBluetoothDevice>,
     modifier: Modifier = Modifier,
     onClick: (DiscoveredBluetoothDevice) -> Unit = {},
-    message: String,
     restartScan: () -> Unit = {},
 ) {
     if (rememberedDevices.isNotEmpty()) {
@@ -109,8 +109,18 @@ fun DisplayRememberedDevicesOrRetryMessage(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text(message,
-                modifier = Modifier.clickable { restartScan() })
+            FlashGearButtonGradient(
+                onClick = { restartScan() },
+                text = "Restart Scan"
+            )
         }
     }
 }
+
+@Composable
+fun isOnHomeScreen(navController: NavHostController): Boolean {
+    // Get the current route from the NavController
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+    return currentRoute == Screen.Home.route
+}
+

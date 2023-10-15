@@ -3,6 +3,7 @@ package com.kl3jvi.yonda
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -14,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
+import com.kl3jvi.yonda.ui.components.FlashGearTopBar
 import com.kl3jvi.yonda.ui.components.NavigationGraph
 import com.kl3jvi.yonda.ui.screens.HomeViewModel
 import com.kl3jvi.yonda.ui.theme.FlashGearTheme
@@ -27,15 +29,32 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val viewModel: HomeViewModel by viewModel()
             val scooterData = viewModel.state.collectAsStateWithLifecycle()
-            var isScanning by remember { mutableStateOf(false) }
+            var isOnHome by remember { mutableStateOf(false) }
             FlashGearTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
-                    NavigationGraph(
-                        scooterData = scooterData.value,
-                    )
+                    Column {
+                        FlashGearTopBar(
+                            navController = navController,
+                            isHomeScreen = isOnHome,
+                            toggleScan = {
+                                viewModel.toggleScan(it)
+                            })
+                        NavigationGraph(
+                            scooterData = scooterData.value,
+                            isOnHome = {
+                                isOnHome = it
+                            },
+                            connectDevice = {
+                                viewModel.connect(it)
+                            },
+                            restartScan = {
+                                viewModel.startScan()
+                            }
+                        )
+                    }
                 }
             }
         }
