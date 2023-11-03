@@ -15,22 +15,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.kl3jvi.yonda.R
-import com.kl3jvi.yonda.ui.screens.isOnHomeScreen
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FlashGearTopBar(
     navController: NavHostController,
-    isHomeScreen: Boolean ,
+    isHomeScreen: Boolean,
     title: String = stringResource(id = R.string.app_name),
-    toggleScan: (Boolean) -> Unit = { },
+    toggleScan: (Boolean) -> Unit,
 ) {
-    var scanBool by remember { mutableStateOf(false) }
+    var scanBool by remember { mutableStateOf(true) }
+
     TopAppBar(
         title = { Text(text = title) },
         colors = TopAppBarDefaults.topAppBarColors(
@@ -40,8 +39,8 @@ fun FlashGearTopBar(
         actions = {
             if (isHomeScreen)
                 IconButton(onClick = {
-                    toggleScan(scanBool)
                     scanBool = !scanBool
+                    toggleScan(scanBool)
                 }) {
                     Icon(
                         imageVector = if (scanBool) Icons.Default.BluetoothDisabled else Icons.Default.Bluetooth,

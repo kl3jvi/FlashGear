@@ -5,4 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface FlashGearScanner {
     fun findScooterDevices(): Flow<DiscoveredBluetoothDevice>
+    fun stopScanning()
 }

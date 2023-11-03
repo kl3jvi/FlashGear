@@ -1,8 +1,8 @@
 package com.kl3jvi.yonda.ui.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,7 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.kl3jvi.yonda.ext.sortDevices
@@ -56,8 +56,10 @@ fun HomeScreen(
                 modifier = modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
-                Text("Searching for devices...")
+                Column(modifier.align(Alignment.Center)) {
+                    CircularProgressIndicator()
+                    Text("Searching for devices...")
+                }
             }
         }
 
@@ -68,16 +70,6 @@ fun HomeScreen(
                 onClick,
                 restartScan
             )
-        }
-
-        is ScanState.Timeout -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Scanning timed out. Tap to try again.",
-                    modifier = Modifier.clickable { restartScan() })
-            }
         }
     }
 }
@@ -122,5 +114,15 @@ fun isOnHomeScreen(navController: NavHostController): Boolean {
     // Get the current route from the NavController
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     return currentRoute == Screen.Home.route
+}
+
+@Preview
+@Composable
+fun HomeScreenPreview() {
+    HomeScreen(
+        scooterData = ScanState.Founded(
+            emptyList()
+        )
+    )
 }
 

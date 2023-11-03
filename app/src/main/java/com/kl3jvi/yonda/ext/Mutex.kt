@@ -13,6 +13,7 @@ suspend inline fun withLock(
         Log.i(tag, "I can't execute right now job $tag because $mutex is locked")
     }
     mutex.withLock {
+        Log.i(tag, "I'm executing job $tag")
         block()
     }
 }

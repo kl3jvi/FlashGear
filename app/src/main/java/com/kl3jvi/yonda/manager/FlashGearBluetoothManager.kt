@@ -26,6 +26,7 @@ class FlashGearBluetoothManager(
     private val bleMutex = Mutex()
 
     override suspend fun connectToDevice(device: BluetoothDevice) {
+
         withLock(bleMutex, "connect") {
             val connectRequestLocal = connect(device)
                 .retry(
@@ -41,11 +42,8 @@ class FlashGearBluetoothManager(
                 }
                 .useAutoConnect(false)
                 .timeout(10000)
-
             connectRequestLocal.enqueue()
-
             connectRequest = connectRequestLocal
-
             return@withLock
         }
         stateAsFlow().filter { it is ConnectionState.Initializing }.first()

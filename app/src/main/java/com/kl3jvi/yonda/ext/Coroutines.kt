@@ -42,7 +42,7 @@ inline fun Fragment.launchAndRepeatWithViewLifecycle(
 fun <T> Flow<T>.delayEachFor(timeMillis: Long): Flow<T> = onEach { delay(timeMillis) }
 
 fun Flow<DiscoveredBluetoothDevice>.accumulateUniqueDevices(): Flow<List<DiscoveredBluetoothDevice>> {
-    return this.scan<DiscoveredBluetoothDevice, MutableList<DiscoveredBluetoothDevice>>(
+    return this.scan(
         mutableListOf()
     ) { acc, value ->
         acc.find { it.address == value.address }?.apply {

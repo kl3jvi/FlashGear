@@ -10,17 +10,17 @@ import com.kl3jvi.yonda.manager.service.FlashGearService
 import com.kl3jvi.yonda.models.DiscoveredBluetoothDevice
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.concurrent.atomic.AtomicBoolean
 
-private const val TIMEOUT_MS = 2 * 60 * 1000L
+private typealias FoundedDevice = ScanState.Founded
 
 class HomeViewModel(
     private val scanner: FlashGearScanner,
@@ -38,38 +38,30 @@ class HomeViewModel(
             return
         }
 
-        scanJob = viewModelScope.launch {
-            launch { startBLEDiscover() }
-            delay(TIMEOUT_MS)
-            if (state.value is ScanState.Searching) {
-                state.emit(ScanState.Timeout)
-                stopScanning()
-            }
+        viewModelScope.launch(Dispatchers.IO) {
+            scanJob = startBLEDiscover()
         }
     }
 
-    private suspend fun startBLEDiscover() = withContext(Dispatchers.IO) {
-        scanner.findScooterDevices()
-            .accumulateUniqueDevices()
-            .delayEachFor(1000)
-            .map<List<DiscoveredBluetoothDevice>, ScanState> {
-                ScanState.Founded(it)
-            }
-            .onStart { emit(ScanState.Searching) }
-            .catch { throwable ->
-                Log.e("Scan error", throwable.message ?: "Unknown error")
-                state.update { ScanState.Stopped() }
-            }
-            .collect { devices ->
-                if (devices is ScanState.Founded)
-                    Log.i("Scan result", devices.devices.map { it.name to it.address }.toString())
+    private suspend fun startBLEDiscover() = scanner.findScooterDevices()
+        .accumulateUniqueDevices()
+        .delayEachFor(1000)
+        .map<List<DiscoveredBluetoothDevice>, ScanState>(::FoundedDevice)
+        .onStart { emit(ScanState.Searching) }
+        .catch { throwable ->
+            Log.e("Scan error", throwable.message ?: "Unknown error")
+            state.update { ScanState.Stopped() }
+        }.onEach { devices ->
+            if (devices is ScanState.Founded)
                 state.update { devices }
-            }
-    }
+        }.launchIn(viewModelScope)
 
-    fun connect(device: DiscoveredBluetoothDevice) = viewModelScope.launch(Dispatchers.IO) {
-        flashGearServiceApi.connect(device.device)
+
+    fun connect(device: DiscoveredBluetoothDevice) {
         stopScanning()
+        viewModelScope.launch(Dispatchers.IO) {
+            flashGearServiceApi.connect(device.device)
+        }
     }
 
     @Synchronized
@@ -79,6 +71,7 @@ class HomeViewModel(
         }
         scanJob?.cancel()
         scanJob = null
+//        scanner.stopScanning()
         state.update { if (it !is ScanState.Stopped) ScanState.Stopped() else it }
     }
 
@@ -97,5 +90,4 @@ sealed class ScanState {
     open class Stopped : ScanState()
     data object Searching : ScanState()
     class Founded(val devices: List<DiscoveredBluetoothDevice>) : ScanState()
-    object Timeout : Stopped()
 }
