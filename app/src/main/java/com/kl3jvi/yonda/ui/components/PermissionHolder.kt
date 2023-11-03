@@ -27,7 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,26 +36,28 @@ import com.kl3jvi.yonda.ui.screens.Screen
 import dev.shreyaspatil.permissionflow.compose.rememberMultiplePermissionState
 import dev.shreyaspatil.permissionflow.compose.rememberPermissionFlowRequestLauncher
 
-private val locationPermissions = arrayOf(
-    Manifest.permission.ACCESS_FINE_LOCATION,
-    Manifest.permission.ACCESS_COARSE_LOCATION,
-)
+private val locationPermissions =
+    arrayOf(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+    )
 
-private val bluetoothPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-    arrayOf(
-        Manifest.permission.BLUETOOTH_CONNECT,
-        Manifest.permission.BLUETOOTH_SCAN,
-    )
-} else {
-    arrayOf(
-        Manifest.permission.BLUETOOTH,
-    )
-}
+private val bluetoothPermissions =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        arrayOf(
+            Manifest.permission.BLUETOOTH_CONNECT,
+            Manifest.permission.BLUETOOTH_SCAN,
+        )
+    } else {
+        arrayOf(
+            Manifest.permission.BLUETOOTH,
+        )
+    }
 
 @Composable
 fun PermissionsScreen(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
 ) {
     val permissionLauncher = rememberPermissionFlowRequestLauncher()
     val locationState by rememberMultiplePermissionState(*locationPermissions)
@@ -66,27 +67,29 @@ fun PermissionsScreen(
         navController.navigate(Screen.Home.route)
     } else {
         Box(
-            modifier = modifier
-                .fillMaxSize()
-                .background(Color.White)
+            modifier =
+                modifier
+                    .fillMaxSize()
+                    .background(Color.White),
         ) {
             Column(
-                modifier = modifier
-                    .align(Alignment.Center)
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier =
+                    modifier
+                        .align(Alignment.Center)
+                        .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Icon(
                     Icons.Default.BluetoothDisabled,
                     contentDescription = null,
                     tint = Color(0xFF589DFF),
-                    modifier = modifier.size(64.dp)
+                    modifier = modifier.size(64.dp),
                 )
                 Spacer(modifier = modifier.height(16.dp))
                 Text(
                     "Essential Permissions Missing",
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = Color.Black,
                 )
                 Spacer(modifier = modifier.height(16.dp))
                 Divider()
@@ -95,7 +98,7 @@ fun PermissionsScreen(
                     icon = Icons.Default.BluetoothDisabled,
                     text = "Bluetooth Permission",
                     enabledState = !blePermission.allGranted,
-                    buttonText = if (!blePermission.allGranted) "Allow" else "Allowed"
+                    buttonText = if (!blePermission.allGranted) "Allow" else "Allowed",
                 ) {
                     Log.d("Permission", "Requesting bluetooth permissions")
                     permissionLauncher.launch(bluetoothPermissions)
@@ -105,7 +108,7 @@ fun PermissionsScreen(
                     icon = Icons.Default.LocationOff,
                     text = "Location Permission",
                     enabledState = !locationState.allGranted,
-                    buttonText = if (!locationState.allGranted) "Allow" else "Allowed"
+                    buttonText = if (!locationState.allGranted) "Allow" else "Allowed",
                 ) {
                     Log.d("Permission", "Requesting location permissions")
                     permissionLauncher.launch(locationPermissions)
@@ -121,22 +124,24 @@ fun PermissionItem(
     text: String,
     buttonText: String,
     enabledState: Boolean = true,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .background(Color.Gray.copy(alpha = 0.1f), shape = RoundedCornerShape(8.dp)),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .background(Color.Gray.copy(alpha = 0.1f), shape = RoundedCornerShape(8.dp)),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Icon(
-                icon, contentDescription = null,
+                icon,
+                contentDescription = null,
                 tint = Color(0xFF589DFF),
             )
             Text(text, color = Color.Black)
@@ -146,7 +151,7 @@ fun PermissionItem(
             onClick = { onClick() },
             text = buttonText,
             enabled = enabledState,
-            colors = listOf(Color(0xFF50C750), Color(0xFF32B332))
+            colors = listOf(Color(0xFF50C750), Color(0xFF32B332)),
         )
     }
 }

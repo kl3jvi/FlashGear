@@ -16,11 +16,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.kl3jvi.yonda.ext.sortDevices
 import com.kl3jvi.yonda.models.DiscoveredBluetoothDevice
-import com.kl3jvi.yonda.ui.components.FlashGearButtonGradient
 import com.kl3jvi.yonda.ui.components.ScannedBleDeviceCard
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -29,7 +26,6 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     scooterData: ScanState,
     onClick: (DiscoveredBluetoothDevice) -> Unit = {},
-    restartScan: () -> Unit = {},
 ) {
     var rememberedDevices by remember { mutableStateOf(listOf<DiscoveredBluetoothDevice>()) }
 
@@ -54,7 +50,7 @@ fun HomeScreen(
         ScanState.Searching -> {
             Box(
                 modifier = modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Column(modifier.align(Alignment.Center)) {
                     CircularProgressIndicator()
@@ -68,7 +64,6 @@ fun HomeScreen(
                 rememberedDevices,
                 modifier,
                 onClick,
-                restartScan
             )
         }
     }
@@ -80,13 +75,12 @@ fun DisplayRememberedDevicesOrRetryMessage(
     rememberedDevices: List<DiscoveredBluetoothDevice>,
     modifier: Modifier = Modifier,
     onClick: (DiscoveredBluetoothDevice) -> Unit = {},
-    restartScan: () -> Unit = {},
 ) {
     if (rememberedDevices.isNotEmpty()) {
         LazyColumn {
             items(
                 rememberedDevices.sortDevices(),
-                key = { it.address }
+                key = { it.address },
             ) { scooter ->
                 Box(modifier = Modifier.animateItemPlacement()) {
                     ScannedBleDeviceCard(
@@ -96,33 +90,16 @@ fun DisplayRememberedDevicesOrRetryMessage(
                 }
             }
         }
-    } else {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            FlashGearButtonGradient(
-                onClick = { restartScan() },
-                text = "Restart Scan"
-            )
-        }
     }
-}
-
-@Composable
-fun isOnHomeScreen(navController: NavHostController): Boolean {
-    // Get the current route from the NavController
-    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
-    return currentRoute == Screen.Home.route
 }
 
 @Preview
 @Composable
 fun HomeScreenPreview() {
     HomeScreen(
-        scooterData = ScanState.Founded(
-            emptyList()
-        )
+        scooterData =
+            ScanState.Founded(
+                emptyList(),
+            ),
     )
 }
-

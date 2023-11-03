@@ -27,11 +27,12 @@ fun BleStatusView(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            modifier = Modifier.padding(
-                start = 60.dp,
-                end = 60.dp,
-                top = 48.dp,
-            ),
+            modifier =
+                Modifier.padding(
+                    start = 60.dp,
+                    end = 60.dp,
+                    top = 48.dp,
+                ),
             text = stringResource(R.string.firstpair_tos_title),
             style = Typography.bodyMedium,
             textAlign = TextAlign.Center,
@@ -48,12 +49,13 @@ fun BleStatusView(
             )
 
             Image(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = 40.dp,
-                        vertical = 8.dp,
-                    ),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = 40.dp,
+                            vertical = 8.dp,
+                        ),
                 painter = painterResource(R.drawable.pic_instruction),
                 contentDescription = stringResource(R.string.firstpair_tos_description),
             )
@@ -63,18 +65,22 @@ fun BleStatusView(
 }
 
 @Composable
-fun ComposableFooter(onApplyPress: () -> Unit, modifier: Modifier = Modifier) {
+fun ComposableFooter(
+    onApplyPress: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         FlashGearButtonGradient(
-            modifier = Modifier
-                .padding(
-                    horizontal = 24.dp,
-                    vertical = 18.dp,
-                )
-                .fillMaxWidth(0.5f),
+            modifier =
+                Modifier
+                    .padding(
+                        horizontal = 24.dp,
+                        vertical = 18.dp,
+                    )
+                    .fillMaxWidth(0.5f),
             onClick = onApplyPress,
             text = stringResource(R.string.firstpair_tos_button),
         )

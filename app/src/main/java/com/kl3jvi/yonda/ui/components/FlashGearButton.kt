@@ -24,12 +24,13 @@ fun FlashGearButtonSimple(
     Button(
         modifier = modifier,
         onClick = onClick,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF589DFF),
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            disabledContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-            disabledContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-        ),
+        colors =
+            ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF589DFF),
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                disabledContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                disabledContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+            ),
     ) {
         Text(text = text, color = Color.White)
     }
@@ -45,17 +46,19 @@ fun FlashGearButtonGradient(
     cornerRadius: Dp = 8.dp,
 ) {
     Button(
-        modifier = modifier
-            .background(
-                Brush.linearGradient(
-                    if (enabled) colors else listOf(Color(0xFFFF3D3D), Color(0xFFFF0000)),
+        modifier =
+            modifier
+                .background(
+                    Brush.linearGradient(
+                        if (enabled) colors else listOf(Color(0xFFFF3D3D), Color(0xFFFF0000)),
+                    ),
+                    shape = RoundedCornerShape(cornerRadius),
                 ),
-                shape = RoundedCornerShape(cornerRadius),
-            ),
         onClick = onClick,
-        colors = ButtonDefaults.textButtonColors(
-            contentColor = Color.Transparent
-        ),
+        colors =
+            ButtonDefaults.textButtonColors(
+                contentColor = Color.Transparent,
+            ),
     ) {
         Text(text, color = Color.White)
     }

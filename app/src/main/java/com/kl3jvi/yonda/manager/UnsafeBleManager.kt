@@ -15,25 +15,22 @@ abstract class UnsafeBleManager(
 ) : BleManager(context),
     ConnectionStateProvider,
     FlashGearBleManager {
-
     private val connectionObservers = ConnectionObserverComposite(scope = scope)
 
     init {
         connectionObserver = connectionObservers
     }
 
-    fun readCharacteristicUnsafe(characteristic: BluetoothGattCharacteristic?) =
-        readCharacteristic(characteristic)
+    fun readCharacteristicUnsafe(characteristic: BluetoothGattCharacteristic?) = readCharacteristic(characteristic)
 
-    fun writeCharacteristicUnsafe(characteristic: BluetoothGattCharacteristic?, data: ByteArray) =
-        writeCharacteristic(characteristic, data, WRITE_TYPE_DEFAULT)
+    fun writeCharacteristicUnsafe(
+        characteristic: BluetoothGattCharacteristic?,
+        data: ByteArray,
+    ) = writeCharacteristic(characteristic, data, WRITE_TYPE_DEFAULT)
 
-    fun setNotificationCallbackUnsafe(characteristic: BluetoothGattCharacteristic?) =
-        setNotificationCallback(characteristic)
+    fun setNotificationCallbackUnsafe(characteristic: BluetoothGattCharacteristic?) = setNotificationCallback(characteristic)
 
-    fun enableNotificationsUnsafe(characteristic: BluetoothGattCharacteristic?) =
-        enableNotifications(characteristic)
-
+    fun enableNotificationsUnsafe(characteristic: BluetoothGattCharacteristic?) = enableNotifications(characteristic)
 
     override fun subscribeOnConnectionState(observer: SuspendConnectionObserver) {
         connectionObservers.addObserver(observer)

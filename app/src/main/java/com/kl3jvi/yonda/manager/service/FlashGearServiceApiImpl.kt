@@ -6,7 +6,7 @@ import com.kl3jvi.yonda.manager.FlashGearBluetoothManager
 
 class FlashGearServiceApiImpl(
     private val bluetoothManager: FlashGearBluetoothManager,
-    private val gattServiceHandler: BluetoothGattServiceWrapper
+    private val gattServiceHandler: BluetoothGattServiceWrapper,
 ) : FlashGearService {
     override suspend fun connect(device: BluetoothDevice) {
         bluetoothManager.connectToDevice(device)
@@ -19,5 +19,4 @@ class FlashGearServiceApiImpl(
     override suspend fun sendCommand(command: ScooterCommand) {
         gattServiceHandler.sendCommandToDevice(command, bluetoothManager)
     }
-
 }

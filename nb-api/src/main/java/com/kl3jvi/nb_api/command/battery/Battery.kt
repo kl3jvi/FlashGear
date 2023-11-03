@@ -14,12 +14,13 @@ class Battery : ScooterCommand() {
 
     override val handler = { it: RawResponse -> "%s".format(getCurrentBattery(it.result)) }
 
-    override fun getRequestString(): String = ScooterMessage()
-        .setDirection(Commands.MASTER_TO_BATTERY)
-        .setReadOrWrite(Commands.READ)
-        .setPosition(0x32)
-        .setPayload(0x02)
-        .build()
+    override fun getRequestString(): String =
+        ScooterMessage()
+            .setDirection(Commands.MASTER_TO_BATTERY)
+            .setReadOrWrite(Commands.READ)
+            .setPosition(0x32)
+            .setPayload(0x02)
+            .build()
 
     fun getCurrentBattery(request: String): String {
         val temp = request.substring(6..7)

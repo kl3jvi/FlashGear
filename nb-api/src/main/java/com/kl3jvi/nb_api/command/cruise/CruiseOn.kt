@@ -13,10 +13,11 @@ class CruiseOn : ScooterCommand() {
     override val requestBit: String = "7C"
     override val defaultUnit: String = ""
 
-    override fun getRequestString(): String = ScooterMessage()
-        .setDirection(Commands.MASTER_TO_M365)
-        .setReadOrWrite(Commands.WRITE)
-        .setPosition(0x7C)
-        .setPayload(0x0001)
-        .build()
+    override fun getRequestString(): String =
+        ScooterMessage()
+            .setDirection(Commands.MASTER_TO_M365)
+            .setReadOrWrite(Commands.WRITE)
+            .setPosition(0x7C)
+            .setPayload(0x0001)
+            .build()
 }

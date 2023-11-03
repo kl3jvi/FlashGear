@@ -7,7 +7,6 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 class HexConversionTest {
-
     @Test
     fun `test bytesToHex`() {
         val input = byteArrayOf(0x01, 0x02, 0x03, 0x04, 0x05)

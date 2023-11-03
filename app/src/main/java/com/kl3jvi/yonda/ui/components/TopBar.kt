@@ -19,7 +19,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.kl3jvi.yonda.R
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FlashGearTopBar(
@@ -32,12 +31,13 @@ fun FlashGearTopBar(
 
     TopAppBar(
         title = { Text(text = title) },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary,
-        ),
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            ),
         actions = {
-            if (isHomeScreen)
+            if (isHomeScreen) {
                 IconButton(onClick = {
                     scanBool = !scanBool
                     toggleScan(scanBool)
@@ -45,9 +45,10 @@ fun FlashGearTopBar(
                     Icon(
                         imageVector = if (scanBool) Icons.Default.BluetoothDisabled else Icons.Default.Bluetooth,
                         contentDescription = stringResource(id = R.string.app_name),
-                        tint = MaterialTheme.colorScheme.onPrimary
+                        tint = MaterialTheme.colorScheme.onPrimary,
                     )
                 }
-        }
+            }
+        },
     )
 }

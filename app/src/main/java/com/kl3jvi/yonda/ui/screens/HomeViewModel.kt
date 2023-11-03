@@ -26,7 +26,6 @@ class HomeViewModel(
     private val scanner: FlashGearScanner,
     private val flashGearServiceApi: FlashGearService,
 ) : ViewModel() {
-
     val state = MutableStateFlow<ScanState>(ScanState.Stopped())
     private val scanStarted = AtomicBoolean(false)
     private var scanJob: Job? = null
@@ -43,19 +42,20 @@ class HomeViewModel(
         }
     }
 
-    private suspend fun startBLEDiscover() = scanner.findScooterDevices()
-        .accumulateUniqueDevices()
-        .delayEachFor(1000)
-        .map<List<DiscoveredBluetoothDevice>, ScanState>(::FoundedDevice)
-        .onStart { emit(ScanState.Searching) }
-        .catch { throwable ->
-            Log.e("Scan error", throwable.message ?: "Unknown error")
-            state.update { ScanState.Stopped() }
-        }.onEach { devices ->
-            if (devices is ScanState.Founded)
-                state.update { devices }
-        }.launchIn(viewModelScope)
-
+    private suspend fun startBLEDiscover() =
+        scanner.findScooterDevices()
+            .accumulateUniqueDevices()
+            .delayEachFor(1000)
+            .map<List<DiscoveredBluetoothDevice>, ScanState>(::FoundedDevice)
+            .onStart { emit(ScanState.Searching) }
+            .catch { throwable ->
+                Log.e("Scan error", throwable.message ?: "Unknown error")
+                state.update { ScanState.Stopped() }
+            }.onEach { devices ->
+                if (devices is ScanState.Founded) {
+                    state.update { devices }
+                }
+            }.launchIn(viewModelScope)
 
     fun connect(device: DiscoveredBluetoothDevice) {
         stopScanning()
@@ -88,6 +88,8 @@ class HomeViewModel(
 
 sealed class ScanState {
     open class Stopped : ScanState()
+
     data object Searching : ScanState()
+
     class Founded(val devices: List<DiscoveredBluetoothDevice>) : ScanState()
 }

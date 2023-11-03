@@ -7,7 +7,6 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 class AmpereTest {
-
     private val rawValue: String = "e6070c10100015059401"
     private val rawResponse = RawResponse(rawValue, 1000)
     lateinit var ampere: Ampere
@@ -39,9 +38,10 @@ class AmpereTest {
 
     @Test
     fun `test valid ampere response handler`() {
-        val scooterResponse = Ampere().run {
-            handleResponse(rawResponse)
-        }
+        val scooterResponse =
+            Ampere().run {
+                handleResponse(rawResponse)
+            }
         assertEquals("0.2A", scooterResponse.formattedValue)
     }
 }

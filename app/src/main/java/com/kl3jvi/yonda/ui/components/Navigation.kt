@@ -15,7 +15,6 @@ fun NavigationGraph(
     scooterData: ScanState,
     isOnHome: (Boolean) -> Unit,
     connectDevice: (DiscoveredBluetoothDevice) -> Unit,
-    restartScan: () -> Unit = {},
 ) {
     val navController = rememberNavController()
     NavHost(
@@ -28,7 +27,6 @@ fun NavigationGraph(
                 HomeScreen(
                     scooterData = scooterData,
                     onClick = connectDevice,
-                    restartScan = restartScan
                 )
             }
         }

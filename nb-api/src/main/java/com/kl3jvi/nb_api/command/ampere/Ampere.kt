@@ -15,12 +15,13 @@ class Ampere : ScooterCommand() {
 
     override val handler = { it: RawResponse -> "%.1f".format(getCurrentAmpere(it.result)) }
 
-    override fun getRequestString(): String = ScooterMessage()
-        .setDirection(Commands.MASTER_TO_BATTERY)
-        .setReadOrWrite(Commands.READ)
-        .setPosition(0x33)
-        .setPayload(0x02)
-        .build()
+    override fun getRequestString(): String =
+        ScooterMessage()
+            .setDirection(Commands.MASTER_TO_BATTERY)
+            .setReadOrWrite(Commands.READ)
+            .setPosition(0x33)
+            .setPayload(0x02)
+            .build()
 
     /**
      * It takes the result from ble response and returns a double that tells the current ampere on

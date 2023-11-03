@@ -29,8 +29,9 @@ data class DiscoveredBluetoothDevice(
     constructor(scanResult: ScanResult) : this(
         device = scanResult.device,
         lastScanResult = scanResult,
-        nameInternal = scanResult.scanRecord?.deviceName
-            ?: scanResult.device.getNameSafe(),
+        nameInternal =
+            scanResult.scanRecord?.deviceName
+                ?: scanResult.device.getNameSafe(),
         rssiInternal = scanResult.rssi,
         previousRssi = scanResult.rssi,
         highestRssiInternal = scanResult.rssi,

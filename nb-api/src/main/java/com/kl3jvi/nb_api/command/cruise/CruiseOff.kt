@@ -14,10 +14,11 @@ class CruiseOff : ScooterCommand() {
     override val defaultUnit: String
         get() = ""
 
-    override fun getRequestString(): String = ScooterMessage()
-        .setDirection(Commands.MASTER_TO_M365)
-        .setReadOrWrite(Commands.WRITE)
-        .setPosition(0x7C)
-        .setPayload(0x0000)
-        .build()
+    override fun getRequestString(): String =
+        ScooterMessage()
+            .setDirection(Commands.MASTER_TO_M365)
+            .setReadOrWrite(Commands.WRITE)
+            .setPosition(0x7C)
+            .setPayload(0x0000)
+            .build()
 }

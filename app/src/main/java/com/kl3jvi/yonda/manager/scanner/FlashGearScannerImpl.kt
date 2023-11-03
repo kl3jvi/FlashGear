@@ -17,7 +17,6 @@ class FlashGearScannerImpl(
     private val scanner: BluetoothLeScannerCompat,
     private val context: Context,
 ) : FlashGearScanner {
-
     override fun findScooterDevices(): Flow<DiscoveredBluetoothDevice> {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S && ActivityCompat.checkSelfPermission(
                 context,
@@ -55,7 +54,6 @@ class FlashGearScannerImpl(
 //            16974 represented in byte is 0x424E
         )
     }
-
 
     private fun provideSettings(): ScanSettings {
         return ScanSettings.Builder()

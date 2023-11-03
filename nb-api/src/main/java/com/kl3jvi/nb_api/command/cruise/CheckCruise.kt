@@ -16,12 +16,13 @@ class CheckCruise : ScooterCommand() {
 
     override val handler = { it: RawResponse -> cruiseState(it.result) }
 
-    override fun getRequestString() = ScooterMessage()
-        .setDirection(Commands.MASTER_TO_M365)
-        .setReadOrWrite(Commands.READ)
-        .setPosition(0x7C)
-        .setPayload(0x02)
-        .build()
+    override fun getRequestString() =
+        ScooterMessage()
+            .setDirection(Commands.MASTER_TO_M365)
+            .setReadOrWrite(Commands.READ)
+            .setPosition(0x7C)
+            .setPayload(0x02)
+            .build()
 
     /**
      * If the request is 01, return ON, otherwise return Off.

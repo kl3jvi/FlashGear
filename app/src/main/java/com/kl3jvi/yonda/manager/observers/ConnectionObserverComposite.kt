@@ -46,7 +46,10 @@ class ConnectionObserverComposite(
     }
 
     @Synchronized
-    override fun onDeviceFailedToConnect(device: BluetoothDevice, reason: Int) {
+    override fun onDeviceFailedToConnect(
+        device: BluetoothDevice,
+        reason: Int,
+    ) {
         observers.forEachIterable {
             scope.launch(Dispatchers.Default) {
                 it.onDeviceFailedToConnect(device, reason)
@@ -73,7 +76,10 @@ class ConnectionObserverComposite(
     }
 
     @Synchronized
-    override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
+    override fun onDeviceDisconnected(
+        device: BluetoothDevice,
+        reason: Int,
+    ) {
         observers.forEachIterable {
             scope.launch(Dispatchers.Default) {
                 it.onDeviceDisconnected(device, reason)

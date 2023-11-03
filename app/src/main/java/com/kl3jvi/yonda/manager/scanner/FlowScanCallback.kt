@@ -14,30 +14,33 @@ internal fun BluetoothLeScannerCompat.scanFlow(
     settings: ScanSettings = ScanSettings.Builder().build(),
     filters: List<ScanFilter> = emptyList(),
 ) = callbackFlow {
-    val callback = object : ScanCallback() {
-        override fun onScanResult(callbackType: Int, result: ScanResult) {
-            trySend(result)
-                .onFailure {
-                    Log.e("FlowScanCallback", "On send scan result", it)
-                }
-        }
-
-        override fun onBatchScanResults(results: MutableList<ScanResult>) {
-            results.forEach { result ->
+    val callback =
+        object : ScanCallback() {
+            override fun onScanResult(
+                callbackType: Int,
+                result: ScanResult,
+            ) {
                 trySend(result)
-                    .onFailure { sendError ->
-                        Log.e("FlowScanCallback", "On send batch scan results", sendError)
+                    .onFailure {
+                        Log.e("FlowScanCallback", "On send scan result", it)
                     }
+            }
+
+            override fun onBatchScanResults(results: MutableList<ScanResult>) {
+                results.forEach { result ->
+                    trySend(result)
+                        .onFailure { sendError ->
+                            Log.e("FlowScanCallback", "On send batch scan results", sendError)
+                        }
+                }
+            }
+
+            override fun onScanFailed(errorCode: Int) {
+                Log.e("FlowScanCallback", "Scan failed $errorCode")
             }
         }
 
-        override fun onScanFailed(errorCode: Int) {
-            Log.e("FlowScanCallback", "Scan failed $errorCode")
-        }
-    }
-
     startScan(filters, settings, callback)
-
 
     Log.i("FlowScanCallback", "Start scan with filter $filters and settings $settings")
 

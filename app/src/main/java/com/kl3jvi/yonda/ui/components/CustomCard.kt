@@ -38,25 +38,28 @@ fun ScannedBleDeviceCard(
 ) {
     val distanceColor = getDistanceColor(discoveredBluetoothDevice.rssi)
     Card(
-        modifier = modifier
-            .clickable { onClick() }
-            .padding(16.dp, 11.dp, 16.dp, 5.dp),
+        modifier =
+            modifier
+                .clickable { onClick() }
+                .padding(16.dp, 11.dp, 16.dp, 5.dp),
         elevation = 4.dp,
         shape = RoundedCornerShape(8.dp),
     ) {
         Column {
             Row(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                modifier =
+                    modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start,
             ) {
                 // Scooter icon with green background
                 Box(
-                    modifier = modifier
-                        .size(24.dp)
-                        .background(MaterialTheme.colors.onBackground),
+                    modifier =
+                        modifier
+                            .size(24.dp)
+                            .background(MaterialTheme.colors.onBackground),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -72,9 +75,10 @@ fun ScannedBleDeviceCard(
             }
 
             Row(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                modifier =
+                    modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start,
             ) {
@@ -97,14 +101,14 @@ fun ScannedBleDeviceCard(
 
         // Green bottom
         Box(
-            modifier = modifier
-                .fillMaxWidth()
-                .height(8.dp)
-                .background(distanceColor),
+            modifier =
+                modifier
+                    .fillMaxWidth()
+                    .height(8.dp)
+                    .background(distanceColor),
         )
     }
 }
-
 
 @Composable
 fun getDistanceColor(rssi: Int): Brush {

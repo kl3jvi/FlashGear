@@ -8,7 +8,6 @@ import com.kl3jvi.yonda.manager.UnsafeBleManager
 import java.util.UUID
 
 class FlashGearGattServiceHandler : BluetoothGattServiceWrapper {
-
     private var commandCharacteristic: BluetoothGattCharacteristic? = null
     private var readDataCharacteristic: BluetoothGattCharacteristic? = null
 
@@ -32,7 +31,7 @@ class FlashGearGattServiceHandler : BluetoothGattServiceWrapper {
 
     override suspend fun sendCommandToDevice(
         command: ScooterCommand,
-        bleManager: UnsafeBleManager
+        bleManager: UnsafeBleManager,
     ) {
         commandCharacteristic?.let { characteristic ->
             val commandInBytes = command.getRequestString().toByteArray(Charsets.UTF_8)
@@ -45,7 +44,7 @@ class FlashGearGattServiceHandler : BluetoothGattServiceWrapper {
 
     private fun readInformation(bleManager: UnsafeBleManager) {
         bleManager.readCharacteristicUnsafe(
-            readDataCharacteristic
+            readDataCharacteristic,
         ).with { _, data ->
             val content = data.value ?: return@with
             println("Received: ${String(content)}")

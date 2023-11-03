@@ -38,12 +38,13 @@ class CheckCruiseTest {
 
     @Test
     fun testGetRequestString() {
-        val expectedMessage = ScooterMessage()
-            .setDirection(Commands.MASTER_TO_M365)
-            .setReadOrWrite(Commands.READ)
-            .setPosition(0x7C)
-            .setPayload(0x02)
-            .build()
+        val expectedMessage =
+            ScooterMessage()
+                .setDirection(Commands.MASTER_TO_M365)
+                .setReadOrWrite(Commands.READ)
+                .setPosition(0x7C)
+                .setPayload(0x02)
+                .build()
         assertEquals(expectedMessage, checkCruise.getRequestString())
     }
 

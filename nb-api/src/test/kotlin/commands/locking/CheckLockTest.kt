@@ -33,12 +33,13 @@ class CheckLockTest {
 
     @Test
     fun testGetRequestString() {
-        val expectedMessage = ScooterMessage()
-            .setDirection(Commands.MASTER_TO_M365)
-            .setReadOrWrite(Commands.READ)
-            .setPosition(0xB2)
-            .setPayload(0x02)
-            .build()
+        val expectedMessage =
+            ScooterMessage()
+                .setDirection(Commands.MASTER_TO_M365)
+                .setReadOrWrite(Commands.READ)
+                .setPosition(0xB2)
+                .setPayload(0x02)
+                .build()
         assertEquals(expectedMessage, checkLock.getRequestString())
     }
 

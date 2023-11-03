@@ -20,7 +20,10 @@ interface BluetoothGattServiceWrapper {
      */
     suspend fun initialize(bleManager: UnsafeBleManager)
 
-    suspend fun sendCommandToDevice(command: ScooterCommand, bleManager: UnsafeBleManager)
+    suspend fun sendCommandToDevice(
+        command: ScooterCommand,
+        bleManager: UnsafeBleManager,
+    )
 
     /**
      * Reset stateflows and others stateful component

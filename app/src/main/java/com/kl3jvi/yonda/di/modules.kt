@@ -17,19 +17,20 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
-private val bleModule = module {
-    single<FlashGearBluetoothManager> { FlashGearBluetoothManager(get(), get(), get()) }
-    single<CoroutineScope> { CoroutineScope(Dispatchers.IO) }
-    single<BluetoothGattServiceWrapper> { FlashGearGattServiceHandler() }
-    single<BluetoothManager> { androidContext().getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager }
-    single<BluetoothLeScannerCompat> { BluetoothLeScannerCompat.getScanner() }
-    single<FlashGearScanner> { FlashGearScannerImpl(get(), get()) }
-    single<FlashGearService> { FlashGearServiceApiImpl(get(), get()) }
+private val bleModule =
+    module {
+        single<FlashGearBluetoothManager> { FlashGearBluetoothManager(get(), get(), get()) }
+        single<CoroutineScope> { CoroutineScope(Dispatchers.IO) }
+        single<BluetoothGattServiceWrapper> { FlashGearGattServiceHandler() }
+        single<BluetoothManager> { androidContext().getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager }
+        single<BluetoothLeScannerCompat> { BluetoothLeScannerCompat.getScanner() }
+        single<FlashGearScanner> { FlashGearScannerImpl(get(), get()) }
+        single<FlashGearService> { FlashGearServiceApiImpl(get(), get()) }
+    }
 
-}
-
-private val viewModelModule = module {
-    viewModel { HomeViewModel(get(),get()) }
-}
+private val viewModelModule =
+    module {
+        viewModel { HomeViewModel(get(), get()) }
+    }
 
 val allModules = bleModule + viewModelModule

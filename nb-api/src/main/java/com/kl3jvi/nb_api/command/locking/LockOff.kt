@@ -11,7 +11,8 @@ class LockOff : ScooterCommand() {
     override val requestBit: String = "71"
     override val defaultUnit: String = ""
 
-    override fun getRequestString(): String = "55aa032001100ebdff" /*ScooterMessage()
+    override fun getRequestString(): String =
+        "55aa032001100ebdff" /*ScooterMessage()
         .setDirection(Commands.MASTER_TO_M365)
         .setReadOrWrite(Commands.WRITE)
         .setPosition(0x7C)

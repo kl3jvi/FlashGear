@@ -15,10 +15,11 @@ class CheckVersion : ScooterCommand() {
     override val requestBit: String
         get() = TODO("Not yet implemented")
 
-    override fun getRequestString(): String = ScooterMessage()
-        .setDirection(Commands.MASTER_TO_M365)
-        .setReadOrWrite(Commands.READ)
-        .setPosition(0x1A)
-        .setPayload(0x02)
-        .build()
+    override fun getRequestString(): String =
+        ScooterMessage()
+            .setDirection(Commands.MASTER_TO_M365)
+            .setReadOrWrite(Commands.READ)
+            .setPosition(0x1A)
+            .setPayload(0x02)
+            .build()
 }

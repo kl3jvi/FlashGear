@@ -21,34 +21,32 @@ class FlashGearBluetoothManager(
     private val scope: CoroutineScope,
     private val flashGearGattServiceHandler: BluetoothGattServiceWrapper,
 ) : UnsafeBleManager(scope, context) {
-
     private var connectRequest: ConnectRequest? = null
     private val bleMutex = Mutex()
 
     override suspend fun connectToDevice(device: BluetoothDevice) {
-
         withLock(bleMutex, "connect") {
-            val connectRequestLocal = connect(device)
-                .retry(
-                    RECONNECT_COUNT,
-                    RECONNECT_TIME_MS.toInt(),
-                )
-                .done { Log.i("Ble Manager", "Connected") }
-                .fail { device, status ->
-                    Log.i(
-                        "Ble Manager",
-                        "Failed to connect ${device.address} with reason $status"
+            val connectRequestLocal =
+                connect(device)
+                    .retry(
+                        RECONNECT_COUNT,
+                        RECONNECT_TIME_MS.toInt(),
                     )
-                }
-                .useAutoConnect(false)
-                .timeout(10000)
+                    .done { Log.i("Ble Manager", "Connected") }
+                    .fail { device, status ->
+                        Log.i(
+                            "Ble Manager",
+                            "Failed to connect ${device.address} with reason $status",
+                        )
+                    }
+                    .useAutoConnect(false)
+                    .timeout(10000)
             connectRequestLocal.enqueue()
             connectRequest = connectRequestLocal
             return@withLock
         }
         stateAsFlow().filter { it is ConnectionState.Initializing }.first()
     }
-
 
     override suspend fun disconnectDevice() {
         withLock(bleMutex, "disconnect") {
@@ -87,7 +85,10 @@ class FlashGearBluetoothManager(
         }
     }
 
-    override fun log(priority: Int, message: String) {
+    override fun log(
+        priority: Int,
+        message: String,
+    ) {
         Log.println(priority, "FlashGearLogger", message)
     }
 

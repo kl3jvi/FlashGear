@@ -10,43 +10,48 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import no.nordicsemi.android.ble.observer.ConnectionObserver
 
-
-fun ConnectionStateProvider.stateAsFlow() = callbackFlow {
-    val observer = getConnectionObserver()
-    send(getConnectionStateFrom(this@stateAsFlow))
-    subscribeOnConnectionState(observer)
-    awaitClose { unsubscribeConnectionState(observer) }
-}
-
-private fun ProducerScope<ConnectionState>.getConnectionObserver() = object : SuspendConnectionObserver {
-    override suspend fun onDeviceConnecting(device: BluetoothDevice) {
-        send(ConnectionState.Connecting)
+fun ConnectionStateProvider.stateAsFlow() =
+    callbackFlow {
+        val observer = getConnectionObserver()
+        send(getConnectionStateFrom(this@stateAsFlow))
+        subscribeOnConnectionState(observer)
+        awaitClose { unsubscribeConnectionState(observer) }
     }
 
-    override suspend fun onDeviceConnected(device: BluetoothDevice) {
-        send(ConnectionState.Initializing)
+private fun ProducerScope<ConnectionState>.getConnectionObserver() =
+    object : SuspendConnectionObserver {
+        override suspend fun onDeviceConnecting(device: BluetoothDevice) {
+            send(ConnectionState.Connecting)
+        }
+
+        override suspend fun onDeviceConnected(device: BluetoothDevice) {
+            send(ConnectionState.Initializing)
+        }
+
+        override suspend fun onDeviceFailedToConnect(
+            device: BluetoothDevice,
+            reason: Int,
+        ) {
+            send(ConnectionState.Disconnected(parseDisconnectedReason(reason)))
+        }
+
+        override suspend fun onDeviceReady(device: BluetoothDevice) {
+            send(ConnectionState.Ready)
+        }
+
+        override suspend fun onDeviceDisconnecting(device: BluetoothDevice) {
+            send(ConnectionState.Disconnecting)
+        }
+
+        override suspend fun onDeviceDisconnected(
+            device: BluetoothDevice,
+            reason: Int,
+        ) {
+            send(ConnectionState.Disconnected(parseDisconnectedReason(reason)))
+        }
     }
 
-    override suspend fun onDeviceFailedToConnect(device: BluetoothDevice, reason: Int) {
-        send(ConnectionState.Disconnected(parseDisconnectedReason(reason)))
-    }
-
-    override suspend fun onDeviceReady(device: BluetoothDevice) {
-        send(ConnectionState.Ready)
-    }
-
-    override suspend fun onDeviceDisconnecting(device: BluetoothDevice) {
-        send(ConnectionState.Disconnecting)
-    }
-
-    override suspend fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
-        send(ConnectionState.Disconnected(parseDisconnectedReason(reason)))
-    }
-}
-
-private fun parseDisconnectedReason(
-    reason: Int
-): ConnectionState.Disconnected.Reason =
+private fun parseDisconnectedReason(reason: Int): ConnectionState.Disconnected.Reason =
     when (reason) {
         ConnectionObserver.REASON_SUCCESS -> ConnectionState.Disconnected.Reason.SUCCESS
         ConnectionObserver.REASON_TERMINATE_LOCAL_HOST ->
@@ -62,17 +67,15 @@ private fun parseDisconnectedReason(
         else -> ConnectionState.Disconnected.Reason.UNKNOWN
     }
 
-
-private fun getConnectionStateFrom(
-    connectionStateProvider: ConnectionStateProvider
-): ConnectionState {
+private fun getConnectionStateFrom(connectionStateProvider: ConnectionStateProvider): ConnectionState {
     return when (connectionStateProvider.getConnectionState()) {
         BluetoothProfile.STATE_CONNECTING -> ConnectionState.Connecting
-        BluetoothProfile.STATE_CONNECTED -> if (connectionStateProvider.isReady()) {
-            ConnectionState.Ready
-        } else {
-            ConnectionState.Initializing
-        }
+        BluetoothProfile.STATE_CONNECTED ->
+            if (connectionStateProvider.isReady()) {
+                ConnectionState.Ready
+            } else {
+                ConnectionState.Initializing
+            }
 
         BluetoothProfile.STATE_DISCONNECTING -> ConnectionState.Disconnecting
         else -> ConnectionState.Disconnected(ConnectionState.Disconnected.Reason.UNKNOWN)

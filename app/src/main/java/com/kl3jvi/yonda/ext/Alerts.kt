@@ -10,7 +10,10 @@ package com.kl3jvi.yonda.ext
  * @param predicate The condition that must be true for the block to be executed.
  * @param block () -> Unit
  */
-inline fun executeIf(predicate: Boolean, block: () -> Unit) {
+inline fun executeIf(
+    predicate: Boolean,
+    block: () -> Unit,
+) {
     if (predicate) {
         block()
     } else {

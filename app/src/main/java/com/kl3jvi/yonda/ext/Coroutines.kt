@@ -43,7 +43,7 @@ fun <T> Flow<T>.delayEachFor(timeMillis: Long): Flow<T> = onEach { delay(timeMil
 
 fun Flow<DiscoveredBluetoothDevice>.accumulateUniqueDevices(): Flow<List<DiscoveredBluetoothDevice>> {
     return this.scan(
-        mutableListOf()
+        mutableListOf(),
     ) { acc, value ->
         acc.find { it.address == value.address }?.apply {
             update(value.scanResult!!)
@@ -55,10 +55,9 @@ fun Flow<DiscoveredBluetoothDevice>.accumulateUniqueDevices(): Flow<List<Discove
 fun List<DiscoveredBluetoothDevice>.sortDevices(): List<DiscoveredBluetoothDevice> {
     return this.sortedWith(
         compareBy<DiscoveredBluetoothDevice> { it.name == null }
-            .thenByDescending { it.rssi }
+            .thenByDescending { it.rssi },
     )
 }
-
 
 private fun List<DiscoveredBluetoothDevice>.findDeviceByAddress(address: String): DiscoveredBluetoothDevice? {
     return this.find { it.address == address }

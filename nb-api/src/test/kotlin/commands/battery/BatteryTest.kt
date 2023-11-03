@@ -33,12 +33,13 @@ class BatteryTest {
 
     @Test
     fun testGetRequestString() {
-        val expectedMessage = ScooterMessage()
-            .setDirection(Commands.MASTER_TO_BATTERY)
-            .setReadOrWrite(Commands.READ)
-            .setPosition(0x32)
-            .setPayload(0x02)
-            .build()
+        val expectedMessage =
+            ScooterMessage()
+                .setDirection(Commands.MASTER_TO_BATTERY)
+                .setReadOrWrite(Commands.READ)
+                .setPosition(0x32)
+                .setPayload(0x02)
+                .build()
 
         assertEquals(expectedMessage, battery.getRequestString())
     }

@@ -37,12 +37,13 @@ class LockOffTest {
 
     @Test
     fun testGetRequestString() {
-        val expectedMessage = ScooterMessage()
-            .setDirection(Commands.MASTER_TO_M365)
-            .setReadOrWrite(Commands.WRITE)
-            .setPosition(0x7C)
-            .setPayload(0x0000)
-            .build()
+        val expectedMessage =
+            ScooterMessage()
+                .setDirection(Commands.MASTER_TO_M365)
+                .setReadOrWrite(Commands.WRITE)
+                .setPosition(0x7C)
+                .setPayload(0x0000)
+                .build()
         assertEquals(expectedMessage, lockOff.getRequestString())
     }
 }
