@@ -5,14 +5,14 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.kl3jvi.yonda.models.DiscoveredBluetoothDevice
+import com.kl3jvi.yonda.ble.model.DiscoveredBluetoothDevice
+import com.kl3jvi.yonda.ble.scanner.ScanningState
 import com.kl3jvi.yonda.ui.screens.HomeScreen
-import com.kl3jvi.yonda.ui.screens.ScanState
 import com.kl3jvi.yonda.ui.screens.Screen
 
 @Composable
 fun NavigationGraph(
-    scooterData: ScanState,
+    scanningState: ScanningState,
     isOnHome: (Boolean) -> Unit,
     connectDevice: (DiscoveredBluetoothDevice) -> Unit,
 ) {
@@ -25,7 +25,7 @@ fun NavigationGraph(
             isOnHome(true)
             Column {
                 HomeScreen(
-                    scooterData = scooterData,
+                    state = scanningState,
                     onClick = connectDevice,
                 )
             }

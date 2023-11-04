@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
+import com.kl3jvi.yonda.ble.scanner.ScanningState
 import com.kl3jvi.yonda.ui.components.FlashGearTopBar
 import com.kl3jvi.yonda.ui.components.NavigationGraph
 import com.kl3jvi.yonda.ui.screens.HomeViewModel
@@ -26,7 +27,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             val viewModel: HomeViewModel by viewModel()
-            val scooterData = viewModel.state.collectAsStateWithLifecycle()
+            val state by viewModel.state.collectAsStateWithLifecycle(ScanningState.Loading)
             var isOnHome by remember { mutableStateOf(false) }
             FlashGearTheme {
                 Surface(
@@ -38,11 +39,11 @@ class MainActivity : ComponentActivity() {
                             navController = navController,
                             isHomeScreen = isOnHome,
                             toggleScan = {
-                                viewModel.toggleScan(it)
+                                viewModel.sendCommand()
                             },
                         )
                         NavigationGraph(
-                            scooterData = scooterData.value,
+                            scanningState = state,
                             isOnHome = {
                                 isOnHome = it
                             },

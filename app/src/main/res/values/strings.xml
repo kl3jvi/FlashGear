@@ -7,7 +7,6 @@
     <string name="usage_message">Turn on bluetooth to scan for devices.</string>
     <string name="yes">OK</string>
     <string name="title_scan">Scan</string>
-    <string name="ble_hint"><![CDATA[Select `Yes` or `Allow all the time` in the next few steps so that this app can run in background & help to trace people.]]></string>
     <string name="permission_title">Please set up necessary app permissions</string>
     <string name="bluetooth">Bluetooth</string>
     <string name="location">Location</string>
@@ -17,4 +16,11 @@
     <string name="firstpair_tos_title">Turn On Bluetooth</string>
     <string name="firstpair_tos_description"><![CDATA[Settings > Bluetooth > Switch On]]></string>
     <string name="firstpair_tos_button">Connect</string>
+<!--    <string name="no_device_guide_title">Can't see your device</string>-->
+<!--    <string name="no_device_guide_info">1. Make sure the device is <b>turned on</b> and is connected to-->
+<!--		a power source.\n\n2. Make sure the appropriate firmware and SoftDevice are flashed.</string>-->
+<!--    <string name="no_device_guide_location_info">3. Location is turned off. Most Android phones-->
+<!--        require it in order to scan for Bluetooth LE devices. If you are sure your-->
+<!--        device is advertising and it doesn\'t show up here, click the button below to-->
+<!--        enable Location.</string>-->
 </resources>

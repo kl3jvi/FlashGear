@@ -28,38 +28,38 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kl3jvi.yonda.R
-import com.kl3jvi.yonda.models.DiscoveredBluetoothDevice
+import com.kl3jvi.yonda.ble.model.DiscoveredBluetoothDevice
 
 @Composable
 fun ScannedBleDeviceCard(
     modifier: Modifier,
     discoveredBluetoothDevice: DiscoveredBluetoothDevice,
-    onClick: () -> Unit,
+    onClick: (DiscoveredBluetoothDevice) -> Unit,
 ) {
     val distanceColor = getDistanceColor(discoveredBluetoothDevice.rssi)
     Card(
         modifier =
-            modifier
-                .clickable { onClick() }
-                .padding(16.dp, 11.dp, 16.dp, 5.dp),
+        modifier
+            .clickable { onClick(discoveredBluetoothDevice) }
+            .padding(16.dp, 11.dp, 16.dp, 5.dp),
         elevation = 4.dp,
         shape = RoundedCornerShape(8.dp),
     ) {
         Column {
             Row(
                 modifier =
-                    modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
+                modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start,
             ) {
                 // Scooter icon with green background
                 Box(
                     modifier =
-                        modifier
-                            .size(24.dp)
-                            .background(MaterialTheme.colors.onBackground),
+                    modifier
+                        .size(24.dp)
+                        .background(MaterialTheme.colors.onBackground),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -76,9 +76,9 @@ fun ScannedBleDeviceCard(
 
             Row(
                 modifier =
-                    modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start,
             ) {
@@ -102,10 +102,10 @@ fun ScannedBleDeviceCard(
         // Green bottom
         Box(
             modifier =
-                modifier
-                    .fillMaxWidth()
-                    .height(8.dp)
-                    .background(distanceColor),
+            modifier
+                .fillMaxWidth()
+                .height(8.dp)
+                .background(distanceColor),
         )
     }
 }
@@ -113,11 +113,13 @@ fun ScannedBleDeviceCard(
 @Composable
 fun getDistanceColor(rssi: Int): Brush {
     return when {
-        rssi > -70 -> Brush.horizontalGradient(listOf(Color(0xFF50C750), Color(0xFF32B332)))
-        rssi > -85 -> Brush.horizontalGradient(listOf(Color(0xFFFFB73D), Color(0xFFFFA000)))
-        else -> Brush.horizontalGradient(listOf(Color(0xFFFF3D3D), Color(0xFFFF0000)))
+        rssi > -60 -> Brush.horizontalGradient(listOf(Color(0xFF50C750), Color(0xFF32B332))) // Strong signal
+        rssi > -75 -> Brush.horizontalGradient(listOf(Color(0xFFA2C948), Color(0xFF8AB032))) // Good signal
+        rssi > -85 -> Brush.horizontalGradient(listOf(Color(0xFFFFB73D), Color(0xFFFFA000))) // Fair signal
+        else -> Brush.horizontalGradient(listOf(Color(0xFFFF3D3D), Color(0xFFFF0000)))       // Weak signal
     }
 }
+
 
 @Preview
 @Composable
@@ -126,3 +128,5 @@ fun ImageCardGridPreview() {
         items(10) {}
     })
 }
+
+

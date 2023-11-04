@@ -54,6 +54,7 @@ android {
 
 dependencies {
     implementation(project(path = ":nb-api"))
+    implementation(project(":ble"))
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("io.insert-koin:koin-android:3.3.2")
     implementation("com.google.android.material:material:1.10.0")
@@ -70,9 +71,11 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation("androidx.compose.material:material-icons-extended:1.5.3")
     // Nordic semiconductor ble android libs
-    implementation("no.nordicsemi.android:ble-ktx:2.6.1")
+    implementation("no.nordicsemi.android:ble-ktx:2.7.0")
     implementation("no.nordicsemi.android:ble-common:2.7.0")
+    implementation("no.nordicsemi.android.kotlin.ble:scanner:1.0.7")
     implementation("no.nordicsemi.android.support.v18:scanner:1.6.0")
+
     implementation("dev.shreyaspatil.permission-flow:permission-flow-compose:1.2.0")
     implementation("com.airbnb.android:lottie:6.1.0")
     implementation("androidx.navigation:navigation-compose:2.7.4")

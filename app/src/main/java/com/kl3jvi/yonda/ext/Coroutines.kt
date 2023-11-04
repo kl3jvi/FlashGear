@@ -4,7 +4,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.kl3jvi.yonda.models.DiscoveredBluetoothDevice
+import com.kl3jvi.yonda.ble.model.DiscoveredBluetoothDevice
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -41,8 +42,8 @@ inline fun Fragment.launchAndRepeatWithViewLifecycle(
  */
 fun <T> Flow<T>.delayEachFor(timeMillis: Long): Flow<T> = onEach { delay(timeMillis) }
 
-fun Flow<DiscoveredBluetoothDevice>.accumulateUniqueDevices(): Flow<List<DiscoveredBluetoothDevice>> {
-    return this.scan(
+fun MutableList<DiscoveredBluetoothDevice>.accumulateUniqueDevices(): List<DiscoveredBluetoothDevice> {
+    return this.fold(
         mutableListOf(),
     ) { acc, value ->
         acc.find { it.address == value.address }?.apply {
