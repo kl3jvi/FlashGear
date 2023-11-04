@@ -19,7 +19,7 @@ fun HomeScreen(
 ) {
     LazyColumn(
         modifier = modifier,
-        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 16.dp)
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 16.dp),
     ) {
         when (state) {
             is ScanningState.Loading -> item { ScanEmptyView(false) }
@@ -31,10 +31,9 @@ fun HomeScreen(
                         ScannedBleDeviceCard(
                             modifier = modifier,
                             discoveredBluetoothDevice = it,
-                            onClick = onClick
+                            onClick = onClick,
                         )
                     }
-
                 }
             }
 

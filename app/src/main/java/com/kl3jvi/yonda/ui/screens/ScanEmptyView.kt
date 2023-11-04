@@ -22,13 +22,12 @@ import com.kl3jvi.yonda.ui.components.WarningView
 import no.nordicsemi.android.common.core.parseBold
 
 @Composable
-fun ScanEmptyView(
-    requireLocation: Boolean = false,
-) {
+fun ScanEmptyView(requireLocation: Boolean = false) {
     WarningView(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
         imageVector = Icons.Default.BluetoothSearching,
         title = "stringResource(id = R.string.no_device_guide_title)",
         hint = stringResource(id = R.string.app_name).parseBold(),
@@ -52,11 +51,9 @@ private fun openLocationSettings(context: Context) {
 @Preview
 @Composable
 private fun ScanEmptyViewPreview_RequiredLocation() {
-
     ScanEmptyView(
         requireLocation = true,
     )
-
 }
 
 @Preview(device = Devices.TABLET)

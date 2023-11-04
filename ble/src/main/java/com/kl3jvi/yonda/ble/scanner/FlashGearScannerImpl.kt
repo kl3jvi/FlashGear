@@ -10,50 +10,56 @@ import no.nordicsemi.android.support.v18.scanner.ScanResult
 import no.nordicsemi.android.support.v18.scanner.ScanSettings
 
 class FlashGearScannerImpl : FlashGearScanner {
+    override fun getScannerState(): Flow<ScanningState> =
+        callbackFlow {
+            // concurrency supporting list that will add new devices to the list
+            // and remove old ones if they are not discovered in 10 seconds
+            val scanResults = mutableListOf<DiscoveredBluetoothDevice>()
 
-    override fun getScannerState(): Flow<ScanningState> = callbackFlow {
-        // concurrency supporting list that will add new devices to the list
-        // and remove old ones if they are not discovered in 10 seconds
-        val scanResults = mutableListOf<DiscoveredBluetoothDevice>()
-
-        val scanCallback: ScanCallback = object : ScanCallback() {
-            override fun onScanResult(callbackType: Int, result: ScanResult) {
-                super.onScanResult(callbackType, result)
-                scanResults.accumulateUniqueDevices(DiscoveredBluetoothDevice(result))
-                trySend(ScanningState.DevicesDiscovered(scanResults))
-            }
-
-            override fun onBatchScanResults(results: MutableList<ScanResult>) {
-                super.onBatchScanResults(results)
-                if (results.isNotEmpty()) {
-                    results.map(::DiscoveredBluetoothDevice).forEach { device ->
-                        scanResults.accumulateUniqueDevices(device)
+            val scanCallback: ScanCallback =
+                object : ScanCallback() {
+                    override fun onScanResult(
+                        callbackType: Int,
+                        result: ScanResult,
+                    ) {
+                        super.onScanResult(callbackType, result)
+                        scanResults.accumulateUniqueDevices(DiscoveredBluetoothDevice(result))
+                        trySend(ScanningState.DevicesDiscovered(scanResults))
                     }
-                    trySend(ScanningState.DevicesDiscovered(scanResults))
+
+                    override fun onBatchScanResults(results: MutableList<ScanResult>) {
+                        super.onBatchScanResults(results)
+                        if (results.isNotEmpty()) {
+                            results.map(::DiscoveredBluetoothDevice)
+                                .forEach { device ->
+                                    scanResults.accumulateUniqueDevices(device)
+                                }
+                            trySend(ScanningState.DevicesDiscovered(scanResults))
+                        }
+                    }
+
+                    override fun onScanFailed(errorCode: Int) {
+                        super.onScanFailed(errorCode)
+                        trySend(ScanningState.Error(errorCode))
+                    }
                 }
-            }
+            trySend(ScanningState.Loading)
 
-            override fun onScanFailed(errorCode: Int) {
-                super.onScanFailed(errorCode)
-                trySend(ScanningState.Error(errorCode))
+            val settings =
+                ScanSettings.Builder()
+                    .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                    .setLegacy(false)
+                    .setReportDelay(500)
+                    .setUseHardwareBatchingIfSupported(false)
+                    .build()
+            val scanner = BluetoothLeScannerCompat.getScanner()
+
+            scanner.startScan(null, settings, scanCallback)
+
+            awaitClose {
+                scanner.stopScan(scanCallback)
             }
         }
-        trySend(ScanningState.Loading)
-
-        val settings = ScanSettings.Builder()
-            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-            .setLegacy(false)
-            .setReportDelay(500)
-            .setUseHardwareBatchingIfSupported(false)
-            .build()
-        val scanner = BluetoothLeScannerCompat.getScanner()
-
-        scanner.startScan(null, settings, scanCallback)
-
-        awaitClose {
-            scanner.stopScan(scanCallback)
-        }
-    }
 }
 
 fun MutableList<DiscoveredBluetoothDevice>.accumulateUniqueDevices(newDevice: DiscoveredBluetoothDevice) {

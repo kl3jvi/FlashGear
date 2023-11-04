@@ -2,8 +2,6 @@ package com.kl3jvi.yonda.ble.model
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
-
-
 import android.os.ParcelUuid
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
@@ -32,8 +30,8 @@ data class DiscoveredBluetoothDevice(
         device = scanResult.device,
         lastScanResult = scanResult,
         nameInternal =
-        scanResult.scanRecord?.deviceName
-            ?: scanResult.device.getNameSafe(),
+            scanResult.scanRecord?.deviceName
+                ?: scanResult.device.getNameSafe(),
         rssiInternal = scanResult.rssi,
         previousRssi = scanResult.rssi,
         highestRssiInternal = scanResult.rssi,

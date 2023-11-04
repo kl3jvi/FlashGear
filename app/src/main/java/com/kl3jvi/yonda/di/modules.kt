@@ -21,7 +21,7 @@ private val bleModule =
 
 private val viewModelModule =
     module {
-        viewModel { HomeViewModel(get(),get()) }
+        viewModel { HomeViewModel(get(), get()) }
     }
 
 val allModules = bleModule + viewModelModule + scannerModule

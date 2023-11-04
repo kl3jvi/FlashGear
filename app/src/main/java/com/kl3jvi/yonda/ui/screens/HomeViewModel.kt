@@ -11,7 +11,6 @@ import com.kl3jvi.yonda.ble.scanner.ScanningState
 import com.kl3jvi.yonda.ext.delayEachFor
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
@@ -24,12 +23,13 @@ class HomeViewModel(
     private val repository: FlashGearRepository,
     scanner: FlashGearScanner,
 ) : ViewModel() {
-    private val filterConfig = MutableStateFlow(
-        DevicesScanFilter(
-            filterNearbyOnly = false,
-            filterWithNames = true
+    private val filterConfig =
+        MutableStateFlow(
+            DevicesScanFilter(
+                filterNearbyOnly = false,
+                filterWithNames = true,
+            ),
         )
-    )
 
     init {
         repository.state.onEach {
@@ -37,21 +37,22 @@ class HomeViewModel(
         }.launchIn(viewModelScope)
     }
 
-    val state = filterConfig.combine(scanner.getScannerState()) { config, result ->
-        when (result) {
-            is ScanningState.DevicesDiscovered -> result.applyFilters(config)
-            else -> result
-        }
-    }.delayEachFor(1000)
+    val state =
+        filterConfig.combine(scanner.getScannerState()) { config, result ->
+            when (result) {
+                is ScanningState.DevicesDiscovered -> result.applyFilters(config)
+                else -> result
+            }
+        }.delayEachFor(1000)
 
     private fun ScanningState.DevicesDiscovered.applyFilters(config: DevicesScanFilter) =
-        ScanningState.DevicesDiscovered(devices
-            .filter { !config.filterNearbyOnly || it.highestRssi >= FILTER_RSSI }
-            .filter { !config.filterWithNames || it.name != null }
+        ScanningState.DevicesDiscovered(
+            devices
+                .filter { !config.filterNearbyOnly || it.highestRssi >= FILTER_RSSI }
+                .filter { !config.filterWithNames || it.name != null },
         )
 
     fun connect(it: DiscoveredBluetoothDevice) {
-
         val exceptionHandler = CoroutineExceptionHandler { _, _ -> }
         viewModelScope.launch(Dispatchers.IO + exceptionHandler) {
             // This method may throw an exception if the connection fails,
@@ -61,7 +62,7 @@ class HomeViewModel(
         }
     }
 
-    fun sendCommand(){
+    fun sendCommand()  {
         viewModelScope.launch(Dispatchers.IO) {
             repository.sendCommand(Ampere())
         }
@@ -70,5 +71,5 @@ class HomeViewModel(
 
 data class DevicesScanFilter(
     val filterNearbyOnly: Boolean,
-    val filterWithNames: Boolean
+    val filterWithNames: Boolean,
 )

@@ -8,12 +8,13 @@ import com.kl3jvi.yonda.ble.spec.FlashGear
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 
-val repoModule = module {
-    single<FlashGearScanner> { FlashGearScannerImpl() }
-}
+val repoModule =
+    module {
+        single<FlashGearScanner> { FlashGearScannerImpl() }
+    }
 
-val scannerModule = module {
-    single<FlashGear> { FlashGearManager(androidApplication().applicationContext) }
-    single { FlashGearRepository(get()) }
-} + repoModule
-
+val scannerModule =
+    module {
+        single<FlashGear> { FlashGearManager(androidApplication().applicationContext) }
+        single { FlashGearRepository(get()) }
+    } + repoModule

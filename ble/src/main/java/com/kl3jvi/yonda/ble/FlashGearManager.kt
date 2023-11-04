@@ -11,6 +11,9 @@ import com.kl3jvi.nb_api.command.battery.Battery
 import com.kl3jvi.nb_api.command.cruise.CheckCruise
 import com.kl3jvi.nb_api.command.util.hexToBytes
 import com.kl3jvi.yonda.ble.spec.FlashGear
+import com.kl3jvi.yonda.ble.spec.FlashGearScooterFailureCallback
+import com.kl3jvi.yonda.ble.spec.FlashGearScooterResponse
+import com.kl3jvi.yonda.ble.spec.FlashGearScooterSentResponse
 import com.kl3jvi.yonda.ble.spec.FlashGearSpec
 import com.kl3jvi.yonda.ble.spec.FlashGearSpec.Companion.SERVICE
 import com.kl3jvi.yonda.ble.spec.FlashGearSpec.Companion.WRITE_CHARACTERISTIC
@@ -20,14 +23,12 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import no.nordicsemi.android.ble.BleManager
 import no.nordicsemi.android.ble.ConnectionPriorityRequest
 import no.nordicsemi.android.ble.ktx.getCharacteristic
 import no.nordicsemi.android.ble.ktx.state.ConnectionState
 import no.nordicsemi.android.ble.ktx.stateAsFlow
 import no.nordicsemi.android.ble.ktx.suspend
-
 
 class FlashGearManager(
     context: Context,
@@ -36,12 +37,21 @@ class FlashGearManager(
 private class FlashGearManagerImpl(
     context: Context,
 ) : BleManager(context), FlashGear {
-
-
     private val scope = CoroutineScope(Dispatchers.IO)
 
     private var writeCharacteristic: BluetoothGattCharacteristic? = null
     private var readCharacteristic: BluetoothGattCharacteristic? = null
+
+    override val scooterResponseHandler: FlashGearScooterResponse by lazy {
+        object : FlashGearScooterResponse() {}
+    }
+    override val scooterFailureCallback: FlashGearScooterFailureCallback by lazy {
+        object : FlashGearScooterFailureCallback() {}
+    }
+    override val scooterSuccessCallback: FlashGearScooterSentResponse by lazy {
+        object : FlashGearScooterSentResponse() {}
+    }
+
 
     override fun onDeviceReady() {
         super.onDeviceReady()
@@ -50,43 +60,46 @@ private class FlashGearManagerImpl(
         ).enqueue()
     }
 
-    override val state = stateAsFlow()
-        .map {
-            when (it) {
-                is ConnectionState.Connecting,
-                is ConnectionState.Initializing -> FlashGear.State.LOADING
+    override val state =
+        stateAsFlow()
+            .map {
+                when (it) {
+                    is ConnectionState.Connecting,
+                    is ConnectionState.Initializing,
+                    -> FlashGear.State.LOADING
 
-                is ConnectionState.Ready -> FlashGear.State.READY
-                is ConnectionState.Disconnecting,
-                is ConnectionState.Disconnected -> FlashGear.State.NOT_AVAILABLE
+                    is ConnectionState.Ready -> FlashGear.State.READY
+                    is ConnectionState.Disconnecting,
+                    is ConnectionState.Disconnected,
+                    -> FlashGear.State.NOT_AVAILABLE
+                }
             }
-        }
-        .stateIn(scope, SharingStarted.Lazily, FlashGear.State.NOT_AVAILABLE)
+            .stateIn(scope, SharingStarted.Lazily, FlashGear.State.NOT_AVAILABLE)
 
     override suspend fun sendCommand(command: ScooterCommand) {
-        val commands = listOf(
-            Ampere(),
-            Battery(),
-            CheckCruise()
-        ).map { it.getRequestString().hexToBytes() }
-            .random()
+        val commands =
+            listOf(
+                Ampere(),
+                Battery(),
+                CheckCruise(),
+            ).map { it.getRequestString().hexToBytes() }
+                .random()
         writeCharacteristic(
             writeCharacteristic,
             commands,
-            BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-        ).done { device ->
-            Log.i("FLASH_GEAR_MANAGER", "Sent to ${device.address}: $commands")
-        }.fail { device, status ->
-            Log.i("FLASH_GEAR_MANAGER", "Failed to send to ${device.address}: $status")
-        }.suspend()
+            BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT,
+        )
+            .with(scooterSuccessCallback)
+            .fail(scooterFailureCallback)
+            .suspend()
     }
 
-
-    override suspend fun connectScooter(device: BluetoothDevice) = connect(device)
-        .retry(3, 600)
-        .useAutoConnect(false)
-        .timeout(3000)
-        .suspend()
+    override suspend fun connectScooter(device: BluetoothDevice) =
+        connect(device)
+            .retry(3, 600)
+            .useAutoConnect(false)
+            .timeout(3000)
+            .suspend()
 
     override fun release() {
         scope.cancel()
@@ -97,7 +110,10 @@ private class FlashGearManagerImpl(
         }
     }
 
-    override fun log(priority: Int, message: String) {
+    override fun log(
+        priority: Int,
+        message: String,
+    ) {
         Log.println(priority, "FLASH_GEAR_MANAGER", message)
     }
 
@@ -107,62 +123,38 @@ private class FlashGearManagerImpl(
 
     override fun isRequiredServiceSupported(gatt: BluetoothGatt): Boolean {
         gatt.getService(SERVICE)?.apply {
-            writeCharacteristic = getCharacteristic(
-                WRITE_CHARACTERISTIC,
-                BluetoothGattCharacteristic.PROPERTY_WRITE
-            )
-            readCharacteristic = getCharacteristic(
-                FlashGearSpec.READ_CHARACTERISTIC,
-                BluetoothGattCharacteristic.PROPERTY_NOTIFY
-            )
+            writeCharacteristic =
+                getCharacteristic(
+                    WRITE_CHARACTERISTIC,
+                    BluetoothGattCharacteristic.PROPERTY_WRITE,
+                )
+            readCharacteristic =
+                getCharacteristic(
+                    FlashGearSpec.READ_CHARACTERISTIC,
+                    BluetoothGattCharacteristic.PROPERTY_NOTIFY,
+                )
             return writeCharacteristic != null && readCharacteristic != null
         }
         return false
     }
 
-
     override fun initialize() {
-
         if (writeCharacteristic == null || readCharacteristic == null) {
             return
         }
 
-
         setNotificationCallback(readCharacteristic)
-            .with { device, data ->
-                println("Received from ${device.address}: ${data.value?.toString(Charsets.UTF_8)}")
-                Log.i(
-                    "FLASH_GEAR_MANAGER",
-                    "Received from ${device.address}: ${data.value?.toString(Charsets.UTF_8)}"
-                )
-            }
-//
-//        waitForNotification(readCharacteristic)
-//            .with { device, data ->
-//                Log.i(
-//                    "FLASH_GEAR_MANAGER",
-//                    "Received from ${device.address}: ${data.value?.toString(Charsets.UTF_8)}"
-//                )
-//            }
-//            .enqueue()
+            .with(scooterResponseHandler)
+
 
         enableNotifications(readCharacteristic)
-            .done { device ->
-                Log.i("FLASH_GEAR_MANAGER", "Enabled notifications for ${device.address}")
-            }
-            .fail { device, status ->
-                Log.i(
-                    "FLASH_GEAR_MANAGER",
-                    "Failed to enable notifications for ${device.address}: $status"
-                )
-            }.enqueue()
+            .with(scooterSuccessCallback)
+            .fail(scooterFailureCallback)
+            .enqueue()
     }
-
 
     override fun onServicesInvalidated() {
         writeCharacteristic = null
         readCharacteristic = null
     }
-
 }
-

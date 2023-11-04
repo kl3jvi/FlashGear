@@ -4,14 +4,13 @@ import android.bluetooth.BluetoothDevice
 import com.kl3jvi.nb_api.command.ScooterCommand
 import kotlinx.coroutines.flow.StateFlow
 
-
 interface FlashGear {
     val state: StateFlow<State>
 
     enum class State {
         LOADING,
         READY,
-        NOT_AVAILABLE
+        NOT_AVAILABLE,
     }
 
     /**
@@ -24,6 +23,10 @@ interface FlashGear {
      */
     fun release()
 
-
     suspend fun sendCommand(command: ScooterCommand)
+
+
+    val scooterResponseHandler: FlashGearScooterResponse
+    val scooterFailureCallback: FlashGearScooterFailureCallback
+    val scooterSuccessCallback: FlashGearScooterSentResponse
 }

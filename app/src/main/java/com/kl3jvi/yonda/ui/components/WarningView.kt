@@ -20,7 +20,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-
 @Composable
 fun WarningView(
     imageVector: ImageVector,
@@ -28,7 +27,7 @@ fun WarningView(
     hint: AnnotatedString,
     modifier: Modifier = Modifier,
     hintTextAlign: TextAlign? = TextAlign.Center,
-    content: @Composable ColumnScope.() -> Unit = {}
+    content: @Composable ColumnScope.() -> Unit = {},
 ) {
     Column(
         modifier = modifier,
@@ -44,7 +43,6 @@ fun WarningView(
         content()
     }
 }
-
 
 @Composable
 internal fun BigIcon(
@@ -89,6 +87,6 @@ fun Hint(
         color = color,
         style = style,
         modifier = modifier,
-        textAlign = textAlign
+        textAlign = textAlign,
     )
 }

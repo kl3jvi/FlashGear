@@ -10,7 +10,7 @@ sealed interface Result<out T> {
 
     data class Error(val exception: Throwable? = null) : Result<Nothing>
 
-    object Loading : Result<Nothing>
+    data object Loading : Result<Nothing>
 }
 
 /**
