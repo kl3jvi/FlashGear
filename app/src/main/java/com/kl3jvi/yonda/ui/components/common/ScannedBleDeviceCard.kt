@@ -1,4 +1,4 @@
-package com.kl3jvi.yonda.ui.components
+package com.kl3jvi.yonda.ui.components.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -113,12 +113,13 @@ fun ScannedBleDeviceCard(
 @Composable
 fun getDistanceColor(rssi: Int): Brush {
     return when {
-        rssi > -60 -> Brush.horizontalGradient(listOf(Color(0xFF50C750), Color(0xFF32B332))) // Strong signal
-        rssi > -75 -> Brush.horizontalGradient(listOf(Color(0xFFA2C948), Color(0xFF8AB032))) // Good signal
-        rssi > -85 -> Brush.horizontalGradient(listOf(Color(0xFFFFB73D), Color(0xFFFFA000))) // Fair signal
-        else -> Brush.horizontalGradient(listOf(Color(0xFFFF3D3D), Color(0xFFFF0000))) // Weak signal
+        rssi >= -70 -> Brush.horizontalGradient(listOf(Color(0xFF50C750), Color(0xFF32B332))) // Excellent signal
+        rssi in -85..-71 -> Brush.horizontalGradient(listOf(Color(0xFFA2C948), Color(0xFF8AB032))) // Good signal
+        rssi in -100..-86 -> Brush.horizontalGradient(listOf(Color(0xFFFFB73D), Color(0xFFFFA000))) // Fair signal
+        else -> Brush.horizontalGradient(listOf(Color(0xFFFF3D3D), Color(0xFFFF0000))) // Poor signal
     }
 }
+
 
 @Preview
 @Composable

@@ -5,6 +5,12 @@
       <entry key="BleStatusViewPreview">
         <State />
       </entry>
+      <entry key="HomeScreenPreview">
+        <State />
+      </entry>
+      <entry key="PreviewPermissionsScreen">
+        <State />
+      </entry>
       <entry key="app">
         <State />
       </entry>

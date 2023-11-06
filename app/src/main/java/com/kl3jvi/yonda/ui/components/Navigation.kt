@@ -1,6 +1,5 @@
 package com.kl3jvi.yonda.ui.components
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -13,7 +12,6 @@ import com.kl3jvi.yonda.ui.screens.Screen
 @Composable
 fun NavigationGraph(
     scanningState: ScanningState,
-    isOnHome: (Boolean) -> Unit,
     connectDevice: (DiscoveredBluetoothDevice) -> Unit,
 ) {
     val navController = rememberNavController()
@@ -22,16 +20,12 @@ fun NavigationGraph(
         startDestination = Screen.Permission.route,
     ) {
         composable(Screen.Home.route) {
-            isOnHome(true)
-            Column {
-                HomeScreen(
-                    state = scanningState,
-                    onClick = connectDevice,
-                )
-            }
+            HomeScreen(
+                state = scanningState,
+                onClick = connectDevice,
+            )
         }
         composable(Screen.Permission.route) {
-            isOnHome(false)
             PermissionsScreen(navController = navController)
         }
     }

@@ -3,8 +3,11 @@ package com.kl3jvi.yonda.ble.spec
 import android.bluetooth.BluetoothDevice
 import com.kl3jvi.nb_api.command.ScooterCommand
 import kotlinx.coroutines.flow.StateFlow
+import no.nordicsemi.android.ble.callback.DataSentCallback
+import no.nordicsemi.android.ble.callback.FailCallback
+import no.nordicsemi.android.ble.callback.profile.ProfileDataCallback
 
-interface FlashGear {
+interface FlashGear : ProfileDataCallback, FailCallback, DataSentCallback {
     val state: StateFlow<State>
 
     enum class State {
@@ -13,20 +16,9 @@ interface FlashGear {
         NOT_AVAILABLE,
     }
 
-    /**
-     * Connects to the device.
-     */
     suspend fun connectScooter(device: BluetoothDevice)
 
-    /**
-     * Disconnects from the device.
-     */
     fun release()
 
     suspend fun sendCommand(command: ScooterCommand)
-
-
-    val scooterResponseHandler: FlashGearScooterResponse
-    val scooterFailureCallback: FlashGearScooterFailureCallback
-    val scooterSuccessCallback: FlashGearScooterSentResponse
 }

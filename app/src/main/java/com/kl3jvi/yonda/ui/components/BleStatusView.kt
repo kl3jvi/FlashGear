@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kl3jvi.yonda.R
+import com.kl3jvi.yonda.ui.components.common.FlashGearButtonGradient
 import com.kl3jvi.yonda.ui.theme.Typography
 
 @Composable

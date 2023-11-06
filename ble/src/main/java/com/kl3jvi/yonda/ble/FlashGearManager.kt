@@ -11,24 +11,25 @@ import com.kl3jvi.nb_api.command.battery.Battery
 import com.kl3jvi.nb_api.command.cruise.CheckCruise
 import com.kl3jvi.nb_api.command.util.hexToBytes
 import com.kl3jvi.yonda.ble.spec.FlashGear
-import com.kl3jvi.yonda.ble.spec.FlashGearScooterFailureCallback
-import com.kl3jvi.yonda.ble.spec.FlashGearScooterResponse
-import com.kl3jvi.yonda.ble.spec.FlashGearScooterSentResponse
 import com.kl3jvi.yonda.ble.spec.FlashGearSpec
 import com.kl3jvi.yonda.ble.spec.FlashGearSpec.Companion.SERVICE
 import com.kl3jvi.yonda.ble.spec.FlashGearSpec.Companion.WRITE_CHARACTERISTIC
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import no.nordicsemi.android.ble.BleManager
 import no.nordicsemi.android.ble.ConnectionPriorityRequest
+import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.ktx.getCharacteristic
 import no.nordicsemi.android.ble.ktx.state.ConnectionState
 import no.nordicsemi.android.ble.ktx.stateAsFlow
 import no.nordicsemi.android.ble.ktx.suspend
+import no.nordicsemi.android.kotlin.ble.scanner.BleScanner
 
 class FlashGearManager(
     context: Context,
@@ -40,24 +41,22 @@ private class FlashGearManagerImpl(
     private val scope = CoroutineScope(Dispatchers.IO)
 
     private var writeCharacteristic: BluetoothGattCharacteristic? = null
-    private var readCharacteristic: BluetoothGattCharacteristic? = null
-
-    override val scooterResponseHandler: FlashGearScooterResponse by lazy {
-        object : FlashGearScooterResponse() {}
-    }
-    override val scooterFailureCallback: FlashGearScooterFailureCallback by lazy {
-        object : FlashGearScooterFailureCallback() {}
-    }
-    override val scooterSuccessCallback: FlashGearScooterSentResponse by lazy {
-        object : FlashGearScooterSentResponse() {}
-    }
-
+    private var notifyCharacteristic: BluetoothGattCharacteristic? = null
 
     override fun onDeviceReady() {
         super.onDeviceReady()
         requestConnectionPriority(
             ConnectionPriorityRequest.CONNECTION_PRIORITY_HIGH,
         ).enqueue()
+    }
+
+    init {
+        scope.launch {
+            while (true) {
+                delay(1000)
+                Log.i("FlashGearManager", isBonded.toString())
+            }
+        }
     }
 
     override val state =
@@ -86,20 +85,22 @@ private class FlashGearManagerImpl(
                 .random()
         writeCharacteristic(
             writeCharacteristic,
-            commands,
+            Data(commands),
             BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT,
         )
-            .with(scooterSuccessCallback)
-            .fail(scooterFailureCallback)
+            .with(this)
+            .fail(this)
             .suspend()
     }
 
-    override suspend fun connectScooter(device: BluetoothDevice) =
+
+    override suspend fun connectScooter(device: BluetoothDevice) {
         connect(device)
-            .retry(3, 600)
+            .retry(3, 300)
             .useAutoConnect(false)
             .timeout(3000)
             .suspend()
+    }
 
     override fun release() {
         scope.cancel()
@@ -122,39 +123,62 @@ private class FlashGearManagerImpl(
     }
 
     override fun isRequiredServiceSupported(gatt: BluetoothGatt): Boolean {
+        val service = gatt.services
+
+
+
         gatt.getService(SERVICE)?.apply {
-            writeCharacteristic =
-                getCharacteristic(
-                    WRITE_CHARACTERISTIC,
-                    BluetoothGattCharacteristic.PROPERTY_WRITE,
-                )
-            readCharacteristic =
-                getCharacteristic(
-                    FlashGearSpec.READ_CHARACTERISTIC,
-                    BluetoothGattCharacteristic.PROPERTY_NOTIFY,
-                )
-            return writeCharacteristic != null && readCharacteristic != null
+            writeCharacteristic = getCharacteristic(
+                WRITE_CHARACTERISTIC,
+                BluetoothGattCharacteristic.PROPERTY_WRITE,
+            )
+            notifyCharacteristic = getCharacteristic(
+                FlashGearSpec.NOTIFY_CHARACTERISTIC,
+                BluetoothGattCharacteristic.PROPERTY_NOTIFY,
+            )
+            return writeCharacteristic != null && notifyCharacteristic != null
         }
+
         return false
     }
 
     override fun initialize() {
-        if (writeCharacteristic == null || readCharacteristic == null) {
+        if (writeCharacteristic == null || notifyCharacteristic == null) {
             return
         }
 
-        setNotificationCallback(readCharacteristic)
-            .with(scooterResponseHandler)
+        requestMtu(34)
+            .with { device, mtu ->
+                Log.d("FLASH_GEAR_MANAGER", "MTU set to $mtu on ${device.address}")
+            }.enqueue()
+
+        setNotificationCallback(notifyCharacteristic)
+            .with(this)
 
 
-        enableNotifications(readCharacteristic)
-            .with(scooterSuccessCallback)
-            .fail(scooterFailureCallback)
+        enableNotifications(notifyCharacteristic)
+            .with(this)
+            .fail(this)
             .enqueue()
+
     }
 
     override fun onServicesInvalidated() {
         writeCharacteristic = null
-        readCharacteristic = null
+        notifyCharacteristic = null
+    }
+
+    override fun onDataReceived(device: BluetoothDevice, data: Data) {
+        Log.d("FLASH_GEAR_MANAGER", "onDataReceived: ${data.value}")
+    }
+
+    override fun onRequestFailed(device: BluetoothDevice, status: Int) {
+        Log.d("FLASH_GEAR_MANAGER", "onFail: $status")
+    }
+
+    override fun onDataSent(device: BluetoothDevice, data: Data) {
+        Log.d("FLASH_GEAR_MANAGER", "onDataSent: ${data.value}")
     }
 }
+
+

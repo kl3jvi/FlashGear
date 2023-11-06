@@ -13,7 +13,9 @@ dependencyResolutionManagement {
         maven { url 'https://jitpack.io' }
     }
     versionCatalogs {
-
+        create("libs") {
+            from("no.nordicsemi.android.gradle:version-catalog:1.9.11")
+        }
     }
 }
 rootProject.name = "Yonda"

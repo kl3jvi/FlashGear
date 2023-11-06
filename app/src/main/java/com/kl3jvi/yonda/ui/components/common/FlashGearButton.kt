@@ -1,4 +1,4 @@
-package com.kl3jvi.yonda.ui.components
+package com.kl3jvi.yonda.ui.components.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column

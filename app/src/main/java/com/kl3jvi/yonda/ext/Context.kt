@@ -19,3 +19,4 @@ fun Context.showToastIf(
         showToast(message.last())
     }
 }
+

@@ -2,10 +2,14 @@ package com.kl3jvi.yonda.ext
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewModelScope
 import com.kl3jvi.yonda.ble.model.DiscoveredBluetoothDevice
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -68,4 +72,12 @@ inline fun <T> Iterable<T>.forEachIterable(block: (T) -> Unit) {
             block(next())
         }
     }
+}
+
+
+fun ViewModel.launchOnIo(
+    errorHandler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, throwable -> throw throwable },
+    block: suspend CoroutineScope.() -> Unit
+): Job {
+    return viewModelScope.launch(Dispatchers.IO + errorHandler, block = block)
 }

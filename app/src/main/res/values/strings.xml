@@ -16,11 +16,13 @@
     <string name="firstpair_tos_title">Turn On Bluetooth</string>
     <string name="firstpair_tos_description"><![CDATA[Settings > Bluetooth > Switch On]]></string>
     <string name="firstpair_tos_button">Connect</string>
-<!--    <string name="no_device_guide_title">Can't see your device</string>-->
-<!--    <string name="no_device_guide_info">1. Make sure the device is <b>turned on</b> and is connected to-->
-<!--		a power source.\n\n2. Make sure the appropriate firmware and SoftDevice are flashed.</string>-->
-<!--    <string name="no_device_guide_location_info">3. Location is turned off. Most Android phones-->
-<!--        require it in order to scan for Bluetooth LE devices. If you are sure your-->
-<!--        device is advertising and it doesn\'t show up here, click the button below to-->
-<!--        enable Location.</string>-->
+    <string name="no_device_guide_title">Can\'t see your device</string>
+    <string name="no_device_guide_info">1. Make sure the device is <b>turned on</b> and/or is connected to
+		a power source.\n\n2. Make sure the scooter is near the phone.</string>
+    <string name="no_device_guide_location_info">3. Location is turned off. Most Android phones
+        require it in order to scan for Bluetooth LE devices. If you are sure your
+        device is advertising and it doesn\'t show up here, click the button below to
+        enable Location.</string>
+    <string name="scanner_error">Scanning failed</string>
+    <string name="scan_failed">Scanning failed with error %d.</string>
 </resources>
