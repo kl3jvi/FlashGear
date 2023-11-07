@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.os.ParcelUuid
 import android.os.Parcelable
+import com.kl3jvi.yonda.ble.spec.FlashGear
 import kotlinx.parcelize.Parcelize
 import no.nordicsemi.android.support.v18.scanner.ScanResult
 import java.util.UUID
@@ -17,6 +18,7 @@ data class DiscoveredBluetoothDevice(
     private var previousRssi: Int,
     private var highestRssiInternal: Int = Byte.MIN_VALUE.toInt(),
     private var servicesResult: List<ParcelUuid>? = null,
+    var connectionState: FlashGear.State = FlashGear.State.NOT_AVAILABLE,
 ) : Parcelable {
     // Wrapper for data variables
     val address: String get() = device.address
@@ -30,8 +32,8 @@ data class DiscoveredBluetoothDevice(
         device = scanResult.device,
         lastScanResult = scanResult,
         nameInternal =
-            scanResult.scanRecord?.deviceName
-                ?: scanResult.device.getNameSafe(),
+        scanResult.scanRecord?.deviceName
+            ?: scanResult.device.getNameSafe(),
         rssiInternal = scanResult.rssi,
         previousRssi = scanResult.rssi,
         highestRssiInternal = scanResult.rssi,
@@ -52,6 +54,7 @@ data class DiscoveredBluetoothDevice(
     override fun equals(other: Any?): Boolean {
         if (other is DiscoveredBluetoothDevice) {
             return device.address == other.address
+
         }
         return false
     }

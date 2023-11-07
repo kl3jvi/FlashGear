@@ -1,4 +1,4 @@
-package com.kl3jvi.yonda.ui.screens
+package com.kl3jvi.yonda.ui.components
 
 import android.content.Context
 import android.content.Intent

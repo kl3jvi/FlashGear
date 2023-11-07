@@ -1,4 +1,4 @@
-package com.kl3jvi.yonda.ui.screens
+package com.kl3jvi.yonda.ui.screens.home
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -7,10 +7,12 @@ import com.kl3jvi.yonda.ble.model.DiscoveredBluetoothDevice
 import com.kl3jvi.yonda.ble.repository.FlashGearRepository
 import com.kl3jvi.yonda.ble.scanner.FlashGearScanner
 import com.kl3jvi.yonda.ble.scanner.ScanningState
+import com.kl3jvi.yonda.ble.spec.FlashGear
 import com.kl3jvi.yonda.ext.launchOnIo
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.update
 
 private const val FILTER_RSSI = -50 // [dBm]
 
@@ -25,31 +27,52 @@ class HomeViewModel(
                 filterWithNames = false,
             ),
         )
+
+
     private val exceptionHandler =
         CoroutineExceptionHandler { context, throwable ->
             Log.e("HomeViewModel", "Error occurred $context: ", throwable)
         }
 
     val state =
-        combine(filterConfig, scanner.getScannerState()) { config, result ->
+        combine(
+            filterConfig,
+            scanner.getScannerState(),
+            repository.state
+        ) { config, result, state ->
             when (result) {
-                is ScanningState.DevicesDiscovered -> result.applyFiltersAndSort(config)
+                is ScanningState.DevicesDiscovered -> result.applyFiltersAndSort(config, state)
+
                 else -> result
             }
         }
 
-    private fun ScanningState.DevicesDiscovered.applyFiltersAndSort(config: DevicesScanFilter) =
-        ScanningState.DevicesDiscovered(
-            devices.asSequence()
+    private fun ScanningState.DevicesDiscovered.applyFiltersAndSort(
+        config: DevicesScanFilter,
+        state: Pair<FlashGear.State, String?>
+    ): ScanningState.DevicesDiscovered = apply {
+        val (currentState, currentMacAddress) = state
+        return ScanningState.DevicesDiscovered(
+            devices = devices
+                .asSequence()
+                .sortedWith(
+                    compareBy<DiscoveredBluetoothDevice> { it.connectionState }
+                        .thenBy { it.name != null }
+                        .thenBy { -it.highestRssi }
+                        .thenBy { it.address }
+                )
                 .filter { !config.filterNearbyOnly || it.highestRssi >= FILTER_RSSI }
                 .filter { !config.filterWithNames || it.name != null }
-                .let { sequence ->
-                    val comparator: Comparator<DiscoveredBluetoothDevice> =
-                        compareBy<DiscoveredBluetoothDevice> { -it.highestRssi }
-                            .thenBy { it.address }
-                    sequence.sortedWith(comparator)
-                }.toList(),
+                .map { device ->
+                    if (device.address == currentMacAddress) {
+                        device.copy(connectionState = currentState)
+                    } else {
+                        device
+                    }
+                }
+                .toList()
         )
+    }
 
     fun connect(device: DiscoveredBluetoothDevice) {
         launchOnIo(exceptionHandler) {
@@ -64,7 +87,7 @@ class HomeViewModel(
     }
 
     fun setFilter(config: DevicesScanFilter) {
-        filterConfig.value = config
+        filterConfig.update { config }
     }
 
     override fun onCleared() {

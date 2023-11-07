@@ -16,6 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import no.nordicsemi.android.ble.BleManager
@@ -40,8 +41,7 @@ private class FlashGearManagerImpl(
     private var writeCharacteristic: BluetoothGattCharacteristic? = null
     private var notifyCharacteristic: BluetoothGattCharacteristic? = null
 
-    override val bondState =
-        bondingStateAsFlow().map {
+    override val bondState = bondingStateAsFlow().map {
             when (it) {
                 BondState.Bonded -> FlashGear.BondState.BONDED
                 BondState.Bonding -> FlashGear.BondState.BONDING
@@ -49,20 +49,24 @@ private class FlashGearManagerImpl(
             }
         }.stateIn(scope, SharingStarted.Lazily, FlashGear.BondState.NOT_BONDED)
 
-    override val state =
+    override val state: StateFlow<Pair<FlashGear.State, String?>> =
         stateAsFlow().map {
             when (it) {
                 is ConnectionState.Connecting,
                 is ConnectionState.Initializing,
-                -> FlashGear.State.LOADING
+                -> FlashGear.State.LOADING to bluetoothDevice?.address
 
-                is ConnectionState.Ready -> FlashGear.State.READY
+                is ConnectionState.Ready -> FlashGear.State.READY to bluetoothDevice?.address
 
                 is ConnectionState.Disconnecting,
                 is ConnectionState.Disconnected,
-                -> FlashGear.State.NOT_AVAILABLE
+                -> FlashGear.State.NOT_AVAILABLE to bluetoothDevice?.address
             }
-        }.stateIn(scope, SharingStarted.Lazily, FlashGear.State.NOT_AVAILABLE)
+        }.stateIn(
+            scope,
+            SharingStarted.Lazily,
+            FlashGear.State.NOT_AVAILABLE to bluetoothDevice?.address
+        )
 
     override fun onDeviceReady() {
         super.onDeviceReady()

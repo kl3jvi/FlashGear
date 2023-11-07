@@ -13,16 +13,15 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.kl3jvi.yonda.ble.scanner.ScanningState
 import com.kl3jvi.yonda.ui.components.FilterView
-import com.kl3jvi.yonda.ui.components.NavigationGraph
+import com.kl3jvi.yonda.ui.components.navigation.NavigationGraph
 import com.kl3jvi.yonda.ui.components.common.FlashGearTopBar
-import com.kl3jvi.yonda.ui.screens.HomeViewModel
+import com.kl3jvi.yonda.ui.screens.home.HomeViewModel
 import com.kl3jvi.yonda.ui.theme.FlashGearTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

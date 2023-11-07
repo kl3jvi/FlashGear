@@ -1,4 +1,4 @@
-package com.kl3jvi.yonda.ui.screens
+package com.kl3jvi.yonda.ui.screens.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,9 +9,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.wear.compose.material.Text
 import com.kl3jvi.yonda.ble.model.DiscoveredBluetoothDevice
 import com.kl3jvi.yonda.ble.scanner.ScanningState
+import com.kl3jvi.yonda.ui.components.ScanEmptyView
 import com.kl3jvi.yonda.ui.components.ScanErrorView
 import com.kl3jvi.yonda.ui.components.common.ScannedBleDeviceCard
 
@@ -19,6 +21,7 @@ import com.kl3jvi.yonda.ui.components.common.ScannedBleDeviceCard
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    navController: NavController,
     state: ScanningState,
     onClick: (DiscoveredBluetoothDevice) -> Unit = {},
 ) {

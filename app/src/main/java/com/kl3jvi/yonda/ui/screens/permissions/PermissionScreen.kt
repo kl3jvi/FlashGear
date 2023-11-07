@@ -1,4 +1,4 @@
-package com.kl3jvi.yonda.ui.components
+package com.kl3jvi.yonda.ui.screens.permissions
 
 import android.Manifest
 import android.os.Build
@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.kl3jvi.yonda.ui.components.common.FlashGearButtonGradient
-import com.kl3jvi.yonda.ui.screens.Screen
+import com.kl3jvi.yonda.ui.components.navigation.Screen
 import dev.shreyaspatil.permissionflow.compose.rememberMultiplePermissionState
 import dev.shreyaspatil.permissionflow.compose.rememberPermissionFlowRequestLauncher
 

@@ -9,7 +9,7 @@ import no.nordicsemi.android.ble.callback.FailCallback
 import no.nordicsemi.android.ble.callback.profile.ProfileDataCallback
 
 interface FlashGear : ProfileDataCallback, FailCallback, DataSentCallback {
-    val state: StateFlow<State>
+    val state: StateFlow<Pair<State, String?>>
 
     enum class State {
         LOADING,

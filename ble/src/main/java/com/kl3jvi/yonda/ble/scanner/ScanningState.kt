@@ -1,6 +1,7 @@
 package com.kl3jvi.yonda.ble.scanner
 
 import com.kl3jvi.yonda.ble.model.DiscoveredBluetoothDevice
+import com.kl3jvi.yonda.ble.spec.FlashGear
 
 sealed class ScanningState {
     data object Loading : ScanningState()
@@ -14,4 +15,5 @@ sealed class ScanningState {
     fun isRunning(): Boolean {
         return this is Loading || this is DevicesDiscovered
     }
+
 }

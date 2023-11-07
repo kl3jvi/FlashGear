@@ -20,7 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.kl3jvi.yonda.ui.screens.DevicesScanFilter
+import com.kl3jvi.yonda.ui.screens.home.DevicesScanFilter
 import com.kl3jvi.yonda.ui.theme.FlashGearTheme
 import no.nordicsemi.android.common.core.parseBold
 
