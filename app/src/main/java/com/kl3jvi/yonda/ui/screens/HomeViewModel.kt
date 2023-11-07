@@ -22,19 +22,21 @@ class HomeViewModel(
         MutableStateFlow(
             DevicesScanFilter(
                 filterNearbyOnly = false,
-                filterWithNames = false
-            )
+                filterWithNames = false,
+            ),
         )
-    private val exceptionHandler = CoroutineExceptionHandler { context, throwable ->
-        Log.e("HomeViewModel", "Error occurred $context: ", throwable)
-    }
-
-    val state = combine(filterConfig, scanner.getScannerState()) { config, result ->
-        when (result) {
-            is ScanningState.DevicesDiscovered -> result.applyFiltersAndSort(config)
-            else -> result
+    private val exceptionHandler =
+        CoroutineExceptionHandler { context, throwable ->
+            Log.e("HomeViewModel", "Error occurred $context: ", throwable)
         }
-    }
+
+    val state =
+        combine(filterConfig, scanner.getScannerState()) { config, result ->
+            when (result) {
+                is ScanningState.DevicesDiscovered -> result.applyFiltersAndSort(config)
+                else -> result
+            }
+        }
 
     private fun ScanningState.DevicesDiscovered.applyFiltersAndSort(config: DevicesScanFilter) =
         ScanningState.DevicesDiscovered(
@@ -46,9 +48,8 @@ class HomeViewModel(
                         compareBy<DiscoveredBluetoothDevice> { -it.highestRssi }
                             .thenBy { it.address }
                     sequence.sortedWith(comparator)
-                }.toList()
+                }.toList(),
         )
-
 
     fun connect(device: DiscoveredBluetoothDevice) {
         launchOnIo(exceptionHandler) {
@@ -76,4 +77,3 @@ data class DevicesScanFilter(
     val filterNearbyOnly: Boolean,
     val filterWithNames: Boolean,
 )
-

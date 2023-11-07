@@ -1,21 +1,15 @@
 package com.kl3jvi.yonda.ble.scanner
 
-import android.content.Context
 import com.kl3jvi.yonda.ble.model.DiscoveredBluetoothDevice
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import no.nordicsemi.android.kotlin.ble.scanner.BleScanner
 import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat
 import no.nordicsemi.android.support.v18.scanner.ScanCallback
 import no.nordicsemi.android.support.v18.scanner.ScanResult
 import no.nordicsemi.android.support.v18.scanner.ScanSettings
 
 class FlashGearScannerImpl : FlashGearScanner {
-
-
     override fun getScannerState(): Flow<ScanningState> =
         callbackFlow {
             // concurrency supporting list that will add new devices to the list

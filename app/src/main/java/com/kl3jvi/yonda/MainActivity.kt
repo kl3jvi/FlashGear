@@ -50,10 +50,11 @@ class MainActivity : ComponentActivity() {
                             FilterView(
                                 config = config,
                                 onChanged = { viewModel.setFilter(it) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.primary)
-                                    .padding(horizontal = 16.dp),
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .background(MaterialTheme.colorScheme.primary)
+                                        .padding(horizontal = 16.dp),
                             )
                         }
                         NavigationGraph(

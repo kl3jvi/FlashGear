@@ -35,10 +35,10 @@ fun FlashGearTopBar(
         TopAppBar(
             title = { Text(text = title) },
             colors =
-            TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                titleContentColor = MaterialTheme.colorScheme.onPrimary,
-            ),
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                ),
             actions = {
                 if (isHomeScreen) {
                     IconButton(onClick = {

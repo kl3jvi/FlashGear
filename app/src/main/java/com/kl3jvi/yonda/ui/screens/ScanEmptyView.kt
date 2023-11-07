@@ -26,20 +26,22 @@ import no.nordicsemi.android.common.core.parseBold
 @Composable
 fun ScanEmptyView(
     modifier: Modifier = Modifier,
-    requireLocation: Boolean = false
+    requireLocation: Boolean = false,
 ) {
     WarningView(
         modifier =
-        modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
         imageVector = Icons.Default.BluetoothSearching,
         title = stringResource(id = R.string.no_device_guide_title),
-        hint = stringResource(id = R.string.no_device_guide_info) + if (requireLocation) {
-            "\n\n" + stringResource(id = R.string.no_device_guide_location_info)
-        } else {
-            ""
-        }.parseBold(),
+        hint =
+            stringResource(id = R.string.no_device_guide_info) +
+                if (requireLocation) {
+                    "\n\n" + stringResource(id = R.string.no_device_guide_location_info)
+                } else {
+                    ""
+                }.parseBold(),
         hintTextAlign = TextAlign.Justify,
     ) {
         if (requireLocation) {
@@ -67,4 +69,3 @@ private fun ScanEmptyViewPreview_RequiredLocation() {
         )
     }
 }
-

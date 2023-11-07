@@ -37,7 +37,7 @@ fun HomeScreen(
                             color = MaterialTheme.colorScheme.primary,
                             text = "${state.devices.size} Devices Found",
                             style = MaterialTheme.typography.bodyMedium,
-                            modifier = modifier.padding(start = 16.dp, bottom = 4.dp)
+                            modifier = modifier.padding(start = 16.dp, bottom = 4.dp),
                         )
                     }
                     items(state.devices, key = { it.address }) {

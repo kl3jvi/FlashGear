@@ -74,10 +74,9 @@ inline fun <T> Iterable<T>.forEachIterable(block: (T) -> Unit) {
     }
 }
 
-
 fun ViewModel.launchOnIo(
     errorHandler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, throwable -> throw throwable },
-    block: suspend CoroutineScope.() -> Unit
+    block: suspend CoroutineScope.() -> Unit,
 ): Job {
     return viewModelScope.launch(Dispatchers.IO + errorHandler, block = block)
 }

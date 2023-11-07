@@ -120,7 +120,6 @@ fun getDistanceColor(rssi: Int): Brush {
     }
 }
 
-
 @Preview
 @Composable
 fun ImageCardGridPreview() {

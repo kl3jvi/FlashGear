@@ -1,7 +1,9 @@
 package com.kl3jvi.nb_api.command.locking
 
+import com.kl3jvi.nb_api.command.Commands
 import com.kl3jvi.nb_api.command.RequestType
 import com.kl3jvi.nb_api.command.ScooterCommand
+import com.kl3jvi.nb_api.command.ScooterMessage
 
 class LockOff : ScooterCommand() {
     override val tag: String = "Lock"
@@ -12,10 +14,10 @@ class LockOff : ScooterCommand() {
     override val defaultUnit: String = ""
 
     override fun getRequestString(): String =
-        "55aa032001100ebdff" /*ScooterMessage()
-        .setDirection(Commands.MASTER_TO_M365)
-        .setReadOrWrite(Commands.WRITE)
-        .setPosition(0x7C)
-        .setPayload(0x0000)
-        .build()*/
+        ScooterMessage()
+            .setDirection(Commands.MASTER_TO_M365)
+            .setReadOrWrite(Commands.WRITE)
+            .setPosition(0x7C)
+            .setPayload(0x0000)
+            .build()
 }

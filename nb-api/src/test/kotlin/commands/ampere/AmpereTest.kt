@@ -38,8 +38,7 @@ class AmpereTest {
 
     @Test
     fun `test valid ampere response handler`() {
-        val scooterResponse =
-            Ampere().run {
+        val scooterResponse = Ampere().run {
                 handleResponse(rawResponse)
             }
         assertEquals("0.2A", scooterResponse.formattedValue)

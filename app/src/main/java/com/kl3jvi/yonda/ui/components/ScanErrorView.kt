@@ -17,15 +17,14 @@ import com.kl3jvi.yonda.ui.theme.FlashGearTheme
 fun ScanErrorView(error: Int) {
     WarningView(
         modifier =
-        Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
         imageVector = Icons.Default.BluetoothSearching,
         title = stringResource(id = R.string.scanner_error),
         hint = stringResource(id = R.string.scan_failed, error),
     )
 }
-
 
 @Preview
 @Composable

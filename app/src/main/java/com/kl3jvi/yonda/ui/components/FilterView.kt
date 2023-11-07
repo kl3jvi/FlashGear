@@ -36,17 +36,17 @@ fun FilterView(
             text = "Filter by:".parseBold(),
             color = MaterialTheme.colorScheme.onPrimary,
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primary)
-                .padding(start = 16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.primary)
+                    .padding(start = 16.dp),
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start,
             modifier = modifier,
         ) {
-
             config.filterNearbyOnly.let {
                 ElevatedFilterChip(
                     selected = it,
@@ -86,15 +86,17 @@ fun FilterView(
 fun FilterViewPreview() {
     FlashGearTheme {
         FilterView(
-            config = DevicesScanFilter(
-                filterNearbyOnly = false,
-                filterWithNames = true,
-            ),
+            config =
+                DevicesScanFilter(
+                    filterNearbyOnly = false,
+                    filterWithNames = true,
+                ),
             onChanged = {},
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primary)
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.primary)
+                    .padding(horizontal = 16.dp),
         )
     }
 }
